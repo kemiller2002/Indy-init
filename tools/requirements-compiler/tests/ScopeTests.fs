@@ -608,7 +608,12 @@ let splitScope (source: string) : string list =
           "SPLIT_BREAKS_REQUIREMENT_DEPENDENCY", onPart "WI-INV-WORKSPACE" "WI-INV-WORKSPACE-DETAILS" (setField "dependsOn" (reqs [ "WI-INV-WORKSPACE-FRAME" ]))
           "SPLIT_UNKNOWN_DEPENDENCY", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "dependsOn" (reqs [ "WI-NOPE" ]))
           "SPLIT_ID_TAKEN", onPart "WI-GEN-UI" "WI-GEN-UI-VERIFY" (setField "id" (JStr "T31"))
-          "SPLIT_EMPTY_PART", onParts "WI-GEN-PF" (fun ps -> ps @ [ JObj [ "id", JStr "WI-GEN-PF-EMPTY"; "dependsOn", JArr []; "requirements", JArr [] ] ]) ]
+          "SPLIT_EMPTY_PART", onParts "WI-GEN-PF" (fun ps -> ps @ [ JObj [ "id", JStr "WI-GEN-PF-EMPTY"; "dependsOn", JArr []; "requirements", JArr [] ] ])
+          // review RVO-1-1: judged against the work items that exist after the split
+          "SPLIT_DROPS_PARENT_DEPENDENCY", onPart "WI-GEN-PF" "WI-GEN-PF-BOUNDARY" (setField "dependsOn" (JArr []))
+          "SPLIT_DEPENDS_ON_REPLACED", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "dependsOn" (reqs [ "WI-GEN-UI" ]))
+          "SPLIT_OWNER_CHANGED", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (fun p -> match p with JObj ps -> JObj(ps @ [ "owner", JStr "nobody" ]) | x -> x)
+          "SPLIT_DUPLICATE_PART_ID", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "id" (JStr "WI-GEN-UI-VERIFY")) ]
     [ match compileWithSplit sources plan planPath "test" with
       | Error ps -> yield sprintf "split: the proposed plan is refused: %A" (List.truncate 3 ps)
       | Ok successor ->
@@ -624,7 +629,22 @@ let splitScope (source: string) : string list =
       if str "scopeSha256" (compile sources) <> str "scopeSha256" (parseFile (Path.Combine(source, "docs", "rehearsal-010-readiness", "scope-manifest.json"))) then
           yield "split: the approved scope no longer compiles to the committed manifest's scopeSha256"
       for code, mutant in mutants do
-          match refusedWith code mutant with Some p -> yield p | None -> () ]
+          match refusedWith code mutant with Some p -> yield p | None -> ()
+      // review RVO-1-2: preflight compares the work items, so a successor edited after compiling is refused
+      match compileWithSplit sources plan planPath "test" with
+      | Ok successor ->
+          let editItem (f: Json -> Json) (m: Json) =
+              match m with
+              | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = "workItems" then k, (match v with JArr xs -> JArr(xs |> List.map (fun w -> if str "id" w = "WI-GEN-PF-SECURITY" then f w else w)) | x -> x) else k, v)) |> withScopeHash
+              | x -> x
+          let strip (m: Json) = match m with JObj ps -> JObj(ps |> List.filter (fun (k, _) -> k <> "scopeSha256")) | x -> x
+          for name, forged in [ "requirements emptied", editItem (setField "requirements" (JArr [])) (strip successor)
+                                "dependency dropped", editItem (setField "dependsOn" (JArr [])) (strip successor)
+                                "owner changed", editItem (setField "owner" (JStr "nobody")) (strip successor) ] do
+              if not (preflight successor forged |> List.exists (fun r -> r.Code = "WORK_ITEM_ALTERED")) then
+                  yield sprintf "split control: a successor with a work item's %s passes preflight" name
+          if not (preflight successor successor).IsEmpty then yield sprintf "split: the successor fails its own preflight: %A" (preflight successor successor |> List.truncate 3)
+      | Error _ -> () ]
 
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]

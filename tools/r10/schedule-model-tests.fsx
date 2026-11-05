@@ -27,7 +27,7 @@ let case (name: string) (problems: string list) =
         printfn "%-72s FAIL" name
         problems |> List.truncate 5 |> List.iter (printfn "    %s")
 
-let cfg setup lanes = { Setup = setup; Merge = 3.0; Window = 420.0; QueueDepth = 1; FailEvery = 0; RepairFraction = 0.25; Scale = 1.0; DefaultMinutes = 20.0; Lanes = parseLanes lanes }
+let cfg setup lanes = { Setup = setup; Merge = 3.0; Window = 420.0; QueueDepth = 1; FailEvery = 0; RepairFraction = 0.25; Scale = 1.0; SliceOverhead = 0.0; DefaultMinutes = 20.0; Lanes = parseLanes lanes }
 let manifest = at "docs/rehearsal-010-readiness/slice-execution-manifest.json"
 let roles = at "docs/rehearsal-010-optimization/inputs/slice-roles.v414.json"
 let ownLanes = "integration:integration,domain:domain,persistence:persistence,ui:ui,ui-2:ui-2,reviewer:reviewer"
@@ -46,7 +46,16 @@ let invariants (c: Config) (slices: Slice list) (recs: Map<string, Record>) : st
         if r.Runs < 1 then yield sprintf "%s integrated with no verification run" s.Id
       if c.Merge > 0.0 then
           for a, b in List.pairwise integrated do
-              if b - a < c.Merge then yield sprintf "two merges overlap: integrations at %.0f and %.0f with %.0f-minute merges" a b c.Merge ]
+              if b - a < c.Merge then yield sprintf "two merges overlap: integrations at %.0f and %.0f with %.0f-minute merges" a b c.Merge
+      // review RVO-1-5: merges follow queue order (no candidate overtakes one ahead of it). With one CI duration and no
+      // failures, queue order is the order of first verification, so integration order must equal it.
+      if c.FailEvery = 0 then
+          let byFirst = slices |> List.sortBy (fun s -> recs[s.Id].FirstVerification, recs[s.Id].Integrated) |> List.map (fun s -> recs[s.Id].Integrated)
+          for a, b in List.pairwise byFirst do
+              if b < a then yield sprintf "a candidate verified later merged earlier (integrations at %.0f then %.0f): merge order is not queue order" a b
+      // and a repair costs its lane time
+      for s in slices do
+          if recs[s.Id].Repairs > 0 && recs[s.Id].RepairMinutes <= 0.0 && c.RepairFraction > 0.0 then yield sprintf "%s was repaired in no time" s.Id ]
 
 // ---- 1. equivalence with schedule.fsx's committed evidence ----------------------------------------------------------
 

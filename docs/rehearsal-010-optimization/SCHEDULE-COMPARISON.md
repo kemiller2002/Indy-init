@@ -18,7 +18,7 @@ Every command is `dotnet fsi tools/r10/schedule-model.fsx -- --merge 3 --ci 0,2,
 | V2 | V1 + split work items | `--slices $SUC …as V1` | ODR-R10-19 |
 | V3 | V2 + speculative verification, depth 3 | `… --queue-depth 3` | ODR-R10-22 + gate code |
 | V4 | V3 + 25-min set-up | `… --setup 25` | ODR-R10-23 |
-| V5 | V4 + v4.1.5 UI ownership rebalance | `--roles $O/inputs/slice-roles.v415-proposed.json` | ODR-R10-20 (successor package) |
+| V5 | V4 + v4.1.5 UI ownership rebalance (**hypothetical**: those files and owners do not exist; change requests to ui's `Update.fs`/`Projections.fs` and to integration's project files are not modelled) | `--roles $O/inputs/slice-roles.v415-proposed.json` | ODR-R10-20 (successor package) |
 | V6 | V5 + ui-3 role, domain and persistence on one agent | `--roles …v415-ui3-proposed.json --lanes integration:integration,core:domain\|persistence,ui:ui,ui-2:ui-2,ui-3:ui-3,reviewer:reviewer` | ODR-R10-20 + topology |
 | V7 | V5 + generated UI items start after T13 and T16 instead of T17 (sensitivity only) | `--slices $O/results/sensitivity-ui-after-t16.slices.json` | not proposed |
 
@@ -93,6 +93,19 @@ The honest original is V1. The optimized plan that needs **only a successor scop
 | Verification time (CI-minutes) | 370 | 530 | +160 (more, smaller slices) | 530 | +160 |
 | Estimated rework (`--fail-every 4 --repair-fraction 0.25`): obligations by T+420 | 302 | 482 | +180 | 509 | +207 |
 
+## What the split itself contributes (review RVO-1-7), and per-slice overhead (RVO-1-6)
+
+`results/table-review.tsv`: V1b = V1 + queue depth 3 + 25-min set-up, with no split. `--slice-overhead 5` adds 5 minutes to every slice for branch, pull request and context switching. That figure is a placeholder, not a measurement.
+
+| 10-min CI | Finish | Mandatory obligations by T+420 |
+|---|---|---|
+| V1b: queue + set-up, no split | T+750 | 490 |
+| V4: queue + set-up + split | T+756 | 565 |
+| V1d: V1b + 5 min overhead per slice | T+805 | 444 |
+| V4b: V4 + 5 min overhead per slice | T+876 | 475 |
+
+**The full-completion gain comes from the queue and the set-up, not the split.** The split only adds verified work inside the window: +75 obligations with no overhead, +31 with 5 minutes per slice. With overhead it delays full completion. The model also gives merges and verification supervision no agent time, which is optimistic for every variant.
+
 ## Sensitivity (`results/sensitivity/summary.tsv`, `*.json`)
 
 | Factor | V1 at 10 min: finish / obligations | V4 | V5 |
@@ -106,7 +119,8 @@ The honest original is V1. The optimized plan that needs **only a successor scop
 | Every 4th slice fails once (50% repair) | 925 / 302 | 868 / 475 | 668 / 475 |
 
 - **The estimates dominate.** Even V5 with estimates 25% too high finishes at T+454 at 10-min CI, and at T+425 at 5-min CI.
-- Counts integrated by the deadline are not strictly monotonic in every factor, because greedy scheduling changes which slices finish first. Completion time is monotonic, and the model tests check that.
+- Counts integrated by the deadline are not strictly monotonic in every factor, because greedy scheduling changes which slices finish first.
+- **Completion time is not always monotonic either** (corrected after review RVO-1-6). The model tests check that it never *improves* with more failures, a deeper queue is never slower, and larger estimates never help. With failures, completion is not monotonic in CI latency: V5 with `--fail-every 4 --repair-fraction 0.5` finishes at T+620 at 2-min CI and T+587 at 5-min CI, because a slice's position in first-verification order decides whether it is the one that fails.
 
 ## Can the full scope finish within 420 minutes?
 

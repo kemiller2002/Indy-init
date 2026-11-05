@@ -25,7 +25,14 @@ The guarantee is `requirements-compiler scope compile --split PLAN` (`Scope.appl
 | `SPLIT_FROZEN_TASK` | splitting an execution-DAG task |
 | `SPLIT_BREAKS_REQUIREMENT_DEPENDENCY` | a requirement whose dependency is in a part its own part does not reach |
 | `SPLIT_CYCLE`, `SPLIT_UNKNOWN_DEPENDENCY`, `SPLIT_DEPENDS_ON_PARENT`, `SPLIT_PARENT_HAS_DEPENDENTS` | broken ordering |
-| `SPLIT_ID_TAKEN`, `SPLIT_DUPLICATE_PART_ID`, `SPLIT_EMPTY_PART`, `SPLIT_TOO_FEW_PARTS`, `SPLIT_PARENT_TWICE`, `SPLIT_EMPTY_PLAN` | malformed plans |
+| `SPLIT_ID_TAKEN`, `SPLIT_DUPLICATE_PART_ID` (across the whole plan), `SPLIT_EMPTY_PART`, `SPLIT_TOO_FEW_PARTS`, `SPLIT_PARENT_TWICE`, `SPLIT_EMPTY_PLAN` | malformed plans |
+| `SPLIT_DROPS_PARENT_DEPENDENCY` | a part that does not wait, directly or through its siblings, for what its parent waited for (T17) |
+| `SPLIT_DEPENDS_ON_REPLACED` | a dependency on a parent the same plan replaces |
+| `SPLIT_OWNER_CHANGED` | a part with an owner other than its parent's (ownership changes only in a successor package) |
+
+All of these are judged against the work items that exist **after** the split (review RVO-1-1). `scope preflight` also compares every work item with what the sources and the recorded plan give: `WORK_ITEM_ALTERED`, `_MISSING`, `_UNSOURCED`, `_DUPLICATED` (review RVO-1-2). So a successor edited after compiling is refused.
+
+**What is not checked (review RVO-1-3).** Requirement dependencies are ordered only between requirements of the **same** split parent. A dependency into another work item is not ordered, for example INV-008 (WORKSPACE-FRAME) on INV-001 (START-FORM), or UI-026 (UI-LANDING) on WDL-003..008. Those were already unordered at work-item level before the split, when every generated item depended only on T17, and stay so.
 
 **`scope preflight`** judges a successor manifest against the sources compiled with the split plan it records. It does so only if that plan file still has the recorded sha256 (`SPLIT_PLAN_CHANGED`, `SPLIT_PLAN_MISSING`). Without a recorded plan, a manifest is judged exactly as before.
 
@@ -46,13 +53,13 @@ The suite also applies nine mutations, and each must be refused with its code.
 | Requirements / mandatory | 205 / 200 | 205 / 200 |
 | Obligations / mandatory | 890 / 844 | 890 / 844 |
 | Work items | 37 | 53 |
-| scopeSha256 | `59bfef5a…` | `23a4dfce4b97c23cc6b93e856c1d78f61a954314bf65a6a7d3054486b69f0fea` |
+| scopeSha256 | `59bfef5a…` | `a847f98c4a4dd13fdb96fcc7f30142960ef1d3b5bc9624f4ce00eb0f158687ec` |
 | `slice-manifest` | COMPLETE COVERAGE | COMPLETE COVERAGE |
 | `scope preflight` | PASS | PASS (against its recorded plan) |
 
 Files: `proposals/scope-manifest.successor.json`, `proposals/slice-execution-manifest.successor.json`, `proposals/praxis-work-inventory.successor.json`.
 
-**It is not adopted.** The approved scope, the readiness documents and the proposed lock all still name `59bfef5a…`. Adopting the successor is ODR-R10-19, and it changes what ODR-R10-01 approves.
+**It is not adopted, and it can only be adopted before T0.** Renaming work items mid-run would orphan Praxis records, attempts and completions keyed to the old ids. The approved scope, the readiness documents and the proposed lock all still name `59bfef5a…`. Adopting the successor is ODR-R10-19, and it changes what ODR-R10-01 approves.
 
 ## File-conflict check
 

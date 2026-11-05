@@ -258,6 +258,10 @@ let withScopeHash (manifest: Json) =
 let applySplit (plan: Json) (items: WorkItem list) (requirements: Requirement list) : Result<WorkItem list * Requirement list, string list> =
     let ids = items |> List.map (fun w -> w.Id) |> Set.ofList
     let reqDeps = requirements |> List.map (fun r -> r.Id, r.DependsOn) |> Map.ofList
+    // Facts about the whole plan, so every part is judged against the work items that exist after the split.
+    let replacedParents = arr "splits" plan |> List.map (str "workItem") |> Set.ofList
+    let allPartIds = arr "splits" plan |> List.collect (fun sp -> arr "parts" sp |> List.map (str "id"))
+    let afterSplit = (ids - replacedParents) + Set.ofList allPartIds
     let checkOne (sp: Json) : string list * (WorkItem * WorkItem list) option =
         let parentId = str "workItem" sp
         match items |> List.tryFind (fun w -> w.Id = parentId) with
@@ -268,7 +272,7 @@ let applySplit (plan: Json) (items: WorkItem list) (requirements: Requirement li
                     { Id = str "id" pj
                       Title = strOpt "title" pj |> Option.defaultValue (str "id" pj)
                       Origin = "generated-split"
-                      Owner = strOpt "owner" pj |> Option.defaultValue parent.Owner
+                      Owner = strOpt "owner" pj |> Option.defaultValue parent.Owner   // a different owner is refused below
                       DependsOn = strs "dependsOn" pj
                       Requirements = strs "requirements" pj
                       GateRequirements = [] })
@@ -292,9 +296,16 @@ let applySplit (plan: Json) (items: WorkItem list) (requirements: Requirement li
                   for p in parts do
                       if p.Requirements.IsEmpty then yield sprintf "SPLIT_EMPTY_PART %s has no requirement" p.Id
                       if ids.Contains p.Id then yield sprintf "SPLIT_ID_TAKEN %s is already a work item" p.Id
+                      // The frozen file ownership decides who implements what: a part keeps its parent's owner.
+                      if p.Owner <> parent.Owner then yield sprintf "SPLIT_OWNER_CHANGED %s names owner %s; its parent %s is %s's (an ownership change is a successor package)" p.Id p.Owner parentId parent.Owner
                       for d in p.DependsOn do
                           if d = parentId then yield sprintf "SPLIT_DEPENDS_ON_PARENT %s depends on the item it replaces" p.Id
-                          elif not (ids.Contains d) && not (List.contains d partIds) then yield sprintf "SPLIT_UNKNOWN_DEPENDENCY %s depends on unknown %s" p.Id d
+                          elif replacedParents.Contains d then yield sprintf "SPLIT_DEPENDS_ON_REPLACED %s depends on %s, which this plan replaces" p.Id d
+                          elif not (afterSplit.Contains d) then yield sprintf "SPLIT_UNKNOWN_DEPENDENCY %s depends on unknown %s" p.Id d
+                      // Every part still waits for what its parent waited for (for a generated item, the kernel T17).
+                      for pd in parent.DependsOn do
+                          if not (reaches p.Id pd Set.empty) then
+                              yield sprintf "SPLIT_DROPS_PARENT_DEPENDENCY %s does not wait for %s, which its parent %s waited for" p.Id pd parentId
                   if partIds |> List.distinct |> List.length <> partIds.Length then yield sprintf "SPLIT_DUPLICATE_PART_ID in %s" parentId
                   if cyclic then yield sprintf "SPLIT_CYCLE among the parts of %s" parentId
                   for w in items do
@@ -311,6 +322,7 @@ let applySplit (plan: Json) (items: WorkItem list) (requirements: Requirement li
     let problems =
         (perSplit |> List.collect fst)
         @ (if parents |> List.distinct |> List.length <> parents.Length then [ "SPLIT_PARENT_TWICE a work item is split more than once" ] else [])
+        @ (allPartIds |> List.countBy id |> List.filter (fun (_, n) -> n > 1) |> List.map (fun (i, n) -> sprintf "SPLIT_DUPLICATE_PART_ID %s is used by %d parts across the plan" i n))
         @ (if (arr "splits" plan).IsEmpty then [ "SPLIT_EMPTY_PLAN the plan splits nothing" ] else [])
     if not problems.IsEmpty then Error problems
     else
@@ -451,6 +463,18 @@ let preflight (expected: Json) (manifest: Json) : Refusal list =
               if serialize w <> serialize h && missing.IsEmpty then yield refusal "REQUIREMENT_ALTERED" (sprintf "%s differs from what the sources give" id)
       for KeyValue(id, _) in have do
           if not (want.ContainsKey id) then yield refusal "REQUIREMENT_UNSOURCED" (sprintf "%s is in the manifest but in no approved source" id)
+      // The work items too (who implements what, in which order): a manifest whose items differ from what the sources
+      // (and, for a successor, its recorded split plan) give is refused, so a split's guarantees hold after compile.
+      let wantItems, haveItemsById = byId "workItems" expected, byId "workItems" manifest
+      for KeyValue(id, w) in wantItems do
+          match haveItemsById.TryFind id with
+          | None -> yield refusal "WORK_ITEM_MISSING" (sprintf "%s is a work item of the sources and not of the manifest" id)
+          | Some h when serialize h <> serialize w -> yield refusal "WORK_ITEM_ALTERED" (sprintf "%s (owner, dependencies or requirements) differs from what the sources give" id)
+          | Some _ -> ()
+      for KeyValue(id, _) in haveItemsById do
+          if not (wantItems.ContainsKey id) then yield refusal "WORK_ITEM_UNSOURCED" (sprintf "%s is in the manifest but the sources give no such work item" id)
+      if arr "workItems" manifest |> List.map (str "id") |> List.distinct |> List.length <> (arr "workItems" manifest).Length then
+          yield refusal "WORK_ITEM_DUPLICATED" "the manifest declares a work item id more than once"
       // Coverage inside the manifest: every executable requirement is built by a declared work item, every
       // obligation is judged by a declared producer.
       for KeyValue(id, h) in have do

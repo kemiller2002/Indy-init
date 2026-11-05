@@ -286,3 +286,34 @@ Each case should use the adversarial.fsx form: Attack, Control, Mutation, with a
    666).
 10. Measurement. Get read access to `indy-init-rehearsal-010` (or 009) Actions and time the real gate's steps. Every
     gate-duration figure here is an estimate until then.
+
+## 7. Speculative verification: required gate semantics (design only, not implemented)
+
+*Added by the coordinating agent after adversarial review finding RVO-1-4. §5 and §6 above do not cover speculative verification. This section is the specification ODR-R10-22 refers to. None of it is built.*
+
+The current rule is `STALE_TARGET` (Ledger.fs:380): a slice is judged only if its target base is the current main head. Speculative verification must keep that guarantee, not relax it. The verified tree must be **exactly** the tree that becomes main.
+
+1. **Queue record.** When candidate *k* enters the queue, the integration authority records `queueBase = { main: M, ahead: [h1 … h(k-1)] }`. Here M is the main SHA and h1…h(k-1) are the exact head SHAs of the candidates ahead of it, in merge order.
+2. **Verified tree.** The gate builds the candidate tree T_k = merge(M, h1, …, h(k-1), hk), applied in order, verifies T_k, and records T_k's tree hash with the verdict.
+3. **Merge condition (strengthened `STALE_TARGET`).** Candidate *k* may merge only when all three hold; otherwise the merge is refused:
+   - main's head is the merge of M with h1…h(k-1), as recorded;
+   - the merge commit's tree hash **equals** T_k's verified tree hash;
+   - every candidate ahead has merged with its verified verdict.
+
+   Refusal codes: `STALE_QUEUE_BASE`, `TREE_NOT_VERIFIED`, `AHEAD_NOT_MERGED`. Nothing else satisfies the rule. In particular, a passing verdict for a different tree never does.
+4. **Failure invalidates what is stacked on it.** If candidate *j* fails, or leaves the queue, every verdict of a candidate behind *j* is void. Those candidates must be re-verified against the new queue base. A merge using a voided verdict is refused (`VERDICT_VOIDED`).
+5. **One authority, in order.** Merges are strictly one at a time, in queue order. A candidate may not overtake one ahead of it (`OUT_OF_ORDER_MERGE`).
+6. **Failures persist.** A failed verdict stays in the record for that candidate head. A re-verification after a change to the candidate produces a new verdict for the new head; it never overwrites the old one.
+
+**Negative controls required before ODR-R10-22 can be decided.** Each is a gate case with its exact refusal:
+
+| Case | Mutation | Expected |
+|---|---|---|
+| S1 | merge candidate *k* after main moved to a commit outside its queue base | `STALE_QUEUE_BASE` |
+| S2 | merge commit tree differs from the verified T_k (for example a conflict resolved differently) | `TREE_NOT_VERIFIED` |
+| S3 | candidate *j* ahead fails; *k* behind merges with its earlier verdict | `VERDICT_VOIDED` |
+| S4 | *k* merges before *j* ahead of it | `OUT_OF_ORDER_MERGE` / `AHEAD_NOT_MERGED` |
+| S5 | the verdict recorded for one candidate head is presented for a later head of the same branch | `TREE_NOT_VERIFIED` |
+| S6 | a failed verdict is removed from the record and the candidate re-queued unchanged | refused: the failure persists for that head |
+
+The model (`--queue-depth`) assumes exactly these semantics: verification on main plus the candidates ahead, merges serialized and in queue order, and a failure restarting every candidate stacked behind it.

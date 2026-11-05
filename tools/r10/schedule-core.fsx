@@ -29,6 +29,7 @@ type Config =
       FailEvery: int
       RepairFraction: float
       Scale: float
+      SliceOverhead: float
       DefaultMinutes: float
       Lanes: (string * string list) list }
 
@@ -72,7 +73,8 @@ let loadSlices (path: string) (rolesPath: string option) (c: Config) : Slice lis
         { Id = id
           Role = roles |> Map.tryFind id |> Option.defaultValue boundary
           Deps = deps
-          Minutes = (if c.Scale = 1.0 then minutes else Math.Ceiling(minutes * c.Scale))
+          // per-slice overhead (branch, pull request, context) is charged to every slice, so finer slices are not free
+          Minutes = (if c.Scale = 1.0 then minutes else Math.Ceiling(minutes * c.Scale)) + c.SliceOverhead
           Source = source
           MandatoryObligations = o
           Requirements = reqs })

@@ -14,6 +14,7 @@
 //                        (--repair-fraction of its estimate) and verified again, and every speculative run stacked on
 //                        it is restarted. 0 (default) = no failures.
 //   --scale F            multiply every implementation estimate by F (sensitivity), default 1.
+//   --slice-overhead M   add M minutes to every slice (branch, pull request, context switching), default 0.
 //   --setup, --ci, --merge, --window, --lanes, --default-minutes: as in schedule.fsx.
 //
 //   dotnet fsi schedule-model.fsx -- --slices slice-execution-manifest.json --setup 45 --ci 0,2,5,10 --merge 3 \
@@ -37,6 +38,7 @@ let config =
       FailEvery = opt "--fail-every" |> Option.map int |> Option.defaultValue 0
       RepairFraction = num "--repair-fraction" 0.25
       Scale = num "--scale" 1.0
+      SliceOverhead = num "--slice-overhead" 0.0
       DefaultMinutes = num "--default-minutes" 20.0
       Lanes = parseLanes (opt "--lanes" |> Option.defaultValue defaultLanes) }
 let slices = loadSlices (req "--slices") (opt "--roles") config
