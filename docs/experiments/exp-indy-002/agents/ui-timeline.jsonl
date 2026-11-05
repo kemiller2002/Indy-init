@@ -1,2 +1,5 @@
 {"t":"2026-11-05T21:21:06Z","agent":"ui","group":"CG-1-START","event":"start","detail":"setup done (npm ci); reading Limen protocol"}
 {"t":"2026-11-05T21:23:33Z","agent":"ui","group":"CG-1-START","event":"start","detail":"all five groups already RELEASED at 21:21Z; building all screens together in release order"}
+{"t":"2026-11-05T21:23:41Z","agent":"ui","group":"CG-2-HEADER","event":"repair","detail":"CR-1 merged (accessible names). Rework cost 0 minutes: no controls written yet","durationSec":0}
+{"t":"2026-11-05T21:26:15Z","agent":"ui","group":"CG-4-RELATIONSHIP","event":"repair","detail":"CR-2 merged: picker labels, empty placeholder, lowercase radio values. Rework ~1 minute (draft default + kind parser in App.fs)","durationSec":60}
+{"t":"2026-11-05T21:26:55Z","agent":"ui","group":"CG-5-PERSISTENCE","event":"compile-pass","detail":"Exp002.Ui (Stub, App, View, Events, Dispatch) first build clean"}
