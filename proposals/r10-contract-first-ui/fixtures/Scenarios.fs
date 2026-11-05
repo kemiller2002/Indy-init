@@ -43,18 +43,24 @@ let label s = FixtureLabel.create (sprintf "%s (causa-data %s)" (name s) (CausaD
 let idOf (s: string) = InvestigationId(Guid.Parse s)
 let private at (s: string) = DateTimeOffset.Parse(s, Globalization.CultureInfo.InvariantCulture)
 
-/// The catalog workspace a stored case lives in, from its stored path (".../investigations/<id>"). v4.1.5 W1.
-let catalogAddressOf (c: CausaDataExtract.StoredCase) : WorkspaceAddress =
-    { Workspace = Workspace(c.Path.Substring(0, c.Path.IndexOf "/investigations/")); Role = WorkspaceRole.Catalog }
+/// The catalog workspace a stored case lives in, from its stored path (".../investigations/<id>"). v4.1.5 W1: a catalog
+/// address comes only from WorkspaceAddress.catalog.
+let catalogAddressOf (c: CausaDataExtract.StoredCase) : WorkspaceAddress.T =
+    WorkspaceAddress.catalog (Workspace(c.Path.Substring(0, c.Path.IndexOf "/investigations/")))
 
-/// The fixture's working-copy workspace. Synthetic, labelled; not a causa-data path.
-let workingCopyAddress : WorkspaceAddress = { Workspace = Workspace "workspaces/demo/fixture-working-copy"; Role = WorkspaceRole.WorkingCopy }
+let catalogWorkspaces = CausaDataExtract.cases |> List.map (catalogAddressOf >> fun a -> a.Workspace) |> List.distinct
+
+/// The fixture's working copy, workspaces/demo/causa-app-fixture (the reserved working-copy namespace). Synthetic,
+/// labelled; not a causa-data path.
+let workingCopyAddress : WorkspaceAddress.T = (WorkspaceAddress.workingCopy catalogWorkspaces "fixture").Value
 
 let refOf (c: CausaDataExtract.StoredCase) : InvestigationRef = { Address = catalogAddressOf c; Id = idOf c.Id }
 
 /// A well-formed reference that is in no fixture (the missing-investigation case).
 let missingRef : InvestigationRef =
     { Address = catalogAddressOf CausaDataExtract.cases.Head; Id = InvestigationId(Guid.Parse "00000000-0000-4000-8000-000000000000") }
+
+let missingTarget : RouteTarget = Navigation.targetOf missingRef
 
 let apollo11 = CausaDataExtract.cases |> List.find (fun c -> c.Key = "apollo-11")
 let apollo11Ref = refOf apollo11
@@ -69,7 +75,7 @@ let summary (lbl: FixtureLabel) (c: CausaDataExtract.StoredCase) : Investigation
       Counts =
         Some(AsStored(Visible.fixture lbl { Hypotheses = Known c.SnapshotHypotheses; Evidence = Known c.SnapshotEvidence; UnresolvedContradictions = UnknownCount }))
       Copy = FrozenDemonstration
-      Href = Navigation.format (WorkspaceRoute(refOf c, Overview)) }
+      Href = Navigation.format (WorkspaceRoute(Navigation.targetOf (refOf c), Overview)) }
 
 let storedRecord (c: CausaDataExtract.StoredCase) : StoredRecordView =
     { Ref = refOf c

@@ -34,5 +34,7 @@
     <Compile Include="System.fs" />
     <Compile Include="UiActions.fs" />
     <Compile Include="Bindings.fs" />
+    <!-- Producer implementation over the contract types (not folded into IF41-VIEW). -->
+    <Compile Include="Presentation.fs" />
   </ItemGroup>
 </Project>

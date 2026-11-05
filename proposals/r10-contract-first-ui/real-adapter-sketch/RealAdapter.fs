@@ -36,31 +36,33 @@ let private connect (engine: Engine) (s: State) =
         { s with Model = m; Local = { s.Local with Errors = [] } }, fx
     | errors, _ -> { s with Local = { s.Local with Errors = errors } }, []
 
-let private currentId s = match s.Local.Route with WorkspaceRoute(id, _) -> Some id | _ -> None
+/// The route's target. Under the frozen v4.1.4 Model an investigation is keyed by its id alone; under v4.1.5 the adapter
+/// resolves the target against Model.Listings (the addresses the engine listed) and an unresolved one is not found.
+let private currentTarget s = match s.Local.Route with WorkspaceRoute(t, _) -> Some t | _ -> None
 
 let private dispatch (engine: Engine) (intent: UiIntent) (s: State) : State * HostEffect list =
     match intent with
-    | Navigate r ->
+    | UiIntent.Navigate r ->
         let m, fx = engine.Update (Msg.Navigate(Route(Navigation.format r))) s.Model
         { Model = m; Local = { s.Local with Route = r } }, fx
-    | Input(f, v, _) when Connection.fields |> List.exists (fun x -> x.Field = f) ->
+    | UiIntent.Input(f, v, _) when Connection.fields |> List.exists (fun x -> x.Field = f) ->
         { s with Local = { s.Local with Form = Connection.withField f v s.Local.Form } }, []
     // Start and content fields wait for the domain owner's command payloads (C1, C5); kept, not dropped.
-    | Input(f, v, _) -> { s with Local = { s.Local with Drafts = s.Local.Drafts |> Map.add f v } }, []
-    | Secret(_, c) -> { s with Local = { s.Local with Credential = Some c; Form = { s.Local.Form with CredentialEntered = true } } }, []
-    | Activate(a, _) when a = Actions.connect -> connect engine s
-    | Activate(a, _) when a = Actions.disconnect ->
+    | UiIntent.Input(f, v, _) -> { s with Local = { s.Local with Drafts = s.Local.Drafts |> Map.add f v } }, []
+    | UiIntent.Secret(_, c) -> { s with Local = { s.Local with Credential = Some c; Form = { s.Local.Form with CredentialEntered = true } } }, []
+    | UiIntent.Activate(a, _) when a = Actions.connect -> connect engine s
+    | UiIntent.Activate(a, _) when a = Actions.disconnect ->
         let m, fx = engine.Update (Msg.Connection ConnectionInput.DisconnectConfirmed) s.Model
         { s with Model = m }, fx
-    | Activate(a, _) when a = Actions.save ->
-        match currentId s with
-        | Some id ->
-            let m, fx = engine.Update (Msg.SessionInput(id.Id, SaveInput.SaveRequested)) s.Model
+    | UiIntent.Activate(a, _) when a = Actions.save ->
+        match currentTarget s with
+        | Some t ->
+            let m, fx = engine.Update (Msg.SessionInput(t.Id, SaveInput.SaveRequested)) s.Model
             { s with Model = m }, fx
         | None -> s, []
     // Content commands need a CommandEnvelope whose Command payloads are opaque in the frozen stubs (C1, C5): the
     // adapter cannot build RecordObservation etc. until the domain owner defines them.
-    | Activate _ -> s, []
+    | UiIntent.Activate _ -> s, []
 
 let private connectionView (s: State) : ConnectionView =
     { State = s.Model.Connection
@@ -71,7 +73,7 @@ let private connectionView (s: State) : ConnectionView =
       Connected = s.Model.Context |> Option.map (fun c -> sprintf "%s/%s on %s" c.Repository.Owner c.Repository.Name c.Repository.Branch)
       WriteScope = (match s.Model.Connection with Connected true -> Writable | Connected false -> ReadOnlyConnection | _ -> WriteScopeUnknown) }
 
-let private loadFailure (id: InvestigationRef) (l: LoadFailure) =
+let private loadFailure (id: RouteTarget) (l: LoadFailure) =
     match l with
     | Unverifiable fs -> InvalidData(sprintf "%d verification failure(s)" fs.Length)
     | ProviderFailed AuthenticationFailed -> CredentialRefused

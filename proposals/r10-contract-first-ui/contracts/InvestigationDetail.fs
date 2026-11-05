@@ -43,8 +43,3 @@ type WorkspaceFrame =
       Sections: NavLink<Section> list
       /// Which aggregate version every section of this frame refers to (UI-013); None for stored-only data.
       Version: AggregateVersion option }
-
-[<RequireQualifiedAccess>]
-module WorkspaceFrame =
-    let currentSection (frame: WorkspaceFrame) =
-        frame.Sections |> List.tryFind (fun l -> l.Current) |> Option.map (fun l -> l.Destination)

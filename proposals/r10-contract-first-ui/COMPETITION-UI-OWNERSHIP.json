@@ -291,6 +291,7 @@
         "src/Causa.App/Engine.fs",
         "src/Causa.App/Routes.fs",
         "src/Causa.App/Projections.fs",
+        "src/Causa.App/Ui/Presentation.fs",
         "src/Causa.App/Ui/UiAdapter.fs",
         "src/Causa.App/Ui/Events.fs",
         "src/Causa.App/Update.fs",

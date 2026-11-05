@@ -92,48 +92,6 @@ type AnalysisProjection =
 
 // ---- Content editors (Data Editable) -----------------------------------------------------------------------------------
 
-[<RequireQualifiedAccess>]
-module ContentForms =
-    let observation : FieldSpec list =
-        [ { Field = Fields.observationText; Label = "Observation text"; Component = TextArea; Rules = [ Required; MinLength 1; MaxLength 10000 ] }
-          { Field = Fields.observationSource; Label = "Observation source reference"; Component = TextInput; Rules = [ MaxLength 10000 ] } ]
-
-    let hypothesis : FieldSpec list =
-        [ { Field = Fields.hypothesisStatement; Label = "Hypothesis statement"; Component = TextArea; Rules = [ Required; MinLength 1; MaxLength 10000 ] }
-          // INV-011 has no validation block in the catalog; required: true.
-          { Field = Fields.hypothesisExplanation; Label = "Hypothesis explanation"; Component = TextArea; Rules = [ Required ] } ]
-
-    /// The fields checked when a hypothesis is first recorded. J2-02 records with the statement only, while the catalog
-    /// marks INV-011 required: until CF-03 is decided this list checks only the statement, and `hypothesis` keeps the
-    /// catalog rule unchanged for the detail editor (S04). No requirement is weakened in the manifest.
-    let hypothesisOnRecord : FieldSpec list = [ hypothesis.Head ]
-
-    let evidence : FieldSpec list =
-        [ { Field = Fields.evidenceLabel; Label = "Evidence label"; Component = TextInput; Rules = [ Required; MinLength 1; MaxLength 200 ] }
-          { Field = Fields.evidenceSource; Label = "Evidence source reference"; Component = TextInput; Rules = [ MaxLength 10000 ] }
-          { Field = Fields.evidenceUrl; Label = "Evidence source URL"; Component = UrlInput; Rules = [ MaxLength 2000; Pattern SafeUrl.pattern ] }
-          // INV-012 has no validation block; required: true.
-          { Field = Fields.evidenceContent; Label = "Evidence original content"; Component = TextArea; Rules = [ Required ] } ]
-
-    let link : FieldSpec list =
-        [ { Field = Fields.linkEvidence; Label = "Evidence"; Component = Select; Rules = [ Required ] }
-          { Field = Fields.linkHypothesis; Label = "Hypothesis"; Component = Select; Rules = [ Required ] }
-          { Field = Fields.relationshipKind; Label = "Evidence relationship kind"; Component = RadioGroup
-            Rules = [ Required; OneOf [ "supports"; "contradicts"; "consistent-with"; "inconclusive" ] ] }
-          { Field = Fields.relationshipRationale; Label = "Evidence relationship rationale"; Component = TextArea; Rules = [ Required; MinLength 1; MaxLength 10000 ] } ]
-
-    let conclusion : FieldSpec list =
-        [ { Field = Fields.conclusionStatement; Label = "Conclusion statement"; Component = TextArea; Rules = [ Required; MinLength 1; MaxLength 10000 ] } ]
-
-    let all = observation @ hypothesis @ evidence @ link @ conclusion
-
-    let kindValue k =
-        match k with
-        | Supports -> "supports"
-        | Contradicts -> "contradicts"
-        | ConsistentWith -> "consistent-with"
-        | Inconclusive -> "inconclusive"
-
 /// The text of the open content editors and their validation (one map: the editor never holds a second store).
 type EditorDrafts = { Values: Map<FieldId, string>; Errors: ValidationError list; OpenEditor: ActionId option }
 

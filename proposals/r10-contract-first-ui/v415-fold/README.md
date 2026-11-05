@@ -74,3 +74,33 @@ Display-only text is unchanged. The frozen `SaveIndicatorView` and `WorkspaceHea
 - 44/44 Layer A tests and 7/7 Layer B.
 
 The proposal's own build links v4.1.4, plus `contracts/V415Workspace.shim.fs`: #135's W1 types copied verbatim. The shim is not part of the fold.
+
+## Revision for v4.1.5 revision 3 and the compile findings (2026-11-05)
+
+Requested by the v4.1.5 session after it folded the previous file.
+
+**Revision 3: `WorkspaceAddress.T` is private.**
+- A route can no longer build an address. `UiRoute.WorkspaceRoute` carries an unresolved `RouteTarget` (`{ Workspace: string; Role; Id }`, exactly as the URL states it).
+- `Navigation.resolve` (producer) matches a target against the references the engine listed, role included. An unresolved target is `InvestigationNotFound target`.
+- The fixture's working copy is `workspaces/demo/causa-app-fixture`, built with `WorkspaceAddress.workingCopy`.
+
+**Compile findings:**
+
+| Check | Finding | Change |
+|---|---|---|
+| X17 | 153 code members in the fold | The fold is types and signatures plus **16** boundary members that must sit beside a private representation (`FixtureLabel`, `Visible`, `Understood`, `SafeUrl`). Every other function moved to the producer file `contracts/Presentation.fs`, which becomes `src/Causa.App/Ui/Presentation.fs` (integration, compiled right after `Projections.fs`) |
+| X04 | name clash with `Msg.Navigate` | `UiIntent` is `[<RequireQualifiedAccess>]` |
+| X04 | combined operations | one operation per member |
+| X04 | integration listed as a consumer of IF41-VIEW | removed: integration is the producer |
+| X04 | unknown interface `UiBackend` | the FixtureBackend helper's `implements` is `[]` |
+| — | interface producers | IF41-APP moves to integration (`Engine.fs`) and IF41-REPORT to ui-3 (`Reporting.fs`), in `interfaceProducers` |
+| — | gaps | `ui-3` gets a fallback lane (`ui`); `Causa.TestSupport` references `Causa.App`; the screen fragments are owned through the exact integration-only path rule text in `rules.integrationOnlyPathRule` instead of a `uiFiles` key the compiler lacks |
+
+**Not package content:**
+- `start-rule.md` is for the STARTUP-INSTRUCTIONS successor (the lead's workstream A).
+- `bootstrap-fixtures.json` documents what the `testHelpers` entries in the delta contain.
+
+**Verified:**
+- #135 rev 3's `ContractCheck` with this file as `07-IF41-VIEW.fs`: 0 warnings;
+- both negative controls refused (FS1093);
+- Layer A 45/45 and Layer B 7/7.

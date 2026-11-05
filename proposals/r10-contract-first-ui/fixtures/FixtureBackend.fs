@@ -74,7 +74,14 @@ let private isStartField f = StartForm.fields |> List.exists (fun s -> s.Field =
 
 let private connected s = match s.Connection with Connected _ -> true | _ -> false
 
-let private currentInvestigation s = match s.Route with WorkspaceRoute(id, _) -> Some id | _ -> None
+/// Every reference this backend has listed: the stored catalog cases and the tab's working copies. A route resolves
+/// only against these (v4.1.5 W1: no address is built from a URL).
+let private known s = (CausaDataExtract.cases |> List.map refOf) @ (s.Copies |> List.map (fun c -> c.Id))
+
+let private currentInvestigation s =
+    match s.Route with
+    | WorkspaceRoute(t, _) -> Navigation.resolve (known s) t
+    | _ -> None
 
 let private isWorkingCopy s id = s.Copies |> List.exists (fun c -> c.Id = id)
 
@@ -189,7 +196,7 @@ let private activate (action: ActionId) (key: string option) (s: State) : State 
                 Copies = s.Copies @ [ copy ]
                 Analysis = s.Analysis |> Map.add id emptyAnalysis
                 SaveKinds = s.SaveKinds |> Map.add id UnsavedKind
-                Route = WorkspaceRoute(id, Overview)
+                Route = WorkspaceRoute(Navigation.targetOf id, Overview)
                 Started = s.Started + 1
                 Start = StartForm.empty (newIdentifier (s.Started + 1))
                 StartErrors = [] }
@@ -270,12 +277,12 @@ let private activate (action: ActionId) (key: string option) (s: State) : State 
 
 let dispatch (intent: UiIntent) (s: State) : State =
     match intent with
-    | Navigate r -> { s with Route = r; DraftErrors = [] }
-    | Input(f, v, _) when isConnectionField f -> { s with Form = Connection.withField f v s.Form }
-    | Input(f, v, _) when isStartField f -> { s with Start = StartForm.withField f v s.Start }
-    | Input(f, v, _) -> { s with Drafts = s.Drafts |> Map.add f v }
-    | Secret(_, c) -> { s with Credential = Some c; Form = { s.Form with CredentialEntered = true } }
-    | Activate(a, key) -> activate a key s
+    | UiIntent.Navigate r -> { s with Route = r; DraftErrors = [] }
+    | UiIntent.Input(f, v, _) when isConnectionField f -> { s with Form = Connection.withField f v s.Form }
+    | UiIntent.Input(f, v, _) when isStartField f -> { s with Start = StartForm.withField f v s.Start }
+    | UiIntent.Input(f, v, _) -> { s with Drafts = s.Drafts |> Map.add f v }
+    | UiIntent.Secret(_, c) -> { s with Credential = Some c; Form = { s.Form with CredentialEntered = true } }
+    | UiIntent.Activate(a, key) -> activate a key s
 
 // ---- projection ------------------------------------------------------------------------------------------------------
 
@@ -295,7 +302,7 @@ let private copySummary (lbl: FixtureLabel) (c: WorkingCopy) : InvestigationSumm
       LastActivity = Some fixtureInstant
       Counts = None
       Copy = WorkingCopy
-      Href = Navigation.format (WorkspaceRoute(c.Id, Overview)) }
+      Href = Navigation.format (WorkspaceRoute(Navigation.targetOf c.Id, Overview)) }
 
 let private listView s : InvestigationListView =
     let lbl = label s.Scenario
@@ -394,14 +401,26 @@ let private workspaceView s (id: InvestigationRef) (section: Section) : Workspac
               Edit = Available; SaveDetails = (if s.DetailsOpen then Available else NotOffered); Cancel = (if s.DetailsOpen then Available else NotOffered) }
           Save = Some(savePresentation id kind title)
           State = ScreenReady }
-    | true, None, None -> failed (InvestigationNotFound id)
+    | true, None, None -> failed (InvestigationNotFound(Navigation.targetOf id))
+
+/// A route whose target no listed workspace holds (or a role that does not match): not found, fail closed.
+let private notFoundView s (t: RouteTarget) (section: Section) : WorkspaceView =
+    let f = InvestigationNotFound t
+    { Frame = Failed f; Stored = Failed f; Section = OverviewSection(Failed f)
+      Drafts = { Values = s.Drafts; Errors = s.DraftErrors; OpenEditor = None }
+      Details = { Open = false; Form = { Title = ""; ProblemStatement = ""; Question = "" }; Errors = []; Edit = NotOffered; SaveDetails = NotOffered; Cancel = NotOffered }
+      Save = None
+      State = ScreenFailed f }
 
 let project (s: State) : AppView =
     let screen =
         match s.Route with
         | InvestigationsRoute -> ListScreen(listView s)
         | StartRoute -> StartScreen(startView s)
-        | WorkspaceRoute(id, section) -> WorkspaceScreen(workspaceView s id section)
+        | WorkspaceRoute(t, section) ->
+            match Navigation.resolve (known s) t with
+            | Some r -> WorkspaceScreen(workspaceView s r section)
+            | None -> WorkspaceScreen(notFoundView s t section)
         | AdministrationRoute -> AdministrationScreen(administration (connectionView s).Connected)
         | SettingsRoute -> SettingsScreen settings
         | NotFoundRoute r -> NotFoundScreen { Requested = r; Copy = PresentationLanguage.failure (CapabilityAbsent(DataVisible, "unknown route")) }

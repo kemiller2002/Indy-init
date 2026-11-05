@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.r10-contract-first-ui.project-structure-delta/1",
-  "status": "PROPOSED input for v4.1.5 (CF-09 A, CF-10 A, CF-08 A, APR-CFUI-OWNER-1). Changes against requirements-compiled/v4.1.4/analysis/project-structure.json; the compilation owner applies them. Domain and persistence files are unchanged. Roles per DTD-R10-004: ui (UI-1), ui-2 (UI-2), ui-3 (UI-3); file owners follow COMPETITION-UI-OWNERSHIP.json.",
+  "status": "PROPOSED input for v4.1.5 (CF-09 A, CF-10 A, CF-08 A, APR-CFUI-OWNER-1). Changes against requirements-compiled/v4.1.4/analysis/project-structure.json; the compilation owner applies them. Domain and persistence files are unchanged. Roles per DTD-R10-004: ui (UI-1), ui-2 (UI-2), ui-3 (UI-3); file owners follow COMPETITION-UI-OWNERSHIP.json. Revised for v4.1.5 rev 3 and the compile findings of the v4.1.5 session (X04, X17).",
   "base": "requirements-compiled/v4.1.4/analysis/project-structure.json",
   "roles": {
     "keep": [
@@ -11,7 +11,8 @@
       {
         "id": "ui-3",
         "lane": "ui-3",
-        "description": "UI-3, hypotheses and evidence: entry and editing, relationships, analysis presentation (overview, timeline, inspector, graph, report)"
+        "description": "UI-3, hypotheses and evidence: entry and editing, relationships, analysis presentation (overview, timeline, inspector, graph, report) In a topology without a ui-3 lane these files belong to ui.",
+        "fallback": "ui"
       }
     ],
     "redescribe": [
@@ -32,6 +33,7 @@
         "src/Causa.App/Engine.fs",
         "src/Causa.App/Routes.fs",
         "src/Causa.App/Projections.fs",
+        "src/Causa.App/Ui/Presentation.fs",
         "src/Causa.App/Connection.fs",
         "src/Causa.App/Ui/UiAdapter.fs",
         "src/Causa.App/Ui/Events.fs",
@@ -111,7 +113,7 @@
                 "src/Causa.App/Engine.fs"
               ],
               "to": [
-                "src/Causa.App/Projections.fs"
+                "src/Causa.App/Ui/Presentation.fs"
               ]
             }
           },
@@ -462,6 +464,20 @@
           "implements": [],
           "requiredTests": [],
           "note": "UI-004, UI-005, UI-034; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+        },
+        {
+          "path": "src/Causa.App/Ui/Presentation.fs",
+          "owner": "integration",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Projections.fs"
+          ],
+          "implements": [],
+          "requiredTests": [
+            "dotnet:Causa.Contract.Tests.View.Producer.ValidationRulesEqualTheCatalog",
+            "dotnet:Causa.Contract.Tests.View.Producer.RoutesRoundTripAndResolveOnlyListedAddresses"
+          ],
+          "note": "IF41-VIEW producer functions (validation, navigation, presentation language, form specs, action contracts, binding helpers, stable ids): proposals/r10-contract-first-ui/contracts/Presentation.fs. Not contract text (X17)."
         }
       ],
       "removals": [
@@ -521,11 +537,9 @@
         "dependsOn": [
           "tests/Causa.TestSupport/UiFixtures/Scenarios.fs"
         ],
-        "implements": [
-          "UiBackend (IF41-VIEW)"
-        ],
+        "implements": [],
         "requiredTests": [],
-        "note": "the fixture UiBackend; its views carry BackendOrigin.FixtureBackend"
+        "note": "the fixture UiBackend; its views carry BackendOrigin.FixtureBackend; implements [] (X04 knows no interface UiBackend)"
       },
       {
         "path": "tests/Causa.TestSupport/UiFixtures/Scenarios.ui.fs",
@@ -562,141 +576,6 @@
       }
     ]
   },
-  "uiFiles": {
-    "additions": [
-      {
-        "path": "web/screens/investigation-list.html",
-        "owner": "ui",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/investigation-list.css",
-        "owner": "ui",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/administration.html",
-        "owner": "ui",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/administration.css",
-        "owner": "ui",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/settings.html",
-        "owner": "ui",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/settings.css",
-        "owner": "ui",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/not-found.html",
-        "owner": "ui",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/not-found.css",
-        "owner": "ui",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/investigation-start.html",
-        "owner": "ui-2",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/investigation-start.css",
-        "owner": "ui-2",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/workspace-frame.html",
-        "owner": "ui-2",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/workspace-frame.css",
-        "owner": "ui-2",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/workspace-save.html",
-        "owner": "ui-2",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/workspace-save.css",
-        "owner": "ui-2",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/workspace-details.html",
-        "owner": "ui-2",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/workspace-details.css",
-        "owner": "ui-2",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/workspace-overview.html",
-        "owner": "ui-3",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/workspace-overview.css",
-        "owner": "ui-3",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/workspace-hypotheses.html",
-        "owner": "ui-3",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/workspace-hypotheses.css",
-        "owner": "ui-3",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/workspace-evidence.html",
-        "owner": "ui-3",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/workspace-evidence.css",
-        "owner": "ui-3",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/workspace-causal-analysis.html",
-        "owner": "ui-3",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/workspace-causal-analysis.css",
-        "owner": "ui-3",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      },
-      {
-        "path": "web/screens/workspace-timeline.html",
-        "owner": "ui-3",
-        "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
-      },
-      {
-        "path": "web/screens/workspace-timeline.css",
-        "owner": "ui-3",
-        "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
-      }
-    ],
-    "note": "CF-08 A: per-screen Limen fragments and styles; web/index.html (integration) includes them through build.fsx and is never edited for a screen change"
-  },
   "rules": {
     "replace": [
       "ui and ui-2 never own the same file; Shell.fs is ui's and ui-2 consumes it read-only."
@@ -707,6 +586,60 @@
       "Screens emit UiIntent and read AppView only; no UI role edits Engine.fs, Update.fs, Projections.fs or View.fs.",
       "A UI role changes web/index.html only through its own web/screens/<screen>.html and .css fragments (CF-08 A)."
     ],
-    "note": "the integration-only path rule (checks X02, X18) gains web/screens/ includes in build.fsx; it keeps web/index.html and web/causa.css integration-owned"
+    "note": "the integration-only path rule (checks X02, X18) gains web/screens/ includes in build.fsx; it keeps web/index.html and web/causa.css integration-owned",
+    "integrationOnlyPathRule": {
+      "keep": "Integration alone writes: ... web/index.html, web/causa.css ... (unchanged)",
+      "replaceSentence": "A UI role changes web/index.html or web/causa.css only through a change request integration owns and applies (v4.1.1).",
+      "with": "A UI role changes web/index.html or web/causa.css only through a change request integration owns and applies (v4.1.1); each UI role writes only its own screen fragments web/screens/<screen>.html and web/screens/<screen>.css as proposals/r10-contract-first-ui/COMPETITION-UI-OWNERSHIP.json assigns them, and web/index.html includes them through build.fsx, which integration writes at bootstrap with every fragment listed.",
+      "why": "the fragments are not compiled and are created during the run, so they are owned by this rule, not bootstrapped (no uiFiles key exists in project-structure)"
+    }
+  },
+  "testProjects": {
+    "changes": [
+      {
+        "id": "Causa.TestSupport",
+        "references": {
+          "add": [
+            "Causa.App"
+          ]
+        },
+        "why": "the UiFixtures backend uses the IF41-VIEW presentation types in Causa.App"
+      }
+    ]
+  },
+  "interfaceProducers": {
+    "changes": [
+      {
+        "interface": "IF41-APP",
+        "producer": {
+          "from": "ui",
+          "to": "integration"
+        },
+        "file": "src/Causa.App/Engine.fs"
+      },
+      {
+        "interface": "IF41-REPORT",
+        "producer": {
+          "from": "ui",
+          "to": "ui-3"
+        },
+        "file": "src/Causa.App/Reporting.fs"
+      },
+      {
+        "interface": "IF41-VIEW",
+        "producer": {
+          "from": "ui",
+          "to": "integration"
+        },
+        "consumers": {
+          "to": [
+            "ui",
+            "ui-2",
+            "ui-3"
+          ]
+        },
+        "file": "src/Causa.App/Projections.fs"
+      }
+    ]
   }
 }

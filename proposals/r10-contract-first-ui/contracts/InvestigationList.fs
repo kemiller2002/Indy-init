@@ -40,18 +40,3 @@ type InvestigationListView =
       /// Opens investigation-start; offered only on a writable connection (J1-02 S8 is open: OWNER-DECISIONS CF-04).
       NewInvestigation: Availability
       State: ScreenState }
-
-[<RequireQualifiedAccess>]
-module InvestigationList =
-    let sort (by: ListSort) (items: InvestigationSummary list) =
-        match by with
-        | ByTitle -> items |> List.sortBy (fun s -> s.Title.ToLowerInvariant())
-        | ByUpdated -> items |> List.sortByDescending (fun s -> s.LastActivity |> Option.defaultValue DateTimeOffset.MinValue)
-
-    let screenState (investigations: Remote<Visible<InvestigationSummary list>>) =
-        match investigations with
-        | NotRequested -> ScreenReady
-        | Waiting _ -> ScreenLoading
-        | Ready v when List.isEmpty (Visible.value v) -> ScreenEmpty
-        | Ready _ -> ScreenReady
-        | Failed f -> ScreenFailed f
