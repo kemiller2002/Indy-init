@@ -11,3 +11,5 @@
 {"t":"2026-11-05T21:39:47Z","phase":"wave-2","event":"CG-6-CONCLUSION released (INV-032, INV-033); domain and UI agents dispatched"}
 {"t":"2026-11-05T21:43:21Z","phase":"wave-2","event":"wave 2 integrated: 67/67 domain, 19/19 UI, contract-check --tests, binding check, acceptance 22/22 (39 requirements); 0 integration defects"}
 {"t":"2026-11-05T21:43:47Z","phase":"verification","event":"feature development stopped at T+29; final candidate pushed for required CI"}
+{"t":"2026-11-05T22:33:56Z","phase":"verification","event":"required CI on 5151cdf: all jobs pass except r10-adversarial-cases (0) cancelled by job timeout in runner setup; aggregator r10-adversarial failure"}
+{"t":"2026-11-05T22:35:28Z","phase":"verification","event":"failed jobs re-run once; final report records cutoff state NOT GREEN; push held so the re-run is not cancelled"}

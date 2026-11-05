@@ -107,7 +107,7 @@ The directive's T+55 and T+75 reporting points fell after development had alread
 - The latency risk is real, but it sits elsewhere:
   - D-3 was invisible to every check the implementing agent ran (unit tests and the static binding check). Only the browser test caught it.
   - That favors running the independent browser test at each integration, not only at the end.
-- Required CI on the final candidate is reported in section 5.
+- **Required CI was the slowest signal.** 46 minutes after the final push it still had no green result, because one shard timed out in runner setup (section 5). Local checks and the browser test gave a verdict on the same code in about 1 minute. A required-CI dependency like this one is the main schedule risk for a timed build.
 
 **8. How long would the sequential strategy take on the same task durations? (Modeled, not measured.)**
 - Contracts to full release: 5.6 min. Domain wave 1 plus CR-3: 9.7. UI wave 1 plus revisions: 11.5. Integration and repair: 4.6. First accepted workflow at about **T+31.4**, against the observed **T+23.0**.
@@ -127,7 +127,7 @@ The directive's T+55 and T+75 reporting points fell after development had alread
 |---|---|---|
 | Verified implementation throughput | 39 req / 28.3 min = **1.38 req/min** (0.43 req/min over the 90-min box) | measured; experiment-level verification |
 | F# implementation throughput | 1,603 app F# lines / 22.5 wall-min = **71 lines/min**. 2,508 lines with unit tests (111/min). Plus 331 lines of F# tooling. | measured (line counts include blanks and comments) |
-| Functions | about 86 top-level/nested `let` functions in the engine and 75 top-level in the UI. All engine functions are exercised by 67 unit tests; none are incomplete. | measured by grep, approximate |
+| Functions | about 86 `let` bindings in the engine and 75 top-level in the UI. 67 engine and 19 UI unit tests pass; coverage per function was not measured. | measured by grep, approximate |
 | Contract accuracy | 29/39 = **74%** without revision (69% counting workarounds) | measured |
 | Integration repair ratio | 3.0 / 28.3 = **10.6%** | measured |
 | Compute efficiency | 812 CPU-s (T+12..T+28) / 39 = **20.8 CPU-s per requirement**. Worker tokens 383,729 / 39 = **9,839 per requirement**. | measured; coordinator tokens unavailable |
@@ -143,7 +143,23 @@ PR [kemiller2002/Indy-init#140](https://github.com/kemiller2002/Indy-init/pull/1
 - On earlier heads, the offline factory passed in about 1.5 min.
 - Preflight runs on superseded heads were cancelled by newer pushes (CI-F1, CI-F2).
 
-**Final candidate (docs-only successor of `76d88cd`; identical application code):** CI_RESULT_PLACEHOLDER
+**Final candidate `5151cdf`** (docs-only successor of `76d88cd`; identical application code), pushed 21:47:05Z.
+
+**State at the T+90 cutoff (22:45:04Z): NOT GREEN, and not accepted.**
+
+- Passed on 5151cdf:
+  - `offline-factory` (65 s)
+  - `offline-contract-tests`
+  - `frozen-v4`
+  - `suite-commands`
+  - `r9-readiness-gates`
+  - `release-gate-repair`
+  - `fsharp-tooling` (19.8 min)
+  - `r10-adversarial-cases` shards 1 and 2
+- **Did not complete:** `r10-adversarial-cases (0)` hit the job timeout after 45 min, still in setup. `playwright install --with-deps` was downloading apt packages from the runner mirror very slowly, and no test had run. The `r10-adversarial` aggregator therefore reports failure ("shards: cancelled").
+- The PR changes nothing under `.github/`, `verification/` or `tools/r10`, so I judge this to be the runner environment, not the candidate.
+- That judgement is **unconfirmed**: failed jobs were re-run once (run 42115761982, queued 22:35Z), and the result is not part of this report. It will be reported separately after the cutoff.
+- The contract groups therefore stay at **INTEGRATION_READY**. None is marked VERIFIED, because VERIFIED requires every applicable acceptance check, including required CI.
 
 ## 6. Comparison with milestone-first (schedule C)
 
@@ -217,7 +233,7 @@ The expected case uses about 0.55 req/min, roughly 40% of this run's rate. Under
 | Staged implementations compile | **Met.** Both, at every staging. |
 | Integration tests detect real mismatches | **Met.** D-3 was caught only by the independent browser test. |
 | Mandatory acceptance checks remain enforced | **Met.** Nothing was disabled or weakened. D-1 changed my own test-ID matcher to accept an ID at the start of a test name; it still requires a named test per ID. |
-| At least one meaningful E2E workflow independently verified | **Met** (experiment-level). |
+| At least one meaningful E2E workflow independently verified | **Met** (experiment-level). Required CI was **not** green at the cutoff (section 5). |
 | Time savings exceed measured integration rework | **Met, modeled.** About 8.4 min saved against 3.0 min of integration and 2.7 agent-min of contract rework. |
 | No provenance or isolation rule violated | **Met.** Only `experiments/` and `docs/experiments/` changed, and nothing was copied. |
 
@@ -236,3 +252,4 @@ Conditions:
 3. Run the independent, registry-driven browser test at **every** integration, not only at the end. Use static binding checks as well, but not instead.
 4. Push once per integration candidate. Avoid PR pushes that cancel required runs (CI-F1, CI-F2).
 5. Before relying on the forecast, repeat the experiment on a GitHub-backed persistence slice with the governed gates, and run a controlled milestone-first comparison on the same slice.
+6. Required CI must give its verdict inside the timebox. The `r10-adversarial` shards spend their time installing browsers (`playwright install --with-deps`) on every run. One shard hit its 45-minute timeout in that step, so the candidate had no required-CI verdict for the rest of this run. Pre-provisioned browsers or a cached runner image is a precondition for any strategy that depends on a final CI gate.
