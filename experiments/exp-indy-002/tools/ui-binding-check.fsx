@@ -31,10 +31,11 @@ let wsM =
     run m (steps NewObservationEditor [ "INV-024", "o"; "INV-025", "s" ]
            @ steps NewHypothesisEditor [ "INV-026", "h"; "INV-011", "x" ]
            @ steps NewEvidenceEditor [ "INV-027", "l"; "INV-012", "c"; "INV-029", "https://example.org" ]
-           @ steps NewRelationshipEditor [ "INV-030-evidence", "ev-1"; "INV-030-hypothesis", "hyp-1"; "INV-031", "supports" ]) |> fst
+           @ steps NewRelationshipEditor [ "INV-030-evidence", "ev-1"; "INV-030-hypothesis", "hyp-1"; "INV-031", "supports" ]
+           @ steps NewConclusionEditor [ "INV-033", "c" ]) |> fst
 let editors =
     [ DetailsEditor; NewObservationEditor; NewHypothesisEditor; NewEvidenceEditor; NewRelationshipEditor
-      RelationshipEditor(RelationshipId "rel-1") ]
+      RelationshipEditor(RelationshipId "rel-1"); NewConclusionEditor ]
 let models =
     [ init; startM; { init with Index = [ { Id = "a"; Title = "t" } ] }; wsM ]
     @ (editors |> List.map (fun e -> run wsM [ Ui(OpenEditor e) ] |> fst))

@@ -197,6 +197,32 @@ let tests: (string * (unit -> Outcome)) list =
           all [ check (inv.Observations.Length = 1 && inv.Observations.Head.Id = oid) "identity changed"
                 check ((rows "history" (project m2)).Length = 3) "history length" ]
 
+      "UT-INV-032 Record a conclusion keeps the investigation Open and makes the save state Unsaved without a write",
+      fun () ->
+          let m, _ = started ()
+          let m1, effects = run m [ Ui(OpenEditor NewConclusionEditor); Ui(SetField("INV-033", "Bearing wear caused the trips")); Ui SubmitEditor ]
+          let v = project m1
+          let ws = m1.Workspace.Value
+          all [ check (ws.Investigation.Conclusions.Length = 1) "no conclusion recorded"
+                check (ws.Editor = None) "editor still open"
+                check (scalar "wsState" v = Some "Open") "state not Open"
+                check (ws.Save = Unsaved) (sprintf "save state %A" ws.Save)
+                check (effects |> List.forall (function StorageSet _ -> false | _ -> true)) "auto-saved"
+                check (scalar "editorTitle" (project (run m [ Ui(OpenEditor NewConclusionEditor) ] |> fst)) = Some "Record a conclusion") "editor title" ]
+
+      "UT-INV-033 conclusions list every statement, the latest marked current; errors shown by FieldId INV-033",
+      fun () ->
+          let m, _ = started ()
+          let mErr, _ = run m [ Ui(OpenEditor NewConclusionEditor); Ui SubmitEditor ]
+          let m1 = withEditor m NewConclusionEditor [ "INV-033", "first" ]
+          let m2 = withEditor m1 NewConclusionEditor [ "INV-033", "second" ]
+          let cs = rows "conclusions" (project m2)
+          let vErr = project mErr
+          all [ check (cs |> List.choose (field "statement") = [ "first"; "second" ]) "statements"
+                check (cs |> List.choose (field "isCurrent") = [ "False"; "True" ]) "current marker"
+                check (scalar "HasErrINV033" vErr = Some "True") "no INV-033 error"
+                check (scalar "InvalidINV033" vErr = Some "true") "aria-invalid" ]
+
       "UI-ROUTE hash routes map to screens",
       fun () ->
           all [ check (parseRoute "#/" = ListRoute) "list"

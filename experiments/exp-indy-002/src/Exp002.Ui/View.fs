@@ -77,13 +77,14 @@ let describeEvent =
     | EvidenceEdited(e, at) -> sprintf "%s · Evidence edited: %s" (formatTimestamp at) e.Label
     | RelationshipRecorded(r, at) -> sprintf "%s · Relationship recorded: %s" (formatTimestamp at) (kindText r.Kind)
     | RelationshipRevised(_, r, at) -> sprintf "%s · Relationship reassessed: %s" (formatTimestamp at) (kindText r.Kind)
+    | ConclusionRecorded(c, at) -> sprintf "%s · Conclusion recorded: %s" (formatTimestamp at) c.Statement
     | RelationshipWithdrawn(_, reason, at) -> sprintf "%s · Relationship withdrawn: %s" (formatTimestamp at) reason
 
 let private startFields = [ "INV-006"; "INV-001"; "INV-002"; "INV-023" ]
 
 let editorFields =
     [ "INV-001"; "INV-002"; "INV-023"; "INV-024"; "INV-025"; "INV-026"; "INV-011"; "INV-027"; "INV-012"; "INV-028"
-      "INV-029"; "INV-030-evidence"; "INV-030-hypothesis"; "INV-031"; "INV-038" ]
+      "INV-029"; "INV-030-evidence"; "INV-030-hypothesis"; "INV-031"; "INV-038"; "INV-033" ]
 
 let private errorEntries prefix (fields: string list) (errors: FieldError list) =
     fields
@@ -110,6 +111,7 @@ let private draftValue (fieldId: string) (d: Draft) =
     | RelationshipDraft x, "INV-030-hypothesis" -> x.HypothesisId
     | RelationshipDraft x, "INV-038" -> x.Rationale
     | RevisionDraft x, "INV-038" -> x.Rationale
+    | ConclusionDraft x, "INV-033" -> x.Statement
     | _ -> ""
 
 let private draftKind =
@@ -153,6 +155,7 @@ let private workspaceEntries (ws: Workspace option) =
         | Some(EvidenceEditor _) -> "Edit evidence"
         | Some NewRelationshipEditor -> "Link evidence to a hypothesis"
         | Some(RelationshipEditor _) -> "Reassess relationship"
+        | Some NewConclusionEditor -> "Record a conclusion"
         | None -> ""
     [ b "wsLoaded" inv.IsSome
       b "wsLoading" inv.IsNone
@@ -174,6 +177,7 @@ let private workspaceEntries (ws: Workspace option) =
       b "editorHypothesis" (isEditor (function NewHypothesisEditor | HypothesisEditor _ -> true | _ -> false))
       b "editorEvidence" (isEditor (function NewEvidenceEditor | EvidenceEditor _ -> true | _ -> false))
       b "editorLink" (isEditor ((=) NewRelationshipEditor))
+      b "editorConclusion" (isEditor ((=) NewConclusionEditor))
       b "editorReassess" (isEditor (function RelationshipEditor _ -> true | _ -> false))
       s "reassessTarget" revising
       items "reassessing" (match editor with
@@ -186,12 +190,13 @@ let private workspaceEntries (ws: Workspace option) =
       yield! errorEntries "" editorFields errors
       match inv with
       | None ->
-          for k in [ "observations"; "hypotheses"; "evidence"; "relationships"; "history"; "evidenceOptions"; "hypothesisOptions" ] do
+          for k in [ "observations"; "hypotheses"; "evidence"; "relationships"; "history"; "evidenceOptions"; "hypothesisOptions"; "conclusions" ] do
               items k []
           b "noObservations" true
           b "noHypotheses" true
           b "noEvidence" true
           b "noRelationships" true
+          b "noConclusions" true
       | Some i ->
           items "observations" (i.Observations |> List.map (fun o ->
               [ "id", S(idText.ob o.Id); "text", S o.Text; "source", S(orEmpty o.SourceReference); "hasSource", B o.SourceReference.IsSome ]))
@@ -214,7 +219,13 @@ let private workspaceEntries (ws: Workspace option) =
           b "noObservations" i.Observations.IsEmpty
           b "noHypotheses" i.Hypotheses.IsEmpty
           b "noEvidence" i.Evidence.IsEmpty
-          b "noRelationships" i.Relationships.IsEmpty ]
+          b "noRelationships" i.Relationships.IsEmpty
+          b "noConclusions" i.Conclusions.IsEmpty
+          let lastIndex = i.Conclusions.Length - 1
+          items "conclusions" (i.Conclusions |> List.mapi (fun n c ->
+              let (ConclusionId cid) = c.Id
+              [ "id", S cid; "statement", S c.Statement; "isCurrent", B(n = lastIndex)
+                "basedOn", S(sprintf "Based on %d current relationship(s)" c.BasedOn.Length) ])) ]
 
 let project (m: Model) : (string * ViewValue) list =
     [ b "onList" (m.Screen = ListScreen)
