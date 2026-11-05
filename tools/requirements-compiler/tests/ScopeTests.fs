@@ -683,7 +683,7 @@ let cf07Deferral (source: string) : string list =
     let journeyCodes (e: Ledger.SliceEvidence) =
         Ledger.sliceRules |> List.filter (fun r -> r.Id = "journeys") |> List.collect (fun r -> r.Check s e) |> List.map (fun r -> r.Code)
     [ // a needed slice not integrated: the assertion is deferred, no journey evidence is demanded at this merge
-      let deferredCase = evidence [ "J1-03", [ "SL-WI-GEN-EXT-DATA"; "SL-WI-INV-START" ] ] [] [ "J1-03" ]
+      let deferredCase = evidence [ "J1-03", [ "SL-WI-INV-LIST"; "SL-WI-INV-START" ] ] [] [ "J1-03" ]
       if Ledger.deferredAssertions s deferredCase <> [ "J1-03" ] then yield sprintf "cf07: J1-03 not deferred: %A" (Ledger.deferredAssertions s deferredCase)
       if not (journeyCodes deferredCase).IsEmpty then yield sprintf "cf07: a deferred assertion still demanded journeys: %A" (journeyCodes deferredCase)
       // control: no needs map -> every bound assertion is judged (the rule before ODR-R10-33)
@@ -697,8 +697,29 @@ let cf07Deferral (source: string) : string list =
       // and with one of those obligations missing, the needed slice is not integrated: deferred again
       if Ledger.deferredAssertions s (evidence [ "J1-03", [ "SL-WI-INV-LIST" ] ] (List.tail listObligations) [ "J1-03" ]) <> [ "J1-03" ] then yield "cf07: a partly verified needed slice counted as integrated"
       // partial: one assertion deferred, the other judged -> the judged one still demands its journey
-      let mixed = evidence [ "J1-03", [ "SL-WI-GEN-EXT-DATA" ] ] [] [ "J1-03"; "J1-06" ]
+      let mixed = evidence [ "J1-03", [ "SL-WI-INV-LIST" ] ] [] [ "J1-03"; "J1-06" ]
       if Ledger.deferredAssertions s mixed <> [ "J1-03" ] || journeyCodes mixed <> [ "JOURNEYS_MISSING" ] then yield sprintf "cf07: mixed case %A %A" (Ledger.deferredAssertions s mixed) (journeyCodes mixed)
+      // review CF07-1: a needed item proved only by the builder's own Praxis records (WI-GEN-EXT-DATA: every requirement
+      // record-only or live) counts as present, so withholding its completion event cannot defer the assertion
+      if journeyCodes (evidence [ "J1-03", [ "SL-WI-GEN-EXT-DATA" ] ] [] [ "J1-03" ]) <> [ "JOURNEYS_MISSING" ] then yield "cf07: a missing Praxis completion event deferred the assertion"
+      // review CF07-2: in a live slice, a needed item's live or WebKit obligations do not count, so breaking them cannot defer
+      let liveSlice (assertions: string list) = JObj [ "id", JStr "SL-T19"; "dependsOn", JArr []; "realProvider", JBool true; "governedAssertions", JArr(assertions |> List.map JStr) ]
+      let liveCase = { evidence [ "J1-04", [ "SL-WI-INV-LIST" ] ] listObligations [ "J1-04" ] with Slice = liveSlice [ "J1-04" ] }
+      if Ledger.deferredAssertions s liveCase <> [] then yield "cf07: a needed item's live obligations deferred the assertion in a live slice"
+      // review CF07-3: the governed needs file carries PR #121's rules unchanged, and every assertion bound in the approved
+      // slice manifest is named in it or deliberately judged at every merge (J1-01 needs nothing but its own slice)
+      let governed = parseFile (Path.Combine(source, "docs/rehearsal-010-readiness/assertion-merge-needs.json"))
+      let original = parseFile (Path.Combine(source, "proposals/r10-contract-first-ui/schedule-inputs/hidden-merge-dependencies.json"))
+      if serialize (field "rules" governed |> Option.defaultValue JNull) <> serialize (field "rules" original |> Option.defaultValue JNull) then yield "cf07: the governed needs file's rules differ from PR #121's"
+      let named = Ledger.assertionNeedsOf governed |> Map.toList |> List.map fst |> Set.ofList
+      let bound = arr "slices" (parseFile (Path.Combine(source, "docs/rehearsal-010-readiness/slice-execution-manifest.json"))) |> List.collect (strs "governedAssertions") |> Set.ofList
+      let unnamed = Set.difference bound named
+      if unnamed <> set [ "J1-01" ] then yield sprintf "cf07: bound assertions missing from the needs file: %A (only J1-01 is judged at every merge by design)" unnamed
+      // review CF07-4: the governed gate passes the file, and through the parser SL-T16's J2-08 is deferred on an empty ledger
+      let gateYml = File.ReadAllText(Path.Combine(source, "tools/r9/verification-gate.yml"))
+      if not (gateYml.Contains "--assertion-needs \"$src/docs/rehearsal-010-readiness/assertion-merge-needs.json\"") then yield "cf07: the governed gate does not pass --assertion-needs"
+      let t16 = { evidence [] [] [ "J2-08" ] with Slice = JObj [ "id", JStr "SL-T16"; "dependsOn", JArr []; "governedAssertions", JArr [ JStr "J2-08" ] ]; AssertionNeeds = Ledger.assertionNeedsOf governed }
+      if Ledger.deferredAssertions s t16 <> [ "J2-08" ] then yield "cf07: SL-T16's J2-08 is not deferred with the governed needs file"
       // the verdict records what was deferred, so release knows what it still owes
       let verdict = Ledger.sliceVerdictJson (Ledger.deferredAssertions s deferredCase) deferredCase []
       if strs "deferredToRelease" verdict <> [ "J1-03" ] then yield "cf07: the slice verdict does not record the deferred assertion" ]

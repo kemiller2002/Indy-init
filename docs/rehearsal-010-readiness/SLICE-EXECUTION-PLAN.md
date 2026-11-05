@@ -25,7 +25,7 @@ Validated: `slice-manifest` exits 0 only when every requirement is placed; other
 
 **Cross-cutting checks** run for every UI-bearing slice and for the release:
 - the design contract;
-- the governed journeys, judged per assertion;
+- the governed journeys, judged per assertion. An assertion whose needed slices are not present yet ([`assertion-merge-needs.json`](assertion-merge-needs.json)) is not judged at that merge; the completion gate judges every assertion at release (ODR-R10-33 A);
 - regression of every integrated obligation.
 
 A requirement never disappears because it lacks a DAG task:

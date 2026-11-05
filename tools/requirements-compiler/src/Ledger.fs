@@ -384,7 +384,24 @@ let assertionNeedsOf (j: Json) : Map<string, string list> =
     |> List.collect (fun r -> strs "assertions" r |> List.map (fun a -> a, strs "needs" r))
     |> List.groupBy fst |> List.map (fun (a, xs) -> a, xs |> List.collect snd |> List.distinct) |> Map.ofList
 
-/// CF-07 option A: the bound assertions this merge does not judge, because a slice they need is not integrated yet.
+/// Whether a needed work item counts as present for CF-07 deferral. Unlike workItemIntegrated, this leans toward
+/// JUDGING (review CF07-1, CF07-2): only obligations that any merge's regression proves count (mandatory, not
+/// record-only, not live-only, not WebKit-only), the builder's own Praxis records are ignored, and a requirement or
+/// work item with no such obligation counts as present. So a builder cannot defer an assertion by withholding a
+/// completion event or by breaking a needed slice's live or WebKit obligations.
+let private presentForJudging (s: State) (e: SliceEvidence) (d: string) : bool =
+    let items = arr "workItems" s.Progress.Manifest |> List.map (fun w -> str "id" w, strs "requirements" w) |> Map.ofList
+    let headVerified = e.Regression |> Option.map (strs "passed" >> Set.ofList) |> Option.defaultValue Set.empty
+    let reqs = arr "requirements" s.Progress.Manifest |> List.map (fun r -> str "id" r, r) |> Map.ofList
+    let provable (o: Json) =
+        boolOr "mandatory" true o && strOpt "kind" o <> Some "record"
+        && not (strs "producers" o |> List.exists (fun p -> liveProducers.Contains p || p = "SU-BROWSER-WEBKIT"))
+    items.TryFind d |> Option.defaultValue []
+    |> List.forall (fun rid ->
+        s.ExcludedBy.ContainsKey rid
+        || (reqs.TryFind rid |> Option.map (fun r -> arr "obligations" r |> List.filter provable |> List.forall (fun o -> headVerified.Contains(str "id" o))) |> Option.defaultValue true))
+
+/// CF-07 option A: the bound assertions this merge does not judge, because a slice they need is not present yet.
 /// A needed slice outside the scope's work items is ignored (the needs file names approved and successor ids alike).
 let deferredAssertions (s: State) (e: SliceEvidence) : string list =
     let self = str "id" e.Slice
@@ -393,7 +410,7 @@ let deferredAssertions (s: State) (e: SliceEvidence) : string list =
     |> List.filter (fun a ->
         Map.tryFind a e.AssertionNeeds |> Option.defaultValue []
         |> List.filter (fun n -> n <> self && inScope.Contains n)
-        |> List.exists (fun n -> not (workItemIntegrated s e (n.Substring 3))))
+        |> List.exists (fun n -> not (presentForJudging s e (n.Substring 3))))
 
 let sliceRules : SliceRule list =
     [ { Id = "main-healthy"

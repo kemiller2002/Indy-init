@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.r10-contract-first-ui.merge-dependencies/1",
-  "description": "Dependencies a slice's MERGE has but its declared dependsOn does not state: slice-gate's journeys rule (tools/requirements-compiler/src/Ledger.fs lines 391-410) requires every bound assertion to pass on both engines against api.github.com, so an assertion's steps must work live. Derived per assertion from verification/journeys/*.spec.mjs and support.mjs. Ids name both the approved (SL-WI-INV-START, ...) and the successor (SL-WI-INV-START-ACTIONS, ...) slices; the model ignores ids absent from the manifest it reads. Applied to BOTH policies. Corrected after the independent review (ADVERSARIAL-REVIEW.md R3): J1-03 and J2-01..08 do not save; UI-to-UI needs are included. Not modelled: ODR-R10-25/-26.",
+  "description": "The merge-time needs of each governed journey assertion: the slices whose work its journey steps need on main (derived per assertion from verification/journeys/*.spec.mjs and support.mjs by PR #121). Used by slice-gate --assertion-needs (Ledger.deferredAssertions) under owner decision ODR-R10-33 A. rules are PR #121's, unchanged (checked offline); ids absent from the scope are ignored.",
   "rules": [
     {
       "assertions": [
@@ -222,5 +222,5 @@
       ]
     }
   ],
-  "adoptedBy": "Owner decision ODR-R10-33 A (CF-07, APR-R10-OWNER-3): the slice gate judges a bound assertion only once every slice it needs (rules[].needs, other than the slice itself and present in the scope) is integrated; otherwise the completion gate judges it at release. Copied unchanged from proposals/r10-contract-first-ui/schedule-inputs/hidden-merge-dependencies.json (PR #121). An under-stated need judges an assertion early (the merge waits, nothing passes falsely); an over-stated need defers it to release, where it is still required."
+  "adoptedBy": "Owner decision ODR-R10-33 A (CF-07, APR-R10-OWNER-3): the slice gate judges a bound assertion only once every slice it needs (rules[].needs, other than the slice itself and present in the scope) is integrated; otherwise the completion gate judges it at release. rules copied unchanged from proposals/r10-contract-first-ui/schedule-inputs/hidden-merge-dependencies.json (PR #121). An under-stated need judges an assertion early (the merge waits, nothing passes falsely); an over-stated need defers it to release, where it is still required."
 }
