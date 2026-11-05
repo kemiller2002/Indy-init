@@ -301,9 +301,9 @@ let describe (e: PersistenceError) =
 /// - Edited: Conflict and Offline are kept (the user must resolve them); every other state, including Saving,
 ///   becomes Unsaved (a write in flight no longer covers the latest edits; its later outcome is then ignored).
 /// - SaveRequested: Unsaved | SaveFailed | UnknownOutcome -> Saving.
-/// - WriteConfirmed(v, t) while Saving -> Saved(v, t), provisionally: the contract's Saving case cannot carry the
-///   confirmed version while the read-back is pending (contract-change-request filed). ReadBackMatched then keeps
-///   Saved; ReadBackMismatched from Saved or Saving -> SaveFailed. ReadBackMatched while still Saving keeps Saving.
+/// - WriteConfirmed(v, t) while Saving stays Saving: the read-back is still pending (CR-3).
+/// - ReadBackMatched(v, t) while Saving -> Saved(v, t); Saved is never entered before the read-back.
+/// - ReadBackMismatched while Saving -> SaveFailed.
 /// - WriteRejected(VersionConflict(_, actual)) while Saving -> Conflict actual; other rejection -> SaveFailed reason.
 /// - WriteOutcomeUnknown while Saving -> UnknownOutcome.
 let saveTransition: SaveTransition =
@@ -312,9 +312,9 @@ let saveTransition: SaveTransition =
         | (Conflict _ | Offline), Edited -> state
         | _, Edited -> Unsaved
         | (Unsaved | SaveFailed _ | UnknownOutcome), SaveRequested -> Saving
-        | Saving, WriteConfirmed(v, at) -> Saved(v, at)
-        | Saved _, ReadBackMatched -> state
-        | (Saving | Saved _), ReadBackMismatched -> SaveFailed "The saved data did not match on read-back."
+        | Saving, WriteConfirmed _ -> Saving
+        | Saving, ReadBackMatched(v, at) -> Saved(v, at)
+        | Saving, ReadBackMismatched -> SaveFailed "The saved data did not match on read-back."
         | Saving, WriteRejected(VersionConflict(_, actual)) -> Conflict actual
         | Saving, WriteRejected e -> SaveFailed(describe e)
         | Saving, WriteOutcomeUnknown -> UnknownOutcome

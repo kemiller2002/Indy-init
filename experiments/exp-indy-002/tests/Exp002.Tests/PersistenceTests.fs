@@ -84,16 +84,21 @@ let tests =
                     (match save 1 doc s1 with Ok(_, v2) -> equal 2 v2 | Error e -> Error(sprintf "%A" e))
                     equal (Error(VersionConflict(0, 1))) (save 0 doc s1 |> Result.map snd)
                     equal (Ok 0) (currentVersion emptyStore doc.Id) ])
-      test "UT-INV-015" "happy save path: Unsaved -> Saving -> Saved(v,t) -> read-back keeps Saved" (fun () ->
-          let steps = [ SaveRequested; WriteConfirmed(4, t2); ReadBackMatched ]
+      test "UT-INV-015" "happy save path: Unsaved -> Saving -> (write confirmed) Saving -> (read-back) Saved(v,t)" (fun () ->
+          let steps = [ SaveRequested; WriteConfirmed(4, t2); ReadBackMatched(4, t2) ]
           let states = List.scan saveTransition Unsaved steps
-          equal [ Unsaved; Saving; Saved(4, t2); Saved(4, t2) ] states)
+          equal [ Unsaved; Saving; Saving; Saved(4, t2) ] states)
+      test "UT-INV-015" "Saved is never entered before the read-back" (fun () ->
+          let states = List.scan saveTransition Unsaved [ SaveRequested; WriteConfirmed(4, t2) ]
+          check (states |> List.forall (function Saved _ -> false | _ -> true)) (sprintf "Saved reached early: %A" states))
       test "UT-INV-015" "failure paths: conflict, rejection, unknown outcome, read-back mismatch" (fun () ->
           all
               [ equal (Conflict 7) (saveTransition Saving (WriteRejected(VersionConflict(6, 7))))
                 equal (SaveFailed(describe (StorageUnavailable "quota"))) (saveTransition Saving (WriteRejected(StorageUnavailable "quota")))
                 equal UnknownOutcome (saveTransition Saving WriteOutcomeUnknown)
-                check (match saveTransition (Saved(4, t2)) ReadBackMismatched with SaveFailed _ -> true | _ -> false) "mismatch after confirm -> SaveFailed"
+                check
+                    (match List.fold saveTransition Saving [ WriteConfirmed(4, t2); ReadBackMismatched ] with SaveFailed _ -> true | _ -> false)
+                    "write confirmed then mismatched read-back -> SaveFailed"
                 check (match saveTransition Saving ReadBackMismatched with SaveFailed _ -> true | _ -> false) "mismatch while saving -> SaveFailed" ])
       test "UT-INV-016" "Edited marks Unsaved from Saved/Saving/SaveFailed/UnknownOutcome; Conflict and Offline kept" (fun () ->
           all
@@ -112,7 +117,8 @@ let tests =
                 equal Saving (saveTransition Saving SaveRequested)
                 equal Unsaved (saveTransition Unsaved (WriteConfirmed(2, t1)))
                 equal (Conflict 3) (saveTransition (Conflict 3) SaveRequested)
-                equal Saving (saveTransition Saving ReadBackMatched) ])
+                equal (Saved(1, t0)) (saveTransition (Saved(1, t0)) (ReadBackMatched(2, t1)))
+                equal Unsaved (saveTransition Unsaved (ReadBackMatched(2, t1))) ])
       test "UT-INV-016" "Engine.ports wires the real implementations" (fun () ->
           let p = Engine.ports
           all
