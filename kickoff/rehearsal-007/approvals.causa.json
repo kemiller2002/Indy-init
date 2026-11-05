@@ -504,6 +504,79 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-HC-OWNER-1",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-05",
+      "changes": [
+        {
+          "decision_id": "OD-HC-01",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "proposals/r10-historical-data-compatibility/SUCCESSOR-CONTRACT.md",
+              "sha256": "c5dfcd4da99b8e82a73a59d715423bb02f2fe51ae131df09f1bb2db35bfd8a7c"
+            },
+            {
+              "path": "proposals/r10-historical-data-compatibility/src/SuccessorContract.fs",
+              "sha256": "14ead8479b211d7298da1af687d7164117be5775cf985a7985f88a38f67825eb"
+            }
+          ]
+        },
+        {
+          "decision_id": "OD-HC-02",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "OD-HC-03",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "OD-HC-04",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "proposals/r10-historical-data-compatibility/REPLAY-VERIFICATION.md",
+              "sha256": "a222980960a9f272b1a97712dd26dcc7e1d5530460f06fa9070de46ec0abe0b6"
+            }
+          ]
+        },
+        {
+          "decision_id": "OD-HC-05",
+          "action": "decide",
+          "option": "B",
+          "pins": [
+            {
+              "path": "proposals/r10-historical-data-compatibility/INTEGRATION-HANDOFF.md",
+              "sha256": "bb14b1f59d7649ba326d3ddcb6fe1bad98f166cd5df18750421230831c72b5c1"
+            }
+          ]
+        },
+        {
+          "decision_id": "OD-HC-06",
+          "action": "decide",
+          "option": "B",
+          "pins": [
+            {
+              "path": "proposals/r10-historical-data-compatibility/SCHEMA-DIFF.md",
+              "sha256": "bb1357dbc203c7a1792fb37fb24bd6dc5d10ee902c8570eedb90d154b92a02ba"
+            }
+          ]
+        },
+        {
+          "decision_id": "OD-HC-07",
+          "action": "decide",
+          "option": "B"
+        }
+      ]
     }
   ]
 }
