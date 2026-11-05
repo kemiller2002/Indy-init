@@ -11,6 +11,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Exp002.Ui/Exp002.Ui.fsproj" />
+    <ProjectReference Include="../Exp002.Engine/Exp002.Engine.fsproj" />
     <SupportedPlatform Include="browser" />
   </ItemGroup>
 </Project>

@@ -98,7 +98,7 @@ let testIds = entries |> List.collect (fun e -> arr e "tests" |> List.map (fun t
 let testSourceProblems =
     if args |> List.contains "--tests" then
         let sources = Directory.GetFiles(Path.Combine(root, "tests"), "*.*", SearchOption.AllDirectories) |> Array.filter (fun f -> not (f.Contains "/bin/" || f.Contains "/obj/")) |> Array.map File.ReadAllText |> String.concat "\n"
-        testIds |> List.filter (fun t -> sources.Contains("\"" + t + "\"") |> not) |> List.map (sprintf "%s: C4 test ID not found in tests/")
+        testIds |> List.filter (fun t -> Regex.IsMatch(sources, "\"" + Regex.Escape t + "[\" ]") |> not) |> List.map (sprintf "%s: C4 test ID not found in tests/")
     else []
 
 let problems = coverageProblems @ (entries |> List.collect checkEntry) @ unboundCommands @ testSourceProblems

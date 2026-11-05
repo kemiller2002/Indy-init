@@ -2,7 +2,8 @@
 // controls by their registry labels and requirement IDs (data-requirement-id), never by the UI agent's markup.
 // Browser automation only; contains no application logic.
 //   NODE_PATH=$(npm root -g) node tests/acceptance/e2e.mjs http://localhost:4174/ [results.json]
-import { chromium } from "playwright";
+import { createRequire } from "node:module";
+const { chromium } = createRequire(import.meta.url)("playwright");
 import { writeFileSync } from "node:fs";
 
 const base = process.argv[2] ?? "http://localhost:4174/";
@@ -105,7 +106,8 @@ const started = await step("AT-08 start investigation", ["INV-004", "INV-001", "
   expect(await page.getByText(title).first().isVisible(), "title not shown");
 });
 
-if (started) {
+const reachedWorkspace = started || (await hash(page)) === `#/investigations/${id}`;
+if (reachedWorkspace) {
   await step("AT-09 record observation", ["INV-014", "INV-024", "INV-025"], async () => {
     await page.getByRole("button", { name: "Record an observation" }).click();
     await page.getByLabel("Observation", { exact: true }).fill("");
