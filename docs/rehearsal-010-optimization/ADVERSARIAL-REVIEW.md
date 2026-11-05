@@ -51,7 +51,7 @@ The reviewer re-verified the round-1 fixes. RVO-1-1 holds for the cases raised (
 
 ### Round 3
 
-Requested together with the addendum's eight checks; see FINAL-REPORT.md.
+Requested on 1ead513 together with the addendum's eight checks; result below when it completes.
 
 ## The ten mission questions (from round 1 unless noted)
 
