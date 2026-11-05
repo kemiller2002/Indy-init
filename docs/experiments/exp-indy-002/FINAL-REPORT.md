@@ -158,7 +158,7 @@ PR [kemiller2002/Indy-init#140](https://github.com/kemiller2002/Indy-init/pull/1
   - `r10-adversarial-cases` shards 1 and 2
 - **Did not complete:** `r10-adversarial-cases (0)` hit the job timeout after 45 min, still in setup. `playwright install --with-deps` was downloading apt packages from the runner mirror very slowly, and no test had run. The `r10-adversarial` aggregator therefore reports failure ("shards: cancelled").
 - The PR changes nothing under `.github/`, `verification/` or `tools/r10`, so I judge this to be the runner environment, not the candidate.
-- That judgement is **unconfirmed**: failed jobs were re-run once (run 42115761982, queued 22:35Z), and the result is not part of this report. It will be reported separately after the cutoff.
+- That judgement is **unconfirmed**. Failed jobs were re-run once (run 42115761982, queued 22:35Z). That re-run was superseded by the push of this report, whose head carries identical application code and gets its own full Preflight run. Neither result is part of this report. It will be reported separately after the cutoff.
 - The contract groups therefore stay at **INTEGRATION_READY**. None is marked VERIFIED, because VERIFIED requires every applicable acceptance check, including required CI.
 
 ## 6. Comparison with milestone-first (schedule C)
