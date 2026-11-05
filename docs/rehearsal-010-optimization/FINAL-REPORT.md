@@ -174,7 +174,7 @@ Its wording findings RVO-5-1..7 were fixed.
 
 ## Execution readiness (continuation)
 
-**Launch blocker, found by Agent 2 (CF-07, PR #121) and confirmed here.** Under the frozen slice gate's journeys rule (Ledger.fs 391–410), the approved plan cannot complete. SL-T16, the shell, is bound to J2-08, which needs slices that depend on T16; slices sharing J1-03 or J1-06 need each other. All 42 merge-dependency edges lie on cycles. Every milestone time in these documents assumes the literal CF-07 option A (assertions whose needs are not yet merged are judged at release). It is not a bound: under a stricter minimal deferral, Connect and Browse move past 420 minutes in every plan. See [execution-readiness/CROSS-AGENT-FINDINGS.md](execution-readiness/CROSS-AGENT-FINDINGS.md).
+**Launch blocker, found by Agent 2 (CF-07, PR #121) and confirmed here.** Under the frozen slice gate's journeys rule (Ledger.fs 391–410), the approved plan cannot complete. SL-T16, the shell, is bound to J2-08, which needs slices that depend on T16; slices sharing J1-03 or J1-06 need each other. All 42 merge-dependency edges lie on cycles. Every milestone time in these documents assumes the literal CF-07 option A (assertions whose needs are not yet merged are judged at release). It is not a bound. Under a stricter greedy cycle-breaking deferral, Browse (M2) moves past 420 minutes in every plan, and Connect (M1) does too except in the combined plan at 0-min CI (T+416). See [execution-readiness/CROSS-AGENT-FINDINGS.md](execution-readiness/CROSS-AGENT-FINDINGS.md).
 
 Full report: [execution-readiness/FINAL-REPORT.md](execution-readiness/FINAL-REPORT.md).
 

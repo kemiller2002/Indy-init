@@ -15,7 +15,7 @@
 
 This is independent of every optimization, and needs the owner's decision on CF-07 (Agent 2, PR #121) before any launch. Details and runs: CROSS-AGENT-FINDINGS.md.
 
-**Every milestone time in this report assumes the literal CF-07 option A.** Under that reading, journey-bound assertions whose needs are not yet on main are judged at release, so merges are never delayed. This is not a bound: the model is not monotone in added constraints (review RVO-8-1). Under the stricter minimal-deferral rule, the combined plan's authoritative list moves from T+239 to T+545 at 10-min CI. The raw M0 browser is unaffected. See CROSS-AGENT-FINDINGS.md.
+**Every milestone time in this report assumes the literal CF-07 option A.** Under that reading, journey-bound assertions whose needs are not yet on main are judged at release, so merges are never delayed. This is not a bound: the model is not monotone in added constraints (review RVO-8-1). Under the stricter greedy cycle-breaking rule, the combined plan's authoritative list moves from T+239 to T+545 at 10-min CI. The raw M0 browser is unaffected. See CROSS-AGENT-FINDINGS.md.
 
 ## 1. Current bottleneck ranking
 

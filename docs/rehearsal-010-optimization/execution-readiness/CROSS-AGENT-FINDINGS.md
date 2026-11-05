@@ -18,7 +18,7 @@ So a slice can merge only after every slice its journeys' earlier steps need is 
 
 **Counts, and what they mean** (corrected after review RVO-8-2). Deadlock is a property of **slices**: a slice can never merge, as frozen, if it lies on a cycle of the combined wait-for graph (`dependsOn` plus the journeys' merge dependencies). Three edge sets matter:
 
-| Plan | Merge-dependency edges | On any cycle | Closing a cycle through `dependsOn` alone (impossible whatever else is deferred) | Minimal cycle-breaking set (`--defer-cyclic minimal`) | Agent 2's deferred set |
+| Plan | Merge-dependency edges | On any cycle | Closing a cycle through `dependsOn` alone (impossible whatever else is deferred) | Greedy cycle-breaking set (`--defer-cyclic minimal`) | Agent 2's deferred set |
 |---|---|---|---|---|---|
 | Approved | 42 | 42 | 9 (7 of them SL-T16's) | 21 | 22 |
 | Successor | 126 | 93 | 18 | 36 | 35 |
@@ -35,7 +35,7 @@ So a slice can merge only after every slice its journeys' earlier steps need is 
 
 `tools/r10/schedule-core.fsx` now models merge dependencies:
 - a slice is **built** when its `dependsOn` are integrated, and **enters the merge queue** only once its merge dependencies are on main;
-- cycles are refused unless `--defer-cyclic all` (every edge on a cycle) or `--defer-cyclic minimal` (a cycle-breaking set, deferred one edge at a time in a fixed order);
+- cycles are refused unless `--defer-cyclic all` (every edge on a cycle) or `--defer-cyclic minimal` (a **greedy** cycle-breaking set: cyclic edges deferred one at a time in sorted order until no cycle remains. It is not a minimum set: 36 edges in the successor against Agent 2's 35, and 21 against 22 in the approved plan; review RVO-9-3);
 - the input file, its sha256 and the policy are recorded in each result (`mergeDependencies`).
 
 Three policies, at 10-min CI (minutes after T0):
@@ -45,19 +45,19 @@ Three policies, at 10-min CI (minutes after T0):
 | Approved | none, as frozen | – | **never** (deadlock) | never | never | never | never |
 | Approved | literal option A (published R0) | – | 681 | 794 | 739 | 566 | 794 |
 | Approved | all cyclic deferred (J0) | – | 681 | 794 | 739 | 566 | 794 |
-| Approved | minimal deferral (J0-minimal) | – | 931 | 983 | 983 | 983 | 1,153 |
+| Approved | greedy cycle-breaking deferral (J0-minimal) | – | 931 | 983 | 983 | 983 | 1,153 |
 | Optimized | literal option A (published R2) | – | 283 | 309 | 489 | 667 | 769 |
 | Optimized | all cyclic deferred (J2) | – | 283 | 309 | 489 | 700 | 769 |
-| Optimized | minimal deferral (J2-minimal) | – | 721 | 747 | 495 | 808 | 834 |
+| Optimized | greedy cycle-breaking deferral (J2-minimal) | – | 721 | 747 | 495 | 808 | 834 |
 | Combined | literal option A (published E8) | 120 | 270 | 239 | 387 | 496 | 565 |
 | Combined | all cyclic deferred (J8) | 120 | 270 | 239 | 387 | 509 | 563 |
-| Combined | minimal deferral (J8-minimal) | 120 | 505 | 545 | 402 | 594 | 617 |
+| Combined | greedy cycle-breaking deferral (J8-minimal) | 120 | 505 | 545 | 402 | 594 | 617 |
 
 Results: `results/J0-*`, `J2-*`, `J8-*`, each with and without `-minimal`.
 
 **What this means.**
 1. **The published figures are not a bound** (corrected; review RVO-8-1). They are the result under the literal option A. The greedy model is not monotone in added constraints: some times come out *earlier* with more merge dependencies. Examples: J2 M5 690 against published 700; J8 completion 563 against 565.
-2. **Under minimal deferral, the early milestones that depend on journeys move by hours.** The combined plan's authoritative list (M2) goes from T+239 to T+545.
+2. **Under greedy cycle-breaking deferral, the early milestones that depend on journeys move by hours.** The combined plan's authoritative list (M2) goes from T+239 to T+545.
 3. **The raw data browser M0 is unaffected (T+101–120).** It carries no journey binding (ODR-R10-30).
 4. **The CF-07 decision decides which row applies.** Literal option A keeps the published schedule but moves those assertions' judgment to the release gate. A stricter rule pushes Connect and Browse past 420 minutes in every plan.
 5. **Agent 2's own tool** (setup 45, its role files, a serial queue) gives all-slices T+709 to T+1,164 at 10-min CI across its configurations (`bound-results.txt` at b89465a). Those are different configurations, so they are not a range for these rows.
@@ -87,7 +87,7 @@ Results: `results/J0-*`, `J2-*`, `J8-*`, each with and without `-minimal`.
 | Contract-first, 3 UI agents | 1 | 278/437/583 | 340/453/635 | 328/493/726 | 435/622/838 |
 | Contract-first, **3 UI agents** | **3** | **278/290/313** | **340/351/367** | **328/348/380** | **435/471/518** |
 
-**Sensitivity bound: minimal deferral (Agent 2's `contract-first-bound.fsx`, its own serial queue).** Data Visible / Understood / Editable / all, in minutes after T0:
+**Sensitivity: greedy cycle-breaking deferral (Agent 2's `contract-first-bound.fsx`, its own serial queue).** Data Visible / Understood / Editable / all, in minutes after T0:
 
 | Plan | 0-min CI | 5-min CI | 10-min CI |
 |---|---|---|---|
@@ -97,12 +97,27 @@ Results: `results/J0-*`, `J2-*`, `J8-*`, each with and without `-minimal`.
 | Contract-first, 2 UI agents | 468/477/486/582 | 571/603/627/663 | 760/812/864/864 |
 | Contract-first, 3 UI agents | 364/373/382/475 | 502/534/558/594 | 708/760/812/812 |
 
-**Reading the two together:**
+**Sensitivity: greedy cycle-breaking deferral in this model** (`--defer-cyclic minimal`, same settings as the primary table; `results/K-*-minimal.json`, with provenance). Data Visible / Understood / Editable / all, in minutes after T0 at 0 / 5 / 10-min CI:
+
+| Plan | Queue depth | Data Visible | Data Understood | Data Editable | All integrated |
+|---|---|---|---|---|---|
+| Current plan | 1 | 755/851/962 | 764/875/1001 | 774/885/1014 | 797/908/1037 |
+| Current plan | 3 | 755/838/915 | 764/857/944 | 774/872/964 | 797/895/987 |
+| Contract-first, existing UI agents | 1 | 620/718/824 | 632/750/876 | 635/758/902 | 740/822/928 |
+| Contract-first, existing UI agents | 3 | 620/659/712 | 632/678/741 | 635/683/751 | 740/787/833 |
+| Contract-first, 1 UI agent | 1 | 773/871/977 | 785/903/1029 | 788/911/1055 | 893/975/1081 |
+| Contract-first, 1 UI agent | 3 | 773/812/865 | 785/831/894 | 788/836/904 | 893/940/986 |
+| Contract-first, 2 UI agents | 1 | 475/554/728 | 481/578/767 | 490/610/819 | 562/658/832 |
+| Contract-first, 2 UI agents | 3 | 475/499/539 | 481/515/565 | 490/526/581 | 562/614/660 |
+| Contract-first, 3 UI agents | 1 | 359/504/701 | 371/536/753 | 374/544/779 | 479/608/805 |
+| Contract-first, **3 UI agents** | **3** | **359/401/454** | **371/420/483** | **374/425/493** | 479/529/575 |
+
+**Reading them together:**
 1. **Contract-first helps only with more UI agents.** With one UI agent it is *later* than the current plan under both deferral rules: the single lane builds everything and then waits at the queue.
-2. **Three UI agents with the speculative queue** is the only configuration that puts all three capabilities inside 420 minutes at every CI value, under option A: Data Visible T+278–313, everything integrated T+435–518. Under minimal deferral, the same plan misses 420 at every CI value.
+2. **Three UI agents with the speculative queue** is the only configuration whose three capabilities are all inside 420 minutes at every CI value under literal-A-style deferral (`all`): Data Visible T+278–313, everything integrated T+435–518. Under greedy cycle-breaking deferral, the capabilities fit only at 0-min CI: T+359–374 in this model, T+364–382 in Agent 2's tool. At 5-min CI only Data Visible (T+401) and Data Understood (T+420) fit, in this model only. At 10-min CI nothing fits. Full integration is past 420 in every greedy run (corrected in review RVO-9-1).
 3. **The queue depth matters more as CI slows.** For contract-first with three UI agents at 10-min CI, depth 1 gives Data Visible T+583 and depth 3 gives T+313.
 4. **Non-monotonic cells appear here too** (the current plan, depth 1: Data Visible 674 at 5-min CI, 620 at 10-min CI). Read each row as a range.
-5. **Under the narrower deferral, nothing fits in 420 minutes.** So the CF-07 decision is worth more than any agent-count or ordering change.
+5. **The CF-07 policy moves the capabilities by 80–140 minutes** for the best plan (three UI agents, depth 3), at 0, 5 and 10-min CI. That is the same order as the gain from adding UI agents (two → three: about 85–115 minutes under the greedy policy). Neither alone brings full integration inside 420 minutes under the greedy policy.
 6. **Data Visible here is PR #121's capability**, including T25 and the authoritative list. It is not this branch's M0 raw browser (MINIMUM-DATA-BROWSER.md), which arrives earlier and needs no T25.
 
 ### Other Agent 2 material

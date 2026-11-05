@@ -167,3 +167,18 @@ The implementation passed: no early merge, equivalence and published runs preser
 | RVO-8-2 | minor | Counts conflated edges on cycles with edges that must be deferred | **Fixed:** the table shows on-cycle, impossible (dependsOn-only), minimal cycle-breaking and Agent 2's sets. `--defer-cyclic minimal` is implemented; it defers 21 and 36, against Agent 2's 22 and 35 |
 | RVO-8-3 | minor | J runs record no merge-dependency input or policy | **Fixed:** `mergeDependencies` (file, sha256, policy, edges deferred) is written to each result. The input lives only in PR #121, so the J runs are not in the reproduction test (stated) |
 | RVO-8-4 | minor | Test 2 did not bite | **Fixed:** it uses a merge dependency ordinary scheduling would not satisfy (T11 waits for T20), checks that it would bite, and fails when merge dependencies are ignored. A minimal-deferral case was added |
+
+### Round 9 (4947573): FAIL, 1 major (documentation)
+
+The RVO-8 fixes, the provenance record, the strengthened test, the K-* table and `contract-first-inputs.fsx` all reproduced.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-9-1 | major | Conclusions 2 and 5 said nothing fits in 420 minutes under the stricter deferral; the table shows all three capabilities fit at 0-min CI | **Fixed:** greedy-policy K runs added in this model (`K-*-minimal.json`); conclusions rewritten from both tables |
+| RVO-9-2 | minor | "Connect and Browse past 420 in every plan" was false for Connect in J8 at 0-min CI (T+416) | **Fixed** |
+| RVO-9-3 | minor | "Minimal" is greedy, not minimum; one table was still headed "bound" | **Fixed:** renamed in the docs; the CLI value `minimal` is documented as greedy |
+| RVO-9-4 | note | No K run under this model's stricter policy | **Fixed** (10 runs, with provenance) |
+
+### Round 10
+
+Requested on the fix commit.
