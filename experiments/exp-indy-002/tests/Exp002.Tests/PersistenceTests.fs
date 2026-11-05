@@ -22,6 +22,7 @@ let fullSession =
         (t2, LinkEvidence { linkInput with EvidenceId = "E-1"; HypothesisId = "H-2"; Kind = Some ConsistentWith })
         (t2, ReviseRelationship(RelationshipId "R-1", { Kind = Some Inconclusive; Rationale = "revised ⇒" }))
         (t2, WithdrawRelationship(RelationshipId "R-2", "withdrawn ∅"))
+        (t2, RecordConclusion { Statement = "Conclusion ✔ — ORM N+1 likely" })
         (Timestamp 9_007_199_254_740_993L, EditInvestigationDetails { ProblemStatement = "  edited  problem  "; Title = "T"; PrimaryQuestion = "" }) ]
 
 let fullLog () =
@@ -34,7 +35,7 @@ let tests =
               let doc = { Id = InvestigationId uuid; Version = 3; Events = events }
               let cases =
                   events |> List.map (fun e -> (Microsoft.FSharp.Reflection.FSharpValue.GetUnionFields(e, typeof<Event>) |> fst).Name) |> List.distinct
-              all [ equal 11 cases.Length; equal (Ok doc) (decode (encode doc)) ]))
+              all [ equal 12 cases.Length; equal (Ok doc) (decode (encode doc)) ]))
       test "UT-INV-017" "save -> load -> replay restores every entered value" (fun () ->
           match runAll fullSession with
           | Error e -> Error(sprintf "%A" e)

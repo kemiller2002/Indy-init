@@ -99,6 +99,10 @@ let rationale (value: string) : Result<string, FieldError list> = requiredText "
 let validateRelationship: ValidateRelationship =
     fun input -> both (kind input.Kind) (rationale input.Rationale)
 
+/// INV-033: conclusion statement required, <= 10000.
+let validateConclusion: ValidateConclusion =
+    fun input -> requiredText "INV-033" 10000 input.Statement
+
 /// Reassessment of a relationship: the same rules as a new link (INV-031, INV-038).
 let validateRevision (input: RelationshipRevisionInput) : Result<RelationshipKind * string, FieldError list> =
     both (kind input.Kind) (rationale input.Rationale)

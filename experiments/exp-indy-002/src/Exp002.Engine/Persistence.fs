@@ -85,6 +85,16 @@ let private event (e: Event) : JsonNode =
         ev "RelationshipRevised" [ "previous", str prev; "next", relationship next; "at", ts at ]
     | RelationshipWithdrawn(RelationshipId id, reason, at) ->
         ev "RelationshipWithdrawn" [ "relationshipId", str id; "reason", str reason; "at", ts at ]
+    | ConclusionRecorded(c, at) ->
+        let (ConclusionId id) = c.Id
+        ev
+            "ConclusionRecorded"
+            [ "conclusion",
+              obj
+                  [ "id", str id
+                    "statement", str c.Statement
+                    "basedOn", arr (c.BasedOn |> List.map (fun (RelationshipId r) -> str r)) ]
+              "at", ts at ]
 
 let schema = "exp002.investigation/1"
 
@@ -260,6 +270,21 @@ let private decodeEvent (n: JsonNode) : R<Event> =
             let! id = getString o "relationshipId"
             let! reason = getString o "reason"
             return RelationshipWithdrawn(RelationshipId id, reason, at)
+        | "ConclusionRecorded" ->
+            let! c = getObject o "conclusion"
+            let! id = getString c "id"
+            let! statement = getString c "statement"
+            let! basedOn =
+                field c "basedOn"
+                |> Result.bind (function
+                    | :? JsonArray as a ->
+                        a
+                        |> Seq.toList
+                        |> traverse (function
+                            | :? JsonValue as v when v.GetValueKind() = JsonValueKind.String -> Ok(RelationshipId(v.GetValue<string>()))
+                            | _ -> Error "'basedOn' item is not a string")
+                    | _ -> Error "'basedOn' is not an array")
+            return ConclusionRecorded({ Id = ConclusionId id; Statement = statement; BasedOn = basedOn }, at)
         | other -> return! Error(sprintf "unknown event type '%s'" other)
     }
 

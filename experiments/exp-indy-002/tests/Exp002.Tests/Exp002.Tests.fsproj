@@ -9,6 +9,7 @@
     <Compile Include="StartTests.fs" />
     <Compile Include="DomainTests.fs" />
     <Compile Include="PersistenceTests.fs" />
+    <Compile Include="ConclusionTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

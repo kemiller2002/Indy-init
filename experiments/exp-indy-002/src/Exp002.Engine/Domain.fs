@@ -30,6 +30,7 @@ let private apply (inv: Investigation) (event: Event) : Investigation =
     | RelationshipRevised(previous, next, _) ->
         { inv with Relationships = (setStatus previous (Revised next.Id) inv.Relationships) @ [ next ] }
     | RelationshipWithdrawn(id, reason, _) -> { inv with Relationships = setStatus id (Withdrawn reason) inv.Relationships }
+    | ConclusionRecorded(c, _) -> { inv with Conclusions = inv.Conclusions @ [ c ] }
 
 /// Folds one event. Non-start events are ignored when there is no investigation (decide never emits them);
 /// a second start is ignored.
@@ -46,6 +47,7 @@ let evolve: Evolve =
                   Hypotheses = []
                   Evidence = []
                   Relationships = []
+                  Conclusions = []
                   History = [ { Sequence = 1; Event = event } ] }
         | Some _, InvestigationStarted _ -> state
         | None, _ -> None
@@ -152,6 +154,17 @@ let private decideOn (inv: Investigation) (at: Timestamp) (command: Command) : R
         findRelationship inv id
         |> Result.bind (fun _ -> Validation.rationale reason |> invalid)
         |> Result.map (fun r -> [ RelationshipWithdrawn(id, r, at) ])
+    | RecordConclusion input ->
+        // INV-032: a snapshot; BasedOn = the relationships Current right now, in recording order. State stays Open.
+        Validation.validateConclusion input
+        |> invalid
+        |> Result.map (fun statement ->
+            [ ConclusionRecorded(
+                  { Id = ConclusionId(sprintf "C-%d" (inv.Conclusions.Length + 1))
+                    Statement = statement
+                    BasedOn = inv.Relationships |> List.filter (fun r -> r.Status = Current) |> List.map (fun r -> r.Id) },
+                  at
+              ) ])
 
 /// Total and pure: start needs no investigation; every other command needs one.
 let decide: Decide =
