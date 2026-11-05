@@ -496,12 +496,16 @@
         {
           "record": "RelationshipInput",
           "property": "EvidenceId",
-          "fsType": "string"
+          "fsType": "string",
+          "label": "Evidence item",
+          "component": "select (one option per current item, value = entity ID, no option preselected)"
         },
         {
           "record": "RelationshipInput",
           "property": "HypothesisId",
-          "fsType": "string"
+          "fsType": "string",
+          "label": "Hypothesis to assess",
+          "component": "select (one option per current item, value = entity ID, no option preselected)"
         }
       ],
       "tests": [
@@ -531,7 +535,13 @@
       "transition": "Relationship.Kind",
       "tests": [
         "UT-INV-031"
-      ]
+      ],
+      "optionLabels": {
+        "supports": "Supports",
+        "contradicts": "Contradicts",
+        "consistent-with": "Consistent with",
+        "inconclusive": "Inconclusive"
+      }
     },
     {
       "id": "INV-038",
@@ -664,5 +674,5 @@
       "accessibleName": "the investigation title, or the problem statement when it has no title"
     }
   ],
-  "revision": "CR-1: accessible names for editor submit, item edit, reassess, withdraw, evidence/link open, New investigation, open link (see CONTRACT-CHANGES.json)"
+  "revision": "CR-2 (after CR-1): labels for the INV-030 evidence and hypothesis pickers and the INV-031 option labels"
 }

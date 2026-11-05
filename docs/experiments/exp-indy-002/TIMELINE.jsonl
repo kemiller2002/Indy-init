@@ -4,3 +4,4 @@
 {"t":"2026-11-05T21:18:12Z","phase":"A","event":"Contracts moved to their own project Exp002.Contracts and EnginePorts seam added (pre-release, so not a revision); contract-check FAIL INV-040 (registry command text) -> fixed 21:18:29 PASS"}
 {"t":"2026-11-05T21:19:07Z","phase":"A","event":"CG-1-START RELEASED; CG-2..5 DEFINED"}
 {"t":"2026-11-05T21:23:23Z","phase":"B","event":"CR-1 released (CG-2..5 v2): control accessible names; UI agent notified"}
+{"t":"2026-11-05T21:26:01Z","phase":"B","event":"CR-2 released (CG-4 v3): picker and option labels; UI agent notified"}
