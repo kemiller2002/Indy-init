@@ -314,7 +314,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
           tar -xzf "$RUNNER_TEMP/forma.tgz" -C "$RUNNER_TEMP/forma"
-          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && npx playwright install --with-deps chromium webkit > /dev/null
+          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && { for attempt in 1 2 3; do timeout 480 npx playwright install --with-deps chromium webkit > /dev/null && break; [ "$attempt" = 3 ] && { echo "::error::Playwright browser install did not finish in 3 attempts of 8 minutes"; exit 1; }; echo "::warning::Playwright browser install attempt $attempt timed out or failed; retrying"; done; }
           cd "$GITHUB_WORKSPACE"
           cp -r requirements-compiled/v4.1/layout-tests/. "$RUNNER_TEMP/layout/"
           node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --browsers chromium,webkit
@@ -428,7 +428,7 @@ jobs:
         run: |
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx"
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx-nowebkit" --without-webkit true
-          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && npx playwright install --with-deps chromium webkit)
+          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && { for attempt in 1 2 3; do timeout 480 npx playwright install --with-deps chromium webkit && break; [ "$attempt" = 3 ] && { echo "::error::Playwright browser install did not finish in 3 attempts of 8 minutes"; exit 1; }; echo "::warning::Playwright browser install attempt $attempt timed out or failed; retrying"; done; })
           cp -r "$RUNNER_TEMP/fx/node_modules" "$RUNNER_TEMP/fx-nowebkit/"
       - name: The frozen v4.1.2 commands are refused (MSB1008), and a missing webkit project is refused
         run: |
@@ -455,12 +455,22 @@ jobs:
   # every shard succeeded, and proves the shards' union is the whole case list before its own steps run.
   r10-adversarial-cases:
     runs-on: ubuntu-latest
+    # Browsers and their OS libraries come preinstalled in Playwright's image (the tag must equal @playwright/test).
+    # Installing them per run with `playwright install --with-deps` pulled ~100 apt packages from the runner mirror and,
+    # on a slow mirror, used the whole 45-minute budget before any case ran (PR #140, runs 42115761982 and 42122833553).
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         shard: [0, 1, 2]
     steps:
+      - name: Tools the image does not carry (git, jq, curl, ICU for .NET)
+        timeout-minutes: 6
+        run: |
+          apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
@@ -478,7 +488,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
-          npx playwright install --with-deps chromium webkit
+          # Chromium and WebKit are already in the container image (no per-run download or apt install).
           npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
           mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
@@ -497,8 +507,18 @@ jobs:
     needs: r10-adversarial-cases
     if: always()
     runs-on: ubuntu-latest
+    # Browsers and their OS libraries come preinstalled in Playwright's image (the tag must equal @playwright/test).
+    # Installing them per run with `playwright install --with-deps` pulled ~100 apt packages from the runner mirror and,
+    # on a slow mirror, used the whole 45-minute budget before any case ran (PR #140, runs 42115761982 and 42122833553).
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
     timeout-minutes: 45
     steps:
+      - name: Tools the image does not carry (git, jq, curl, ICU for .NET)
+        timeout-minutes: 6
+        run: |
+          apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Every adversarial shard succeeded
         run: |
           test "${{ needs.r10-adversarial-cases.result }}" = success || { echo "::error::adversarial shards: ${{ needs.r10-adversarial-cases.result }}"; exit 1; }
@@ -536,7 +556,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
-          npx playwright install --with-deps chromium webkit
+          # Chromium and WebKit are already in the container image (no per-run download or apt install).
           npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
           mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"

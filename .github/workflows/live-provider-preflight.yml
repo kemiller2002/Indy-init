@@ -75,7 +75,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/pw" "$RUNNER_TEMP/live" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
-          npx playwright install --with-deps chromium webkit
+          for attempt in 1 2 3; do timeout 480 npx playwright install --with-deps chromium webkit && break; [ "$attempt" = 3 ] && { echo "::error::Playwright browser install did not finish in 3 attempts of 8 minutes"; exit 1; }; echo "::warning::Playwright browser install attempt $attempt timed out or failed; retrying"; done
       - name: Journeys J1-J3 against the real provider (Chromium and WebKit)
         env:
           CAUSA_PROVIDER: github
