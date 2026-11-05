@@ -40,7 +40,8 @@ let fileSystemSource (workspaceInvestigations: string) : DocumentSource =
             else
                 let entries =
                     Directory.GetFileSystemEntries dir
-                    |> Array.map (fun p -> Path.GetFileName p, (if File.Exists p then File.ReadAllBytes p else [||]))
+                    // A subdirectory keeps a trailing "/" so it can never pass for one of the three files (CONTRACT §3.3).
+                    |> Array.map (fun p -> if File.Exists p then Path.GetFileName p, File.ReadAllBytes p else Path.GetFileName p + "/", [||])
                     |> Array.toList
                 Ok { DirectoryName = name; Entries = entries } }
 

@@ -104,7 +104,7 @@
       "id": "C03",
       "missionCheck": "2",
       "passed": true,
-      "title": "Every registered discriminator is decoded from real data and round-trips (historical cases + frozen synthetic fixtures)"
+      "title": "Every registered discriminator is decoded from causa-data files and round-trips (26 from the historical cases, the other 5 only from the frozen synthetic fixtures)"
     },
     {
       "evidence": {},
@@ -131,14 +131,17 @@
     },
     {
       "evidence": {
-        "eventTypes": 26,
-        "mutations": 214
+        "causalMemberMutations": 3,
+        "envelopeAndActorMutations": 27,
+        "eventTypes": 31,
+        "mutations": 275,
+        "payloadMutations": 245
       },
       "failures": [],
       "id": "C06",
       "missionCheck": "6",
       "passed": true,
-      "title": "Required fields are validated: every field of every historical event type removed, retyped, and an undeclared field added"
+      "title": "Required fields are validated: every payload field of all 31 types (taken from causa-data lines) removed and retyped, undeclared payload, envelope, actor and causal-member fields added, every envelope and actor field removed and retyped"
     },
     {
       "evidence": {
@@ -869,7 +872,7 @@
       "id": "C11",
       "missionCheck": "11",
       "passed": true,
-      "title": "No event or field disappears: re-encoding every typed event reproduces events.ndjson byte for byte, directly and through the proposed v4.1.5 union"
+      "title": "No event or field disappears: re-encoding every typed event reproduces events.ndjson byte for byte (3 historical cases + 5 synthetic fixtures, all 31 types), directly and through the proposed v4.1.5 union"
     },
     {
       "evidence": {
@@ -994,6 +997,45 @@
     },
     {
       "evidence": {
+        "cases": [
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION at snapshot.json: state has undeclared field(s): zzz",
+            "mutation": "undeclared state field"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION at snapshot.json: state is missing field(s): proposals",
+            "mutation": "state.proposals missing"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION at snapshot.json: state.title: field 'x' must be a string",
+            "mutation": "state.title an integer"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION at snapshot.json: state.evidence[] has undeclared field(s): label",
+            "mutation": "evidence entity with an undeclared field"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION at snapshot.json: state.evidence[].verification: value outside its enumeration",
+            "mutation": "evidence entity with an invalid verification"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION at snapshot.json: state.evidence[].provenance: actor kind 'imported' is not registered",
+            "mutation": "provenance actor kind 'imported'"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION at snapshot.json: state has undeclared field(s): zzz",
+            "mutation": "undeclared state field plus a stage-8 manifest defect"
+          }
+        ]
+      },
+      "failures": [],
+      "id": "C18",
+      "missionCheck": "7 (adversarial)",
+      "passed": true,
+      "title": "snapshot.json state is schema-checked at stage 7 (closed keys, types, enumerations at every level), before stage 8 and stage 17"
+    },
+    {
+      "evidence": {
         "envelopeFieldsDroppedForEveryEvent": [
           "occurredAt",
           "actor",
@@ -1032,6 +1074,37 @@
       "missionCheck": "-",
       "passed": true,
       "title": "The proposed successor keeps every frozen case name and the compatibility table agrees with it for every event"
+    },
+    {
+      "evidence": {
+        "cases": [
+          {
+            "caseKey": "challenger-sts-51l",
+            "investigationId": "1784da3c-7141-59ee-a495-1d5d44bf2284",
+            "result": "structurally verified; admissibility not evaluated"
+          },
+          {
+            "caseKey": "apollo-1",
+            "investigationId": "c6b26614-fc43-5013-a15c-cf95942ee07b",
+            "result": "structurally verified; admissibility not evaluated"
+          },
+          {
+            "caseKey": "apollo-11",
+            "investigationId": "e3adbee5-5096-5a10-bbfb-cecda86a154b",
+            "result": "structurally verified; admissibility not evaluated"
+          },
+          {
+            "caseKey": "burned-out-lightbulb",
+            "investigationId": "fc3f71a9-4c14-5a31-8196-7ce17a7041c1",
+            "result": "structurally verified; admissibility not evaluated"
+          }
+        ]
+      },
+      "failures": [],
+      "id": "C16",
+      "missionCheck": "3",
+      "passed": true,
+      "title": "The active catalog (catalog/active.json -> demonstration-v1, four cases) loads through the DocumentSource port to the catalog's state digests"
     },
     {
       "evidence": {

@@ -104,7 +104,10 @@ let orderPreserved (loaded: Loaded list) =
         |> List.collect (fun l ->
             let raw = lines l.Files
             let ds = decodedOf l.Files
-            (List.zip raw ds |> List.mapi (fun i (r, d) -> i, r, d))
+            if List.length raw <> List.length ds then [ $"{l.Case.CaseKey}: {List.length raw} lines but {List.length ds} decoded events" ]
+            else
+            List.zip raw ds
+            |> List.mapi (fun i (r, d) -> i, r, d)
             |> List.choose (fun (i, r, d) ->
                 if d.Envelope.Line <> i + 1 then Some $"{l.Case.CaseKey}: decoded #{i + 1} came from line {d.Envelope.Line}"
                 elif d.Envelope.AggregateVersion <> int64 (i + 1) then Some $"{l.Case.CaseKey}: line {i + 1} has aggregateVersion {d.Envelope.AggregateVersion}"
@@ -132,13 +135,11 @@ let identities (loaded: Loaded list) =
 
 // ---------------------------------------------------------------- C06 required fields, C08 unknown types
 
-/// Mutates the payload of one real line and reports the outcome of the mutated line.
-let private mutateOutcome (raw: string) (f: (string * JValue) list -> (string * JValue) list) : LineOutcome =
+/// Re-serializes one real line after `f` changes its top-level object, then decodes it as the reader would.
+let private mutateLine (raw: string) (f: (string * JValue) list -> (string * JValue) list) : LineOutcome =
     match Json.parse raw with
     | Ok(JObj o) ->
-        let payload = match Json.tryField "payload" o with Some(JObj p) -> p | _ -> []
-        let o' = o |> List.map (fun (k, v) -> if k = "payload" then k, JObj(f payload) else k, v)
-        let text = Json.canonical (JObj o')
+        let text = Json.canonical (JObj(f o))
         match Json.parse text with
         | Ok(JObj m) ->
             match Envelope.decode 1 text m with
@@ -150,25 +151,50 @@ let private mutateOutcome (raw: string) (f: (string * JValue) list -> (string * 
         | _ -> failwith "unreachable"
     | _ -> failwith "not an object"
 
-let requiredFields (loaded: Loaded list) =
+let private onField (key: string) (f: JValue -> JValue) (o: (string * JValue) list) = o |> List.map (fun (k, v) -> if k = key then k, f v else k, v)
+let private onObject f = function JObj m -> JObj(f m) | v -> v
+let private without k = List.filter (fun (n: string, _: JValue) -> n <> k)
+let private retyped k = List.map (fun (n: string, v: JValue) -> if n = k then n, JInt 42L else n, v)
+
+/// Mutates the payload of one real line.
+let private mutateOutcome (raw: string) (f: (string * JValue) list -> (string * JValue) list) : LineOutcome =
+    mutateLine raw (onField "payload" (onObject f))
+
+let requiredFields (historical: Loaded list) (fixtures: Loaded list) =
     let firstPerType =
-        loaded
+        (historical @ fixtures)
         |> List.collect (fun l -> decodedOf l.Files)
         |> List.distinctBy (fun d -> d.Envelope.EventType)
-    let mutations =
+    let payloadMutations =
         firstPerType
         |> List.collect (fun d ->
             let raw = d.Envelope.RawLine
             let keys = d.Envelope.Payload |> List.map fst
-            let without k = List.filter (fun (n: string, _: JValue) -> n <> k)
-            let retyped k = List.map (fun (n: string, v: JValue) -> if n = k then n, JInt 42L else n, v)
             let removed = keys |> List.map (fun k -> $"{d.Envelope.EventType} without '{k}'", mutateOutcome raw (without k))
             let wrongType = keys |> List.map (fun k -> $"{d.Envelope.EventType} with '{k}' as an integer", mutateOutcome raw (retyped k))
             let extra = [ $"{d.Envelope.EventType} with an undeclared field", mutateOutcome raw (fun p -> p @ [ "confidence", JInt 1L ]) ]
             removed @ wrongType @ extra)
+    let sample = List.head firstPerType
+    let raw = sample.Envelope.RawLine
+    let envelopeMutations =
+        (Envelope.keys |> List.collect (fun k -> [ $"envelope without '{k}'", mutateLine raw (without k); $"envelope '{k}' as an integer", mutateLine raw (retyped k) ]))
+        @ [ "envelope with an undeclared field", mutateLine raw (fun o -> o @ [ "recordedAt", JStr "2026-01-01T00:00:00.000Z" ]) ]
+        @ ([ "actorId"; "kind" ] |> List.collect (fun k -> [ $"actor without '{k}'", mutateLine raw (onField "actor" (onObject (without k))); $"actor '{k}' as an integer", mutateLine raw (onField "actor" (onObject (retyped k))) ]))
+        @ [ "actor with an undeclared field", mutateLine raw (onField "actor" (onObject (fun a -> a @ [ "displayName", JStr "x" ])))
+            "actor kind 'imported'", mutateLine raw (onField "actor" (onObject (onField "kind" (fun _ -> JStr "imported")))) ]
+    let memberMutations =
+        firstPerType
+        |> List.filter (fun d -> d.Envelope.EventType = "CausalAssertionRecorded")
+        |> List.collect (fun d ->
+            let onFirstMember f = onField "members" (function JArr(m :: rest) -> JArr(onObject f m :: rest) | v -> v)
+            [ "causal member without 'role'", mutateOutcome d.Envelope.RawLine (onFirstMember (without "role"))
+              "causal member with an undeclared field", mutateOutcome d.Envelope.RawLine (onFirstMember (fun m -> m @ [ "weight", JInt 1L ]))
+              "causal member role 'cause'", mutateOutcome d.Envelope.RawLine (onFirstMember (onField "role" (fun _ -> JStr "cause"))) ])
+    let mutations = payloadMutations @ envelopeMutations @ memberMutations
     let failures = mutations |> List.choose (fun (name, o) -> match o with Rejected e when e.Code = SchemaViolation -> None | _ -> Some $"{name}: not rejected as SCHEMA_VIOLATION")
-    check "C06" "6" "Required fields are validated: every field of every historical event type removed, retyped, and an undeclared field added" failures
-        [ "mutations", jint (List.length mutations); "eventTypes", jint (List.length firstPerType) ]
+    check "C06" "6" "Required fields are validated: every payload field of all 31 types (taken from causa-data lines) removed and retyped, undeclared payload, envelope, actor and causal-member fields added, every envelope and actor field removed and retyped" failures
+        [ "mutations", jint (List.length mutations); "payloadMutations", jint (List.length payloadMutations); "envelopeAndActorMutations", jint (List.length envelopeMutations)
+          "causalMemberMutations", jint (List.length memberMutations); "eventTypes", jint (List.length firstPerType) ]
 
 let unknownTypes (apollo1: Loaded) =
     let raw = lines apollo1.Files
@@ -255,7 +281,7 @@ let discriminators (historical: Loaded list) (fixtures: Loaded list) =
         |> List.collect (fun l -> decodedOf l.Files)
         |> List.filter (fun d -> EventEncoder.canonicalLine d <> d.Envelope.RawLine)
         |> List.map (fun d -> $"{d.Envelope.EventType} line {d.Envelope.Line} does not round-trip")
-    check "C03" "2" "Every registered discriminator is decoded from real data and round-trips (historical cases + frozen synthetic fixtures)"
+    check "C03" "2" "Every registered discriminator is decoded from causa-data files and round-trips (26 from the historical cases, the other 5 only from the frozen synthetic fixtures)"
         ((missing |> Set.toList |> List.map (fun t -> $"{t} never decoded")) @ roundTrip)
         [ "registered", jint (List.length EventDecoder.eventTypes); "inHistoricalCases", jint hist.Count; "onlyInSyntheticFixtures", jlist jstr (Set.difference fix hist |> Set.toList) ]
 
@@ -301,7 +327,8 @@ let provenance (root: string) (loaded: Loaded list) =
           |> jlist (fun (k, n, a, _, _, actors) ->
               JObj [ "caseKey", jstr k; "provenanceEntries", jint n; "admittedEvidence", jint a; "actors", JObj(actors |> List.map (fun (id, c) -> id, jint c)) ]) ]
 
-let noLoss (loaded: Loaded list) =
+let noLoss (historical: Loaded list) (fixtures: Loaded list) =
+    let loaded = historical @ fixtures
     let failures =
         loaded
         |> List.collect (fun l ->
@@ -315,7 +342,7 @@ let noLoss (loaded: Loaded list) =
                     | Ok _ -> Some $"{l.Case.CaseKey}: line {d.Envelope.Line} changes through the successor contract"
                     | Error e -> Some $"{l.Case.CaseKey}: line {d.Envelope.Line}: {e}")
             [ if Sha256.ofBytes rebuilt <> l.Case.EventsSha256 then $"{l.Case.CaseKey}: re-encoded events.ndjson does not reproduce the catalog eventsSha256" ] @ viaSuccessor)
-    check "C11" "11" "No event or field disappears: re-encoding every typed event reproduces events.ndjson byte for byte, directly and through the proposed v4.1.5 union" failures []
+    check "C11" "11" "No event or field disappears: re-encoding every typed event reproduces events.ndjson byte for byte (3 historical cases + 5 synthetic fixtures, all 31 types), directly and through the proposed v4.1.5 union" failures []
 
 let replayIndependent (historical: Loaded list) (root: string) (fixtures: Loaded list) =
     let golden (c: Case) = Path.Combine(root, "contract/v1.0.0/golden", c.CaseKey + ".state.json")
@@ -438,3 +465,56 @@ let acceptanceLevels (loaded: Loaded list) =
               JObj
                   [ "caseKey", jstr k; "levelA", label r.LevelA_RawReadable; "levelB", label r.LevelB_Decoded
                     "levelCProjection", label r.LevelCProjection_SnapshotReproduced; "levelC", label r.LevelC_Authoritative ]) ]
+
+// ---------------------------------------------------------------- C16 the active catalog (EXT-DATA-013)
+
+let activeCatalog (root: string) =
+    let manifest = readJsonFile (Path.Combine(root, "catalog/demonstration-v1/manifest.json"))
+    let expected = objs "cases" manifest |> List.map (fun c -> field "investigationId" c, (field "caseKey" c, field "expectedStateSha256" c, field "expectedLifecycle" c))
+    let source = fileSystemSource (Path.Combine(root, "workspaces/demo/demonstration-v1/investigations"))
+    match HistoricalLoader.loadWorkspace source with
+    | Error e -> check "C16" "3" "The active catalog workspace demonstration-v1 loads through the DocumentSource port" [ e ] []
+    | Ok results ->
+        let rows =
+            results
+            |> List.map (fun (dir, r) ->
+                let key, sha, lifecycle = expected |> List.tryFind (fst >> (=) dir) |> Option.map snd |> Option.defaultValue ("not-in-catalog", "", "")
+                let problems =
+                    match r with
+                    | LoadRejected _ -> [ $"{key}: {describeResult r}" ]
+                    | StructurallyVerified h ->
+                        [ if h.StateSha256 <> sha then $"{key}: state {h.StateSha256} <> catalog {sha}"
+                          if WireEnum.toWire Enums.lifecycle h.State.Lifecycle <> lifecycle then $"{key}: lifecycle differs from the catalog" ]
+                key, dir, problems, r)
+        let missing = expected |> List.filter (fun (id, _) -> not (results |> List.exists (fst >> (=) id))) |> List.map (fun (id, (k, _, _)) -> $"{k} ({id}) not found in the workspace")
+        check "C16" "3" "The active catalog (catalog/active.json -> demonstration-v1, four cases) loads through the DocumentSource port to the catalog's state digests"
+            (missing @ (rows |> List.collect (fun (_, _, p, _) -> p)) @ (if List.length results <> List.length expected then [ "workspace holds a different number of investigations than the catalog" ] else []))
+            [ "cases", rows |> jlist (fun (k, d, _, r) -> JObj [ "caseKey", jstr k; "investigationId", jstr d; "result", jstr (describeResult r) ]) ]
+
+// ---------------------------------------------------------------- C18 snapshot state schema (adversarial review AR-01)
+
+let snapshotSchema (apollo1: Loaded) =
+    let text name = Encoding.UTF8.GetString(apollo1.Files.Entries |> List.find (fst >> (=) name) |> snd).TrimEnd('\n')
+    let parsed name = match Json.parse (text name) with Ok(JObj o) -> o | _ -> failwith name
+    let setField k v (o: (string * JValue) list) = (o |> List.filter (fst >> (<>) k)) @ (match v with Some x -> [ k, x ] | None -> [])
+    /// Rewrites snapshot.state with f and makes the manifest's snapshotSha256 consistent, so only the schema can object.
+    let withState (f: (string * JValue) list -> (string * JValue) list) (manifestEdit: (string * JValue) list -> (string * JValue) list) =
+        let snap = parsed "snapshot.json" |> List.map (fun (k, v) -> if k = "state" then k, (match v with JObj s -> JObj(f s) | x -> x) else k, v)
+        let snapText = Json.canonical (JObj snap)
+        let manifest = parsed "manifest.json" |> setField "snapshotSha256" (Some(JStr(Sha256.ofText snapText))) |> manifestEdit
+        apollo1.Files
+        |> withEntry "snapshot.json" (Encoding.UTF8.GetBytes(snapText + "\n"))
+        |> withEntry "manifest.json" (Encoding.UTF8.GetBytes(Json.canonical (JObj manifest) + "\n"))
+    let firstEvidence f = fun (s: (string * JValue) list) -> s |> List.map (fun (k, v) -> if k = "evidence" then k, (match v with JArr(JObj e :: rest) -> JArr(JObj(f e) :: rest) | x -> x) else k, v)
+    let cases =
+        [ "undeclared state field", withState (setField "zzz" (Some(JInt 1L))) id
+          "state.proposals missing", withState (setField "proposals" None) id
+          "state.title an integer", withState (setField "title" (Some(JInt 5L))) id
+          "evidence entity with an undeclared field", withState (firstEvidence (setField "label" (Some(JStr "x")))) id
+          "evidence entity with an invalid verification", withState (firstEvidence (setField "verification" (Some(JStr "trusted")))) id
+          "provenance actor kind 'imported'", withState (firstEvidence (setField "provenance" (Some(JObj [ "actor", JObj [ "actorId", JStr "x"; "kind", JStr "imported" ]; "recordedAt", JStr "2026-10-23T00:00:00.000Z" ])))) id
+          "undeclared state field plus a stage-8 manifest defect", withState (setField "zzz" (Some(JInt 1L))) (setField "createdAt" (Some(JStr "2001-01-01T00:00:00.000Z"))) ]
+    let rows = cases |> List.map (fun (n, f) -> n, HistoricalLoader.load f)
+    let failures = rows |> List.choose (fun (n, r) -> match r with LoadRejected(e, false) when e.Code = SchemaViolation -> None | _ -> Some $"{n}: expected CAUSA.SCHEMA_VIOLATION, got {describeResult r}")
+    check "C18" "7 (adversarial)" "snapshot.json state is schema-checked at stage 7 (closed keys, types, enumerations at every level), before stage 8 and stage 17" failures
+        [ "cases", rows |> jlist (fun (n, r) -> JObj [ "mutation", jstr n; "actual", jstr (describeResult r) ]) ]

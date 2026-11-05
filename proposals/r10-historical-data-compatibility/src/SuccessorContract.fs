@@ -4,7 +4,7 @@ open Causa.HistoricalCompatibility
 
 /// PROPOSED, not frozen. The smallest extension of the frozen v4.1.4 `CoreEvent` union
 /// (requirements-compiled/v4.1.4/contracts/00-DOMAIN-STUBS.fs:92-120) that represents every causa-storage v1.0.0
-/// event without loss. Every frozen case name is kept; six cases gain fields; 22 cases are added. See
+/// event without loss. Every frozen case name is kept; nine cases gain fields; 22 cases are added. See
 /// SUCCESSOR-CONTRACT.md. Payload records reuse this adapter's wire records only so the proposal compiles and can be
 /// tested; in a successor package they would be the domain owner's records with the same fields.
 type HypothesisTransition =

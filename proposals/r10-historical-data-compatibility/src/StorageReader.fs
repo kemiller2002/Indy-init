@@ -184,6 +184,7 @@ module StorageReader =
                 let! pv = Field.int o "projectionVersion"
                 let! g = Field.timestamp o "generatedAt"
                 let! state = Field.obj o "state"
+                do! StateSchema.check (JObj state)
                 if fv <> "1.0.0" || smv <> "1.0.0" then return! Error "snapshot version fields must be the string 1.0.0"
                 elif pv <> 1L then return! Error "projectionVersion must be 1"
                 else return { InvestigationId = id; AggregateVersion = av; ProjectionVersion = pv; GeneratedAt = g; State = JObj state }

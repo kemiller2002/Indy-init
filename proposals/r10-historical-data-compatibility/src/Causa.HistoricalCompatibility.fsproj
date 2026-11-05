@@ -9,6 +9,7 @@
     <Compile Include="EventEnvelope.fs" />
     <Compile Include="EventDecoder.fs" />
     <Compile Include="EventEncoder.fs" />
+    <Compile Include="StateSchema.fs" />
     <Compile Include="StorageReader.fs" />
     <Compile Include="ReplayAdapter.fs" />
     <Compile Include="SuccessorContract.fs" />

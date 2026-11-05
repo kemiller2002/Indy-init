@@ -60,17 +60,19 @@ let main argv =
               discriminators historical fixtures
               orderPreserved historical
               identities historical
-              requiredFields historical
+              requiredFields historical fixtures
               negatives root
               unknownTypes apollo1
               deterministic historical
               provenance root historical
-              noLoss historical
+              noLoss historical fixtures
               replayIndependent historical root fixtures
               byteIdentity root cases
               tampering apollo1
+              snapshotSchema apollo1
               frozenCompatibility historical
               successorContract historical
+              activeCatalog root
               acceptanceLevels historical ]
         let coverage = Json.pretty (report results) + "\n"
         let matrix = Json.pretty (Matrix.build historical fixtures) + "\n"
