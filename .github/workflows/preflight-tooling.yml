@@ -412,6 +412,10 @@ jobs:
           diff "$RUNNER_TEMP/a.json" "$RUNNER_TEMP/b.json" || { echo "::error::the committed schedule evidence is stale; regenerate it"; exit 1; }
       - name: Schedule model (docs/rehearsal-010-optimization) equals schedule.fsx under its defaults, and its invariants and controls hold
         run: dotnet fsi tools/r10/schedule-model-tests.fsx -- --indy-init .
+      - name: Delegated authority (DA-R10-1) records stay in scope and are never owner approvals
+        run: |
+          dotnet fsi tools/r10/delegated-authority.fsx -- --indy-init . test
+          git fetch -q --depth=1 origin main && dotnet fsi tools/r10/delegated-authority.fsx -- --indy-init . check --base-ref FETCH_HEAD
       - name: Change-impact selection (proposed Level 2; never the gate) holds its adversarial cases
         run: dotnet fsi tools/r10/change-impact.fsx -- --indy-init . test
       - name: Proposed successor manifests regenerate from their scope manifests (review RVO-3-3; the committed files must not be stale or edited)

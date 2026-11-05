@@ -1,0 +1,50 @@
+{
+  "schema": "indy-init.delegated-authority/1",
+  "id": "DA-R10-1",
+  "notAnOwnerApproval": true,
+  "description": "Records the owner's standing technical authorization so that agents can decide covered technical matters with provenance. It is NOT an owner approval: it never satisfies a request in any owner-decision-requests.json, is never written to an approvals file, and launch-preflight does not read it. tools/r10/delegated-authority.fsx enforces this.",
+  "source": {
+    "kind": "owner-directive-in-session",
+    "title": "Indy Init: Parallel Acceleration Directive",
+    "owner": "kemiller2002",
+    "receivedAt": "2026-11-05T19:08:39Z",
+    "receivedIn": "https://claude.ai/code/session_01G1iECgS2MYoyqvc2eXNdhV",
+    "text": "kickoff/rehearsal-010/delegated/DIRECTIVE-2026-11-05.md",
+    "sha256": "eaba381442eb2f660848526c18d20e7c92bddd21ee7cd9dd98c7eff4183f5c66",
+    "provenanceLimit": "The text was transcribed by the receiving agent from the owner's message in that session. Nothing here is signed by the owner; the owner can revoke or correct it at any time."
+  },
+  "validFrom": "2026-11-05T19:08:39Z",
+  "validUntil": "2026-11-07T23:59:59Z",
+  "covered": [
+    { "class": "implementation-approach", "quote": "Selecting implementation approaches and work-item boundaries." },
+    { "class": "work-item-boundary", "quote": "Selecting implementation approaches and work-item boundaries." },
+    { "class": "milestone-reordering", "quote": "Reordering work to prioritize functional milestones." },
+    { "class": "source-ownership", "quote": "Assigning nonoverlapping source ownership across agents." },
+    { "class": "technical-interface", "quote": "Creating and modifying technical interfaces." },
+    { "class": "test-correction", "quote": "Running tests and correcting failures." },
+    { "class": "pr-merge-after-required-checks", "quote": "Creating and merging PRs after required checks pass." },
+    { "class": "dev-workflow-update", "quote": "Updating preparation scripts, development workflows, and non-security governance procedures." },
+    { "class": "noncritical-deferral", "quote": "Deferring noncritical work while preserving its original requirements and incomplete status." },
+    { "class": "routine-recommended-option", "quote": "Selecting the recommended option for routine technical decisions." },
+    { "class": "approved-tooling-reuse", "quote": "Reusing existing approved libraries, packages, and tooling." }
+  ],
+  "reserved": [
+    { "class": "acceptance-weakening", "quote": "Weakening or removing acceptance criteria." },
+    { "class": "test-result-claim", "quote": "Claiming failed or unexecuted tests passed." },
+    { "class": "access-expansion", "quote": "Expanding credential or repository access." },
+    { "class": "secret-publication", "quote": "Publishing secrets." },
+    { "class": "unrecorded-scope-reduction", "quote": "Reducing the fundamental application scope without recording the reduction." },
+    { "class": "eligibility-rule-change", "quote": "Altering competition eligibility rules." },
+    { "class": "official-build-start", "quote": "Starting the official timed competition build." },
+    { "class": "owner-identity-or-approval", "quote": "Forging owner identity, signatures, or approval records." }
+  ],
+  "protectedPaths": [
+    "kickoff/*/approvals*.json",
+    "kickoff/*/proposals/owner-decision-requests.json",
+    "kickoff/rehearsal-010/delegated/delegated-authority.json",
+    "kickoff/rehearsal-010/delegated/DIRECTIVE-2026-11-05.md",
+    ".github/CODEOWNERS",
+    ".github/workflows/live-provider-preflight.yml"
+  ],
+  "neverSatisfies": "Any request id listed in any owner-decision-requests.json in the repository (ODR-*, OD-*, CF-*, ...): those still need the owner's own signed record (RDP-003)."
+}
