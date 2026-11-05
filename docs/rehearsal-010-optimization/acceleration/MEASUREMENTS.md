@@ -29,15 +29,45 @@ The UI session (B) opened PR #134 (ownership map). The v4.1.5 session (D) opened
 
 Other sessions, before T0: the v4.1.5 session sat **blocked on an owner decision** ("merge PR #128, record ODR-V415-IF-VIEW, say go"). The directive and the #128 merge unblocked it within about 3 min of T0. Its pre-T0 blocked span is in its own transcript and is not measured here.
 
-## Application milestones
-These are filled from the practice builder's report, which runs on a REST double for persistence: component behaviour, **not** real persistence acceptance.
+## Application milestones (practice app, fenced branch `practice/r10-acceleration-app` at `a5bbdd6`, never merged)
+Observed by the practice builder. Persistence ran against the harness REST double: this is **component behaviour, not real persistence acceptance**.
 
-| Milestone | Observed | Evidence |
-|---|---|---|
-| First successful F# build | pending | |
-| First browser render | pending | |
-| Connect | pending | |
-| Browse | pending | |
-| Create | pending | |
-| Save/Reload (double) | pending | |
-| Save/Reload (real) | **blocked**: owner decision 3 | |
+| Milestone | UTC | T+min | Evidence |
+|---|---|---|---|
+| First successful F# build | 19:28:24 | 19.8 | `practice/causa-app/evidence/timeline.md` |
+| First browser render | 19:32:44 | 24.1 | Playwright run |
+| Connect, Browse, Open, Create, Save/Reload (double) | 19:33:18 | 24.7 | in-journey offsets +1.25 s, +3.1, +3.2, +3.3, +3.4, reload +5.9 s |
+| A real defect found and fixed (listing counted a folder per file) | 19:34:34 | 26.0 | regression test added |
+| Save/Reload against real GitHub | **not executed** | – | blocked: owner decision 3 (credential use) |
+
+**Tests.**
+- **Engine: 16/16 pass against real causa-data `e8259df`.**
+  - Covers 4 investigations, with the raw, decoded, replayed and authoritative layers distinct.
+  - Event counts are 432, 431 and 452.
+  - A tampered snapshot is not authoritative, and a tampered event file is refused.
+  - Negative cases: a read-back mismatch, no token, a refused write, and the token never appearing in the view.
+- **Playwright: 6/6 pass** (30.2 s), on desktop Chromium, Pixel 7, and an iPhone 13 viewport emulated in Chromium.
+
+**Not executed:**
+- real WebKit;
+- a real write and read-back;
+- an admissibility oracle.
+
+**Interop.** One C# file, `Host.cs`, exists only because `[JSExport]` needs the C# source generator; it holds no logic. There is also a small JS bootstrap.
+
+**Builder waiting by cause:**
+- downloads, about 8 s;
+- WebAssembly publish, 52 s;
+- site build, 10 s;
+- CI and owner, 0;
+- repair, about 2.5 min (compile errors in a test file, plus the defect above).
+
+## Governance timebox
+The directive allowed 45 min for the delegated-authority change.
+- **First version:** about 6 min (19:12–19:18).
+- **Independent review:** found three blockers.
+  - B1: my own entry DTD-R10-002 decided the owner's OD-V415-01. It was withdrawn before merge.
+  - B2: the authority record certified itself.
+  - B3: protected paths were self-declared.
+- **Rework:** about 19:40–20:00. **Total about 30 min, within the 45.**
+- **Blocked:** no other work waited on it.

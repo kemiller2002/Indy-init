@@ -423,9 +423,9 @@ jobs:
             (.[0].allCases | sort) as $all
             | ([.[].allCases | sort] | unique | length == 1)
             and ([.[].cases[].id] | sort) == $all
-            and ([.[].cases[] | select(.verdict != "VALIDATED" and .verdict != "NOT-RUN")] | length == 0)
+            and ([.[].cases[] | select(.verdict != "VALIDATED")] | length == 0)
             and ($all | length) > 0' "$R"/adversarial-shard-*/adversarial-results.json \
-            || { echo "::error::the adversarial shards do not cover every case exactly once, or a case did not validate"; exit 1; }
+            || { echo "::error::the adversarial shards do not cover every case exactly once, or a case did not validate (NOT-RUN included: every shard runs with browsers and .NET tests)"; exit 1; }
           jq -r '.cases[] | "\(.id) \(.verdict)"' "$R"/adversarial-shard-*/adversarial-results.json | sort
           mkdir -p "$RUNNER_TEMP/adv-evidence" && cp -r "$R"/. "$RUNNER_TEMP/adv-evidence/"
       - uses: actions/checkout@v4

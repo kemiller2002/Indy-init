@@ -41,7 +41,8 @@ The "Indy Init offline factory" workflow takes 1.2–8.0 min per run (40 runs sa
   - fails unless every shard succeeded;
   - proves with `jq` that the shards' case ids equal the full case list exactly once, and that none failed;
   - then runs its own steps unchanged.
-- **Controls for the merge check** (run locally): it accepts a complete set and refuses each of these: a missing case, a failed case, a duplicate in place of a case, and a case run twice.
+- **Controls for the merge check** (run locally): it accepts a complete set and refuses each of these: a missing case, a failed case, a duplicate in place of a case, and a case run twice. Since review L1 it also refuses NOT-RUN.
+- **Evidence layout (review L2).** Each shard's evidence sits under `adv-evidence/adversarial-shard-N/`; there is no merged `adversarial-results.json` (no tool reads one). When a shard fails, its evidence is in that shard's artifact.
 - **Shard selection**, checked locally: `--only C09,C10,C11,C12 --shard 1/3` ran exactly C11 (index 10 mod 3 = 1). It reported VALIDATED and recorded `allCases` = 36.
 - **Expected effect (model, not observed).** The critical path drops from about 21.5 min to about 1.7 (set-up) + 15.9/3 + 1.7 (set-up) + 4.5 (the remaining steps), roughly 13 min. This depends on free runners. The **measured** after-timing will come from this PR's own CI run and will be recorded in [MEASUREMENTS.md](MEASUREMENTS.md).
 

@@ -23,7 +23,7 @@ Deferred items keep their requirements and their incomplete status; nothing here
 ## Deferrable (recorded, incomplete)
 | Item | Deferred to |
 |---|---|
-| FO-1..3, T19/T22 contract work in v4.1.5 | v4.1.6 (DTD-R10-002) |
+| FO-1..3, T19/T22 contract work in v4.1.5 | v4.1.6 **if the owner records OD-V415-01** (staging); until then they stay in v4.1.5 scope, incomplete |
 | Further schedule-model refinements (V5–V7 variants, new sensitivities) | after the competition |
 | Generalized workspace abstractions beyond Connect → Reload | after M4 |
 | Optional UI contract extensions; nonessential Forma refinements | after M4 |
