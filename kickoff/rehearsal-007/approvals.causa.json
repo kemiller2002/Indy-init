@@ -797,6 +797,31 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-V415-OWNER-1",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-05",
+      "changes": [
+        {
+          "decision_id": "ODR-V415-01",
+          "action": "select",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V415-03",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V415-04",
+          "action": "decide",
+          "option": "A"
+        }
+      ]
     }
   ]
 }
