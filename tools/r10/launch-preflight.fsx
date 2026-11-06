@@ -385,21 +385,29 @@ let lp09 =
     let defined =
         let f = path "tools/r10/adversarial.fsx"
         if File.Exists f then Regex.Matches(File.ReadAllText f, "\\{ Id = \"(C[0-9]+)\"") |> Seq.map (fun m -> m.Groups[1].Value) |> Set.ofSeq else Set.empty
-    /// Every cases.tsv the run published: one per adversarial shard (adv-evidence/adversarial-shard-N/cases.tsv), or a
-    /// single one from an unsharded run. The run validates a case only if some shard's table says so.
+    /// The shard tables the run published (adv-evidence/adversarial-shard-N/cases.tsv). Every case the suite defines must
+    /// appear exactly once across them, and every row must be VALIDATED.
     let judged (meta: JsonNode) (tsvs: string list) =
         let headSha = str meta "headSha"
         let ancestor = headSha <> "" && fst (git src [ "merge-base"; "--is-ancestor"; headSha; "HEAD" ]) = 0
         let unchanged = ancestor && fst (git src [ "diff"; "--quiet"; headSha; "HEAD"; "--"; "tools"; "verification"; ".github/workflows/preflight-tooling.yml" ]) = 0
-        let rows = tsvs |> List.collect (fun tsv -> File.ReadAllLines tsv |> Array.skip 1 |> Array.filter (fun l -> l.Trim() <> "") |> List.ofArray)
-        let validated = rows |> List.filter (fun l -> l.EndsWith "VALIDATED") |> List.map (fun l -> l.Split('\t').[0]) |> Set.ofList
+        let rows =
+            tsvs
+            |> List.collect (fun tsv -> File.ReadAllLines tsv |> Array.skip 1 |> Array.filter (fun l -> l.Trim() <> "") |> List.ofArray)
+            |> List.map (fun l -> let cells = l.Split('\t') in cells.[0], cells.[cells.Length - 1].Trim())
+        let validated = rows |> List.filter (fun (_, verdict) -> verdict = "VALIDATED") |> List.map fst |> Set.ofList
         let missing = Set.difference defined validated
+        // Every case once, and only VALIDATED: a second row can never hide a failure (as LP-08 for journeys).
+        let notValidated = rows |> List.filter (fun (_, verdict) -> verdict <> "VALIDATED") |> List.map fst |> List.distinct
+        let repeated = rows |> List.countBy fst |> List.filter (fun (_, n) -> n > 1) |> List.map fst
         fail (str meta "workflowName" = "Preflight tooling") $"""run is workflow "{str meta "workflowName"}", not "Preflight tooling" """
         @ fail (str meta "headBranch" = "main") $"""run is on {str meta "headBranch"}, not main"""
         @ fail (str meta "conclusion" = "success") $"""run concluded {str meta "conclusion"}"""
         @ fail ancestor $"the run's commit {headSha} is not in this history"
         @ fail (not ancestor || unchanged) $"the tools or the verification assets changed since the run's commit {headSha}: use a run of this tree"
         @ fail missing.IsEmpty $"""cases not VALIDATED in the run: {String.Join(", ", missing)}"""
+        @ fail notValidated.IsEmpty $"""cases the run did not validate: {String.Join(", ", notValidated)}"""
+        @ fail repeated.IsEmpty $"""cases reported more than once across the shards: {String.Join(", ", repeated)}"""
     check "LP-09" "the adversarial suite is validated in every case it defines (a CI run of this tree)" (
         if defined.IsEmpty then [ "tools/r10/adversarial.fsx defines no case" ] else
         match opt "--adversarial-run" with
@@ -411,10 +419,19 @@ let lp09 =
             if wfPath <> ".github/workflows/preflight-tooling.yml" then [ $"run {id} is of workflow file {wfPath}, not .github/workflows/preflight-tooling.yml" ] else
             let dir = tempDir "adversarial"
             let dcode, dout = run src gh [ "run"; "download"; id; "--repo"; indyInitRepo; "--name"; "r10-adversarial"; "--dir"; dir ]
-            let tsvs = if Directory.Exists dir then Directory.EnumerateFiles(dir, "cases.tsv", SearchOption.AllDirectories) |> Seq.sort |> List.ofSeq else []
+            // Only the shard tables: adv-evidence/adversarial-shard-N/cases.tsv (another evidence folder can never validate a case).
+            let shardTables =
+                if Directory.Exists dir then
+                    Directory.EnumerateDirectories(dir, "adversarial-shard-*", SearchOption.AllDirectories)
+                    |> Seq.filter (fun d -> Path.GetFileName(Path.GetDirectoryName d) = "adv-evidence")
+                    |> Seq.map (fun d -> Path.Combine(d, "cases.tsv"))
+                    |> Seq.filter File.Exists
+                    |> Seq.sort |> List.ofSeq
+                else []
+            let tsvs = shardTables
             let result =
                 match dcode, tsvs with
-                | 0, [] -> [ $"run {id} has no r10-adversarial cases.tsv" ]
+                | 0, [] -> [ $"run {id} has no adversarial shard table (r10-adversarial adv-evidence/adversarial-shard-N/cases.tsv)" ]
                 | 0, ts -> judged (JsonNode.Parse metaText) ts
                 | _ -> [ $"gh run download {id} failed: {dout}" ]
             (try Directory.Delete(dir, true) with _ -> ())

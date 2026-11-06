@@ -314,6 +314,12 @@ let cases =
       case "adversarial-case-not-validated" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv")) "C02\tgate\tVALIDATED" "C02\tgate\tFAILED")
       case "adversarial-case-missing" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv")) "C02\tgate\tVALIDATED\n" "")
       case "adversarial-shard-table-missing" "LP-09" (fun f -> File.Delete(Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv")))
+      case "adversarial-no-shard-tables" "LP-09" (fun f -> Directory.Delete(Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence"), true))
+      case "adversarial-duplicate-row-hides-a-failure" "LP-09" (fun f ->
+          write (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-2", "cases.tsv")) "case\ttitle\tverdict\nC02\tgate\tFAILED\n")
+      case "adversarial-table-outside-the-shards" "LP-09" (fun f ->
+          File.Delete(Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv"))
+          write (Path.Combine(f.Runs, "777", "r10-adversarial", "launch-evidence", "cases.tsv")) "case\ttitle\tverdict\nC02\tgate\tVALIDATED\n")
       case "adversarial-run-of-older-tools" "LP-09" (fun f -> write (Path.Combine(f.Indy, "tools/r10/new-tool.fsx")) "// new\n"; commitPush f "tools")
       // LP-10: the competition repository, as published
       case "clock-already-started" "LP-10" (fun f ->
