@@ -16,8 +16,9 @@
 //   dotnet fsi tools/r9/r9.fsx -- run-suites (--obligations F | --plan EXECUTION-PLAN) --root REPO --out DIR [--suites ID,...] [--require-tests true]
 //   dotnet fsi tools/r9/r9.fsx -- suite-preflight (--obligations F | --plan EXECUTION-PLAN) --root REPO [--out F] [--require-tests true]
 //        Executes every executable suite command in list mode; refuses readiness if any cannot execute, and with
-//        --require-tests if one executes but selects no test (run-suites: if one runs but executes no test).
-//   dotnet fsi tools/r9/r9.fsx -- suite-fixture --out NEW-DIR [--without-webkit true] [--empty-project NAME]
+//        --require-tests if one executes but selects no test (run-suites: if one runs but executes no test). A .NET test
+//        assembly xunit skips (could not find dependent assembly, e.g. FSharp.Core) is refused in every mode.
+//   dotnet fsi tools/r9/r9.fsx -- suite-fixture --out NEW-DIR [--without-webkit true] [--empty-project NAME] [--without-fsharp-core NAME]
 //        A deterministic tree with the plan's test layout (one trivial test per suite, no application code).
 //   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F --scope-sha256 HEX [--scope-checkpoint F]
 //        --spec-preflight F --acceptance-preflight F [--work-plan F] [--manifest F] [--scope F] [--praxis EXE]
@@ -639,6 +640,16 @@ let executedTests (format: string) (path: string) : int =
             [ "expected"; "unexpected"; "flaky" ] |> List.sumBy (fun k -> match stats with | null -> 0 | s when isNull s[k] -> 0 | s -> s[k].GetValue<int>())
         with _ -> 0
 
+/// The test assemblies xunit skipped because they cannot load ("Skipping: X (could not find dependent assembly ...)").
+/// Such an assembly lists and runs no test and the command still exits 0: Rehearsal 010's bootstrap enabled central
+/// package management, which drops the F# SDK's implicit FSharp.Core reference, so no F# test assembly shipped
+/// FSharp.Core.dll and every .NET suite was vacuously green. Never legitimate, so refused with or without --require-tests.
+let skippedAssemblies (output: string) : string list =
+    Regex.Matches(output, @"Skipping: (\S+) \((could not find dependent assembly [^)]*)\)")
+    |> Seq.map (fun m -> $"{m.Groups[1].Value} ({m.Groups[2].Value})")
+    |> Seq.distinct
+    |> List.ofSeq
+
 // ---- run-suites: execute the plan's own suite commands and record machine-readable results at HEAD -----------------
 
 /// Runs each selected executable suite exactly as the frozen plan states it, adding only a machine-readable logger,
@@ -662,8 +673,12 @@ let runSuites () =
         let code, output = run "sh" [ "-c"; command ] root
         File.WriteAllText(Path.Combine(dir, "run.log"), $"$ {command}\nexit {code}\n{output}")
         let files = Directory.EnumerateFiles(dir, (if format = "trx" then "*.trx" else "results.json"), SearchOption.AllDirectories) |> List.ofSeq
-        id, code, files |> List.map (fun f -> Path.GetRelativePath(out, f), format)
-    let ran = suites |> List.map runOne
+        (id, code, files |> List.map (fun f -> Path.GetRelativePath(out, f), format)), (id, (if format = "trx" then skippedAssemblies output else []))
+    let ranWithSkips = suites |> List.map runOne
+    let ran = ranWithSkips |> List.map fst
+    let skipped =
+        ranWithSkips |> List.map snd |> List.filter (snd >> List.isEmpty >> not)
+        |> List.map (fun (id, asms) -> $"""suite {id}: test assemblies were skipped and ran no test: {String.Join("; ", asms)}; see {id}/run.log""")
     let runs =
         ran |> List.collect (fun (id, _, files) ->
             files |> List.map (fun (path, format) ->
@@ -689,7 +704,7 @@ let runSuites () =
             ran
             |> List.filter (fun (_, _, files) -> not files.IsEmpty && files |> List.sumBy (fun (p, f) -> executedTests f (Path.Combine(out, p))) = 0)
             |> List.map (fun (id, code, _) -> $"suite {id} executed no test (exit {code}); a command that selects zero tests is not verification; see {id}/run.log")
-    let missing = missing @ empty
+    let missing = missing @ skipped @ empty
     if suites.IsEmpty then Unusable "no executable suite selected"
     elif missing.IsEmpty then Pass (ran |> List.map (fun (id, code, files) -> $"{id}: exit {code}, {files.Length} result file(s)") |> fun l -> l @ [ $"results {out}/results.json at {head}" ])
     else Refused missing
@@ -731,12 +746,16 @@ let suitePreflight () =
         let listed = if runner = "dotnet-test" then $"{command} --list-tests -m:1" else $"{command} --list --pass-with-no-tests"
         let code, output = run "sh" [ "-c"; listed ] root
         let count = listedTests runner output
+        let skipped = if runner = "dotnet-test" then skippedAssemblies output else []
         let cause =
             if code <> 0 then
                 output.Split('\n')
                 |> Array.tryFind (fun l -> Regex.IsMatch(l, @"error|Error:|not found", RegexOptions.IgnoreCase))
                 |> Option.map (fun l -> l.Trim())
                 |> Option.defaultValue $"exit {code}"
+            // Always refused (Rehearsal 010): an assembly xunit skips lists no test however many it declares.
+            elif not skipped.IsEmpty then
+                $"""test discovery skipped {String.Join("; ", skipped)}; the suite cannot list its tests (an F# test assembly without FSharp.Core.dll: central package management drops the SDK's implicit reference)"""
             elif requireTests && count = 0 then "the command executes but selects no test"
             else ""
         id, listed, code, count, cause
@@ -774,7 +793,9 @@ let suitePreflight () =
 /// A deterministic test tree with the plan's project, namespace and folder layout and one trivial test per suite,
 /// so every suite command of a package can be executed before T0 (#102). withWebkit = false reproduces Rehearsal
 /// 009's missing project.
-let fixtureFiles (withWebkit: bool) (emptyProject: string option) : (string * string) list =
+let fixtureFiles (withWebkit: bool) (emptyProject: string option) (withoutFSharpCore: string option) : (string * string) list =
+    let centralWithoutFSharpCore =
+        "<Project>\n  <PropertyGroup>\n    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>\n  </PropertyGroup>\n  <ItemGroup>\n    <PackageVersion Include=\"Microsoft.NET.Test.Sdk\" Version=\"17.11.1\" />\n    <PackageVersion Include=\"xunit\" Version=\"2.9.2\" />\n    <PackageVersion Include=\"xunit.runner.visualstudio\" Version=\"2.8.2\" />\n  </ItemGroup>\n</Project>\n"
     let dotnetProjects =
         [ "Causa.Contract.Tests", [ "Causa.Contract.Tests.Fixture" ]
           "Causa.Domain.Tests", [ "Causa.Domain.Tests.Fixture" ]
@@ -795,14 +816,21 @@ let fixtureFiles (withWebkit: bool) (emptyProject: string option) : (string * st
       "package.json", "{\n  \"name\": \"r9-suite-fixture\",\n  \"private\": true,\n  \"devDependencies\": {\n    \"@playwright/test\": \"1.63.0\"\n  }\n}\n"
       "playwright.config.ts", $"import {{ defineConfig }} from '@playwright/test';\n\nexport default defineConfig({{\n  testDir: 'tests/browser',\n  projects: [\n{projects}  ],\n}});\n"
       ".gitignore", "bin/\nobj/\nnode_modules/\ntest-results/\n" ]
-    @ (dotnetProjects |> List.collect (fun (p, ms) -> [ $"tests/{p}/{p}.fsproj", fsproj; $"tests/{p}/Tests.fs", testsFs p ms ]))
+    @ (dotnetProjects |> List.collect (fun (p, ms) ->
+        // --without-fsharp-core P: P is centrally managed (its own Directory.Packages.props) with no FSharp.Core version,
+        // as Rehearsal 010's bootstrap wrote it; it builds, but xunit skips the assembly and lists no test.
+        if Some p = withoutFSharpCore then
+            [ $"tests/{p}/{p}.fsproj", Regex.Replace(fsproj, " Version=\"[^\"]+\"", "")
+              $"tests/{p}/Directory.Packages.props", centralWithoutFSharpCore
+              $"tests/{p}/Tests.fs", testsFs p ms ]
+        else [ $"tests/{p}/{p}.fsproj", fsproj; $"tests/{p}/Tests.fs", testsFs p ms ]))
     @ ([ "contract"; "acceptance"; "invariants"; "live" ] |> List.map spec)
 
 let suiteFixture () =
     let out = Path.GetFullPath(req "--out")
     if Directory.Exists out && not (Seq.isEmpty (Directory.EnumerateFileSystemEntries out)) then Unusable $"{out} is not empty"
     else
-        let files = fixtureFiles (opt "--without-webkit" <> Some "true") (opt "--empty-project")
+        let files = fixtureFiles (opt "--without-webkit" <> Some "true") (opt "--empty-project") (opt "--without-fsharp-core")
         files |> List.iter (fun (path, text) ->
             let full = Path.Combine(out, path)
             Directory.CreateDirectory(Path.GetDirectoryName full) |> ignore

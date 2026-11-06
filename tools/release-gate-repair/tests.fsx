@@ -164,6 +164,12 @@ r9case "suite-preflight-zero-selected-tests-refused" [ 4 ] [ "SU-DOTNET-DETERMIN
 r9case "suite-preflight-zero-tests-allowed-before-implementation" [ 0 ] [ "SU-DOTNET-DETERMINISTIC: executable, 0 test(s)" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fxEmpty ] fxEmpty |> ignore
 r9case "run-suites-release-zero-executed-refused" [ 4 ] [ "suite SU-DOTNET-DETERMINISTIC executed no test (exit 0)" ] [ "run-suites"; "--obligations"; obl414; "--root"; fxEmpty; "--out"; Path.Combine(work, "runs-empty"); "--suites"; "SU-DOTNET-DETERMINISTIC"; "--require-tests"; "true" ] fxEmpty |> ignore
 r9case "run-suites-release-fixture-executes" [ 0 ] [ "SU-OWN-DOTNET: exit 0"; "SU-DOTNET-DETERMINISTIC: exit 0" ] [ "run-suites"; "--obligations"; obl414; "--root"; fx; "--out"; Path.Combine(work, "runs-fx"); "--suites"; "SU-OWN-DOTNET,SU-DOTNET-DETERMINISTIC"; "--require-tests"; "true" ] fx |> ignore
+// Rehearsal 010 (Fix 2): a centrally managed F# test project without FSharp.Core builds, but xunit skips the assembly
+// ("could not find dependent assembly 'FSharp.Core'") and the command exits 0. Refused in every mode, before and after
+// implementation, by suite-preflight and by run-suites.
+let fxNoCore = fixtureAt "fx-nofsharpcore" [ "--without-fsharp-core"; "Causa.Acceptance" ]
+r9case "suite-preflight-skipped-assembly-refused-without-require-tests" [ 4 ] [ "SU-DOTNET-DETERMINISTIC: test discovery skipped Causa.Acceptance (could not find dependent assembly 'FSharp.Core" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fxNoCore ] fxNoCore |> ignore
+r9case "run-suites-development-skipped-assembly-refused" [ 4 ] [ "suite SU-DOTNET-DETERMINISTIC: test assemblies were skipped and ran no test: Causa.Acceptance" ] [ "run-suites"; "--obligations"; obl414; "--root"; fxNoCore; "--out"; Path.Combine(work, "runs-nofsharpcore"); "--suites"; "SU-DOTNET-DETERMINISTIC,SU-OWN-DOTNET" ] fxNoCore |> ignore
 
 // ---- 3. Praxis ordering: authorize-implementation and check-sequencing -------------------------------------------
 

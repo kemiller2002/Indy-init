@@ -354,6 +354,39 @@ let suiteRunners (source: string) : string list =
       // v4.1.2 is frozen: it compiles without X21, byte for byte as approved (the committed-package check covers the bytes).
       if not (x21 (inputs "v4.1.2")).IsEmpty then yield "X21: the frozen v4.1.2 gained a check" ]
 
+/// Rehearsal 010 (Fix 2): central package management drops the F# SDK's implicit FSharp.Core reference, so no F#
+/// assembly ships FSharp.Core.dll and xunit discovers no test. A successor package that pins bootstrap.fsharpCore gets
+/// the central version and the conditional reference; the frozen packages bootstrap exactly as before.
+let bootstrapFSharpCore (source: string) : string list =
+    let inputs v = Program.v41Inputs source (Path.Combine(source, "requirements-compiled", v)) (Path.Combine(source, "requirements-compiled", "v4")) None
+    let v415 = inputs "v4.1.5"
+    let withCore (fc: Json) =
+        { v415 with Amendment = v415.Amendment |> Option.map (fun a -> setIn "bootstrap" (setIn "fsharpCore" fc (field "bootstrap" a |> Option.defaultValue (JObj []))) a) }
+    let pinned = withCore (JObj [ "version", JStr "10.1.402"; "decision", JStr "ODR-V41-07"; "approval", JStr "APR-TEST" ])
+    let undecided = withCore (JObj [ "version", JStr "10.*"; "decision", JStr "ODR-NOPE" ])
+    let boot (i: V41Package.Inputs) = V41Package.bootstrapFiles i (V41Package.ownedFiles i) "{}" |> Map.ofList
+    let x19 (i: V41Package.Inputs) = (V41Package.build i).Checks |> List.filter (fun c -> c.Id = "X19") |> List.collect (fun c -> c.Problems)
+    let reference = "<PackageReference Include=\"FSharp.Core\" />"
+    let conditorProps = "<Project>\n  <PropertyGroup>\n    <TargetFramework>net10.0</TargetFramework>\n    <Nullable>enable</Nullable>\n    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>\n  </PropertyGroup>\n</Project>\n"
+    [ for v in [ "v4.1.4"; "v4.1.5" ] do
+          if boot (inputs v) |> Map.exists (fun _ text -> text.Contains "FSharp.Core") then yield sprintf "FSharp.Core: the frozen %s bootstrap changed (it names FSharp.Core)" v
+      let b = boot pinned
+      let get n = b.TryFind n |> Option.defaultValue ""
+      if not ((get "Directory.Packages.props").Contains "<PackageVersion Include=\"FSharp.Core\" Version=\"10.1.402\" />") then yield "FSharp.Core: a pinned package's Directory.Packages.props has no central FSharp.Core version"
+      if not ((get "Directory.Build.props").Contains reference && (get "Directory.Build.props").Contains "'$(MSBuildProjectExtension)' == '.fsproj' And '$(ManagePackageVersionsCentrally)' == 'true'") then
+          yield "FSharp.Core: a pinned package's Directory.Build.props does not reference FSharp.Core for centrally managed F# projects"
+      if b |> Map.exists (fun n text -> n.EndsWith ".fsproj" && text.Contains "FSharp.Core") then yield "FSharp.Core: a project file references FSharp.Core itself"
+      if x19 pinned |> List.exists (fun p -> p.Contains "fsharpCore") then yield sprintf "FSharp.Core: X19 refuses a decided pin: %A" (x19 pinned)
+      let refused = x19 undecided |> List.filter (fun p -> p.Contains "fsharpCore")
+      if refused.Length < 3 then yield sprintf "FSharp.Core control: X19 does not refuse an inexact, undecided, unapproved pin: %A" refused
+      // Layering onto Conditor's Directory.Build.props adds the reference once and keeps Conditor's properties.
+      match V41Package.layerFile "Directory.Build.props" conditorProps (get "Directory.Build.props") with
+      | Ok(Some merged) ->
+          if not (merged.Contains reference && merged.Contains "<TargetFramework>net10.0</TargetFramework>" && merged.TrimEnd().EndsWith "</Project>") then yield sprintf "FSharp.Core: layering gave %s" merged
+          if V41Package.layerFile "Directory.Build.props" merged (get "Directory.Build.props") <> Ok None then yield "FSharp.Core: layering twice adds the reference again"
+      | other -> yield sprintf "FSharp.Core: layering onto Conditor's Directory.Build.props gave %A" other
+      if V41Package.layerFile "Directory.Build.props" conditorProps ((boot v415).["Directory.Build.props"]) <> Ok None then yield "FSharp.Core: layering a frozen package's props is no longer a no-op" ]
+
 /// The owner's record against v4.1.4's corrected runners (RDP-003, FREEZE.md step 2), as a pure check over the records:
 /// each runner names its decision and the operator approval whose latest record of that decision selects option A; its
 /// content (every field but the approval) equals the runner of that suite in the amendment the owner decided on, so a
@@ -1025,4 +1058,4 @@ let cf07Deferral (source: string) : string list =
 
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source)
+    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "bootstrap FSharp.Core" (fun () -> bootstrapFSharpCore source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source)

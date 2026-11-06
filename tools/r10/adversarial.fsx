@@ -442,7 +442,7 @@ let cases : Case list =
         Correct = refusedWith "executed no test"
         Control = fun t -> runSuites t (suiteFixture ("full-" + string (Guid.NewGuid())) []) "full"
         ControlOk = fun o -> o.Exit = 0
-        Mutation = [ "tools/r9/r9.fsx", [ "    let missing = missing @ empty\n", "    let missing = missing\n" ] ] }
+        Mutation = [ "tools/r9/r9.fsx", [ "    let missing = missing @ skipped @ empty\n", "    let missing = missing @ skipped\n" ] ] }
       { Id = "C02"; Title = "The full-release gate cannot execute"; Requirements = [ "R1"; "R6"; "SA-01" ]; Needs = Nothing
         Expected = "completion-gate INCOMPLETE: RELEASE_GATE_MISSING (no release verdict is not a pass)"
         Attack = fun t -> completion t allIntegrated false coverageAll
