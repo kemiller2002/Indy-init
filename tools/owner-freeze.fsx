@@ -358,7 +358,7 @@ let scopeNotCurrent repo =
         let succ = atMain repo "docs/rehearsal-010-readiness/proposals/causa-investigation.requirement-catalog.successor.proposed.json" |> parse
         Set.isSubset (ids succ) (ids (atMain repo (str frozen "catalog") |> parse))
     if str frozen "catalogSha256" <> catalogNow then Some "the scope manifest was compiled from another catalog than the ratified one on main (the agent recompiles it)"
-    elif str frozen "packageManifestSha256" <> packageNow then Some "the scope manifest was compiled from another v4.1.4 than the one on main (the agent recompiles it)"
+    elif str frozen "packageManifestSha256" <> packageNow then Some "the scope manifest was compiled from another package manifest than the one on main (the agent recompiles it)"
     elif successorChosen && not (successorIn ()) then Some "ODR-R10-02 chose the successor, which is not ratified yet (ratify rehearsal-010)"
     else None
 
