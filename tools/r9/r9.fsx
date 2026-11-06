@@ -877,12 +877,16 @@ let authorizeImplementation () =
         let code, out = run praxis [ "work"; "--root"; target ] target
         if code <> 0 then []
         else
-            try (JsonNode.Parse out :?> JsonArray) |> Seq.map (fun n -> str n "id") |> List.ofSeq with _ -> []
+            try (JsonNode.Parse out :?> JsonArray) |> Seq.map (fun n -> str n "id", str n "title") |> List.ofSeq with _ -> []
     let lifecycle (id: string) = id.StartsWith "COND-MISSION" || id.StartsWith "ROS-INSTALL"
+    // A work-plan item is in Praxis when a Praxis item carries its id, or a title that starts with "[ID]": the
+    // STARTUP-INSTRUCTIONS form `praxis add "[ID] title"`, needed because Praxis refuses ids such as T10 as its own.
+    let inPraxis (id: string) =
+        praxisItems |> List.exists (fun (pid, title) -> pid = id || (not (isNull title) && title.StartsWith($"[{id}]", StringComparison.Ordinal)))
     let step3 =
         check (not (isNull workPlan)) $"3 work items: {workPlanPath} (indy-init.r9-work-plan/1) is missing"
-        @ check (praxisItems |> List.exists (lifecycle >> not)) "3 work items: Praxis holds no work item beyond its own lifecycle records; create them before implementing"
-        @ (items |> List.choose (fun w -> let id = str w "id" in if List.contains id praxisItems then None else Some $"3 work items: {id} is in the work plan but not in Praxis"))
+        @ check (praxisItems |> List.exists (fst >> lifecycle >> not)) "3 work items: Praxis holds no work item beyond its own lifecycle records; create them before implementing"
+        @ (items |> List.choose (fun w -> let id = str w "id" in if inPraxis id then None else Some $"3 work items: {id} is in the work plan but not in Praxis"))
     let manifest = if exists manifestPath then readJson manifestPath else null
     let catalogObligations = arr manifest "requirements" |> List.collect (fun r -> arr r "obligations" |> List.map (fun o -> str o "id", str r "id")) |> Map.ofList
     let plan = if exists (req "--obligations") then readJson (req "--obligations") else null
@@ -908,8 +912,12 @@ let authorizeImplementation () =
         scopeCauses
         @ (items |> List.collect (fun w ->
             let id = str w "id"
-            check (not (strList w "requirements").IsEmpty) $"4 links: {id} names no requirement"
-            @ check (not (strList w "obligations").IsEmpty) $"4 links: {id} names no verification obligation"
+            let reqs, obls = strList w "requirements", strList w "obligations"
+            // A coordination item the generated scope work plan gives neither requirements nor obligations (T14, T17,
+            // ...) links nothing and is not refused; an item with requirements must still name its obligations.
+            let coordination = reqs.IsEmpty && obls.IsEmpty
+            check (coordination || not reqs.IsEmpty) $"4 links: {id} names no requirement"
+            @ check (coordination || not obls.IsEmpty) $"4 links: {id} names no verification obligation"
             @ (strList w "obligations" |> List.filter (known >> not) |> List.map (fun o -> $"4 links: {id} names obligation {o}, which neither the catalog manifest nor the plan defines"))))
         @ (match inScope |> List.filter (linked.Contains >> not) with
            | [] -> []
