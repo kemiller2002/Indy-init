@@ -684,7 +684,7 @@
     "B: decline; v4.1.6 is withdrawn and the competition builds on v4.1.5"
    ],
    "recommendation": "A. The owner answered \"accept all\" to docs/v416-competition-decisions/DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
-   "rationale": "INV-032/INV-033 and J2-07/J2-09 cannot pass under v4.1.5 (no command emits ConclusionRecorded; RECORD-CONCLUSION.md section 3), and INV-025/027/029 and INV-031's two kinds cannot be stored losslessly in causa-storage v1.0.0 (STORAGE-1.1.md section 2).",
+   "rationale": "INV-032/INV-033 and J2-07/J2-09 cannot pass under v4.1.5 (no command emits ConclusionRecorded; proposals/RECORD-CONCLUSION.md section 3), and INV-025/027/029 and INV-031's two kinds cannot be stored losslessly in causa-storage v1.0.0 (STORAGE-1.1.md section 2).",
    "impact": "Until recorded, the two contract changes name no approval and the package does not validate (X17).",
    "approvalRecord": {
     "how": "A change in an operator approval: {\"decision_id\": \"ODR-V416-01\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.6. Agents never write an owner record (RDP-003)."
@@ -960,7 +960,7 @@
    "id": "ODR-V416-CAT",
    "kind": "scope",
    "title": "Apply the decided catalog edits",
-   "question": "Apply OD-CR-02 A, OD-CR-03 A and OD-CR-04 A (recorded) and ODR-V416-RC4 A to CAT-CAUSA-INVESTIGATION with v4.1.6: INV-028 required; INV-045 'Evidence category' (required radio group over the seven evidenceCategory values, no initial selection); INV-046 'Conclusion strength' (required radio group over the five conclusionStrength values, no initial selection); INV-047 'Residual uncertainty' (optional, at most 10,000)? The successor is the pinned file; tools/owner-freeze.fsx ratify v4.1.6-catalog writes it as the ratified catalog only if it is the file recorded here and changes no other ratified requirement.",
+   "question": "Apply OD-CR-02 A, OD-CR-03 A and OD-CR-04 A (recorded), ODR-V416-RC4 A and ODR-V416-S8 B to CAT-CAUSA-INVESTIGATION with v4.1.6: INV-028 required; INV-030's note says a new assessment of the same pair is the reassessment and the latest is current (S-8 B: the second-link refusal is dropped); INV-045 'Evidence category' (required radio group over the seven evidenceCategory values, no initial selection); INV-046 'Conclusion strength' (required radio group over the five conclusionStrength values, no initial selection); INV-047 'Residual uncertainty' (optional, at most 10,000)? The successor is the pinned file; tools/owner-freeze.fsx ratify v4.1.6-catalog writes it as the ratified catalog only if it is the file recorded here, changes exactly the ratified requirements named in amendsRequirements (INV-028, INV-030), adds exactly those in addsRequirements and drops none.",
    "options": [
     "A: apply them with v4.1.6 (the pinned successor)",
     "B: not now"
@@ -977,7 +977,8 @@
     }
    ],
    "amendsRequirements": [
-    "INV-028"
+    "INV-028",
+    "INV-030"
    ],
    "addsRequirements": [
     "INV-045",
@@ -1018,6 +1019,22 @@
    "impact": "With A, the competition scope has 31 work items and no split plan; with B, Rehearsal 010's approved scope record changes; with C, the mis-mapping stays.",
    "approvalRecord": {
     "how": "A change in an operator approval: {\"decision_id\": \"ODR-V416-SCOPE-SELECTORS\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.6. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-V416-FSCORE",
+   "kind": "dependency-lock",
+   "title": "FSharp.Core 10.1.402 as a central package in the bootstrap (P-2)",
+   "question": "Under central package management the F# SDK drops its implicit FSharp.Core reference, so no F# test assembly ships FSharp.Core.dll and xunit discovers no test (Rehearsal 010, PR #174 fix 2). Should the v4.1.6 bootstrap pin FSharp.Core 10.1.402 centrally (Directory.Packages.props) with a conditional reference for centrally managed F# projects (Directory.Build.props), as analysis/amendment.json bootstrap.fsharpCore {version 10.1.402, decision ODR-V416-FSCORE, approval}?",
+   "options": [
+    "A: pin FSharp.Core 10.1.402 in the v4.1.6 bootstrap",
+    "B: do not pin it; the F# test projects stay without FSharp.Core.dll"
+   ],
+   "recommendation": "A. It is P-2 of the decisions sheet (docs/v416-competition-decisions/DECISIONS-FOR-TONIGHT.md, section B), which the owner accepted in session on 2026-11-06; that answer is not a record. This request is how it is recorded for v4.1.6.",
+   "rationale": "A package version the bootstrap adds is a dependency-lock decision of the owner (X16, X19). The pin is written into analysis/amendment.json with the recorded approval id at FREEZE step 2: a pin without a recorded owner approval fails X19 and the offline fsharpCoreOwnerRecords check.",
+   "impact": "With B, Causa's F# test assemblies run no test under central package management.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V416-FSCORE\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.6. Agents never write an owner record (RDP-003)."
    }
   },
   {

@@ -3,7 +3,7 @@
   "catalogId": "CAT-CAUSA-INVESTIGATION",
   "idPattern": "^INV-\\d{3}$",
   "status": "proposed",
-  "description": "PROPOSED SUCCESSOR (ODR-V416-CAT, v4.1.6) of the ratified CAT-CAUSA-INVESTIGATION (INV-001..044). It applies the recorded OD-CR-02 A (INV-045 evidence category), OD-CR-03 A (INV-028 required) and OD-CR-04 A (INV-046 conclusion strength), and ODR-V416-RC4 A (INV-047 residual uncertainty, optional). No other ratified requirement changes. Only the owner ratifies it (owner-freeze.fsx ratify v4.1.6-catalog). The ratified catalog's description follows: PROPOSED SUCCESSOR (ODR-R10-02) of the ratified CAT-CAUSA-INVESTIGATION (sha256 19a03668..., INV-001..038): distinct screens and routes for the list, start and workspace (SA-04), and INV-039..044 for application structure (adversarial audit R4). Nothing ratified is changed except the workspace route; every new entry is sourced from an existing approved requirement. Component kinds are those Dokimos judges (region, link, display): Dokimos refuses list, navigation and status, so the audit draft's kinds are replaced. Behaviour the catalog cannot express (destinations activating, sections showing content, seven save states driven) is judged by the governed journeys J1-J3. Field-level decomposition of the authoritative Causa investigation requirements: creation and workspace (SCREEN-CONTRACTS S01, S02, S04, S05; REQUIREMENTS R1-R3, R10; CAUSA-UI-EXPERIENCE UI-006; CAUSA-PERSISTENCE PERSIST-007, PERSIST-021, PERSIST-030), INV-001..INV-018; and investigation content, the Rehearsal 9 content gaps and the answers to the catalog's open questions (OD-INDY-19..21, OD-INDY-23), INV-019..INV-038. Drafted by an agent; ratified by the owner.",
+  "description": "PROPOSED SUCCESSOR (ODR-V416-CAT, v4.1.6) of the ratified CAT-CAUSA-INVESTIGATION (INV-001..044). It applies the recorded OD-CR-02 A (INV-045 evidence category), OD-CR-03 A (INV-028 required) and OD-CR-04 A (INV-046 conclusion strength), and ODR-V416-RC4 A (INV-047 residual uncertainty, optional), and amends INV-030's note to ODR-V416-S8 B (a new assessment of the same pair is the reassessment; the latest is current; no second-link refusal). No other ratified requirement changes. Only the owner ratifies it (owner-freeze.fsx ratify v4.1.6-catalog). The ratified catalog's description follows: PROPOSED SUCCESSOR (ODR-R10-02) of the ratified CAT-CAUSA-INVESTIGATION (sha256 19a03668..., INV-001..038): distinct screens and routes for the list, start and workspace (SA-04), and INV-039..044 for application structure (adversarial audit R4). Nothing ratified is changed except the workspace route; every new entry is sourced from an existing approved requirement. Component kinds are those Dokimos judges (region, link, display): Dokimos refuses list, navigation and status, so the audit draft's kinds are replaced. Behaviour the catalog cannot express (destinations activating, sections showing content, seven save states driven) is judged by the governed journeys J1-J3. Field-level decomposition of the authoritative Causa investigation requirements: creation and workspace (SCREEN-CONTRACTS S01, S02, S04, S05; REQUIREMENTS R1-R3, R10; CAUSA-UI-EXPERIENCE UI-006; CAUSA-PERSISTENCE PERSIST-007, PERSIST-021, PERSIST-030), INV-001..INV-018; and investigation content, the Rehearsal 9 content gaps and the answers to the catalog's open questions (OD-INDY-19..21, OD-INDY-23), INV-019..INV-038. Drafted by an agent; ratified by the owner.",
   "screens": [
     {
       "id": "investigation-list",
@@ -992,9 +992,13 @@
         {
           "document": "docs/OWNER-DECISIONS-2026-11-03.md",
           "requirement": "OD-INDY-23"
+        },
+        {
+          "document": "requirements-compiled/v4.1.6/proposals/owner-decision-requests.json",
+          "requirement": "ODR-V416-S8"
         }
       ],
-      "notes": "The link is shown on both the evidence and the hypothesis, and survives a reload. A link to a non-existent target is refused. At most one current assessment per evidence-hypothesis pair: a second link for the pair is refused, pointing to the existing one. Reassessing or withdrawing keeps the earlier assessment and its provenance in the history (OD-INDY-23)."
+      "notes": "The link is shown on both the evidence and the hypothesis, and survives a reload. A link to a non-existent target is refused. At most one current assessment per evidence-hypothesis pair (ODR-V416-S8 B): a new assessment of the same pair is recorded as the reassessment (a new EvidenceRelated), the latest is current, and earlier ones stay in the history with their provenance. Reassessing or withdrawing keeps the earlier assessment and its provenance in the history (OD-INDY-23)."
     },
     {
       "id": "INV-031",

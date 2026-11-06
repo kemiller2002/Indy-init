@@ -35,7 +35,7 @@
     "bindings": 784,
     "planTests": 660,
     "obligations": 613,
-    "ownTests": 163,
+    "ownTests": 172,
     "suites": 11
   },
   "categoryBindings": {
@@ -71,7 +71,7 @@
       "planTests": false,
       "sha": "runs on the exact candidate SHA; every result records it",
       "counts": {
-        "tests": 159,
+        "tests": 168,
         "bindings": 0,
         "obligations": 0,
         "files": 27,
@@ -121,6 +121,9 @@
           "id": "dotnet:Causa.Contract.Tests.App.ConsumerIntegration.ShimRoundTrip"
         },
         {
+          "id": "dotnet:Causa.Contract.Tests.App.Producer.AdmitEvidenceUnavailableOnV100Investigation"
+        },
+        {
           "id": "dotnet:Causa.Contract.Tests.App.Producer.CredentialNeverRendered"
         },
         {
@@ -142,10 +145,16 @@
           "id": "dotnet:Causa.Contract.Tests.Domain.ConsumerUi2.KernelSignaturesAndFixtures"
         },
         {
+          "id": "dotnet:Causa.Contract.Tests.Domain.Producer.AdmitEvidenceEmitsRevisionInGroup"
+        },
+        {
           "id": "dotnet:Causa.Contract.Tests.Domain.Producer.DecideIsTotalOverCommands"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Domain.Producer.FrozenFixturesReplay"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Domain.Producer.LatestAssessmentIsCurrent"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Domain.Producer.RecordConclusionEmitsOneConclusionRecorded"
@@ -154,7 +163,16 @@
           "id": "dotnet:Causa.Contract.Tests.Domain.Producer.RecordConclusionRules"
         },
         {
+          "id": "dotnet:Causa.Contract.Tests.Domain.Producer.RelationshipKindsNeverSupport"
+        },
+        {
           "id": "dotnet:Causa.Contract.Tests.Domain.Producer.ReplayRefusesGaps"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Domain.Producer.ReviseEvidenceRules"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Domain.Producer.ReviseObservationRules"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Errors.ConsumerPersistence.EveryProviderErrorHasAMessage"
@@ -229,6 +247,9 @@
           "id": "dotnet:Causa.Contract.Tests.Storage.Producer.GoldenFixturesRoundTrip"
         },
         {
+          "id": "dotnet:Causa.Contract.Tests.Storage.Producer.StoredHistoriesReplayUnchanged"
+        },
+        {
           "id": "dotnet:Causa.Contract.Tests.Storage.Producer.V100InvestigationRefusesV110Events"
         },
         {
@@ -241,10 +262,16 @@
           "id": "dotnet:Causa.Contract.Tests.Storage.Producer.WritableRefusesCatalog"
         },
         {
+          "id": "dotnet:Causa.Contract.Tests.View.Producer.ConclusionCardShowsStrength"
+        },
+        {
           "id": "dotnet:Causa.Contract.Tests.View.Producer.CredentialNeverInBindings"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.View.Producer.IndicatorTextMatchesPersist031"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.View.Producer.LinkCardLatestIsCurrent"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.View.Producer.RoutesRoundTripAndResolveOnlyListedAddresses"
