@@ -33,7 +33,7 @@ Its neighbours are touched by the same change, so they are named too (section 4)
    Never in `index.html`, a script, an assembly, `build-info.json` or any other file of the artifact.
 5. **Still never:** committed to any repository; logged (build log, console, Praxis telemetry); in events, snapshots,
    manifests or any investigation file; in reports or Praxis state; in a URL; in error text or an announcement; in
-   localStorage, sessionStorage or any browser store; in screenshots, traces or test artifacts. In the tab it is the
+   never in localStorage, sessionStorage or any browser store; in screenshots, traces or test artifacts. In the tab it is the
    opaque `Credential.T`, used only as the Authorization header (IF41-WIRE, unchanged).
 6. **Least privilege.** A fine-grained personal access token, resource owner `REPO_OWNER`, repository access **only
    `DATA_SOURCE`**, repository permissions **Contents: Read and write** (Metadata: Read-only is added by GitHub and is
