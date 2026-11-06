@@ -1,0 +1,10 @@
+{
+    "round": 0,
+    "package": "requirements-compiled/v4.1.6",
+    "commit": null,
+    "verdict": "PENDING",
+    "reviewer": null,
+    "scope": "v4.1.6 (RecordConclusion; causa-storage 1.1.0 minimal, S-1 B; ConclusionCard.Strength, RC-6 A)",
+    "summary": "Not reviewed yet. FREEZE step 2 needs an independent review by an agent other than the package author, recorded here, before ODR-V416-02.",
+    "previousRounds": []
+}
