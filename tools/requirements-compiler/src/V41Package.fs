@@ -1474,6 +1474,14 @@ let runnerCheck (i: Inputs) : Check =
                   for p in ps do
                       if not (List.contains p defined) then yield sprintf "%s: Playwright project %s is not defined by %s" s.Id p config ]
 
+/// The FSharp.Core version a successor package's amendment pins for the bootstrap (bootstrap.fsharpCore.version), or
+/// None. Central package management makes the F# SDK drop its implicit FSharp.Core reference, so no F# assembly ships
+/// FSharp.Core.dll and xunit discovers no test (Rehearsal 008 DEV-R8-04; Rehearsal 010: suite-preflight and CI were
+/// vacuously green). A package that pins it gets a central FSharp.Core version and a version-less reference in every
+/// centrally managed F# project; frozen packages, which do not pin it, bootstrap exactly as they did.
+let bootstrapFSharpCore (i: Inputs) : string option =
+    i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (field "fsharpCore") |> Option.bind (strOpt "version") |> Option.filter (fun v -> v <> "")
+
 let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (string * string) list =
     let lists = compileLists i files |> Map.ofList
     let interfaces = arr "interfaces" i.Interfaces |> List.map (fun x -> sOr "file" x, x) |> Map.ofList
@@ -1515,7 +1523,15 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
     let projectFiles = projects |> List.map (fun (p, _) -> str "path" p, (if (str "path" p).EndsWith(".csproj", StringComparison.Ordinal) then csproj p else fsproj p))
     let slnx =
         String.concat "\n" ([ "<Solution>" ] @ (projects |> List.map (fun (p, _) -> sprintf "  <Project Path=\"%s\" />" (str "path" p))) @ [ "</Solution>"; "" ])
-    let props = String.concat "\n" [ "<Project>"; "  <PropertyGroup>"; "    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>"; "    <Nullable>enable</Nullable>"; "  </PropertyGroup>"; "</Project>"; "" ]
+    let fsharpCore = bootstrapFSharpCore i
+    let fsharpCoreReference =
+        match fsharpCore with
+        | Some _ ->
+            [ "  <ItemGroup Condition=\"'$(MSBuildProjectExtension)' == '.fsproj' And '$(ManagePackageVersionsCentrally)' == 'true'\">"
+              "    <PackageReference Include=\"FSharp.Core\" />"
+              "  </ItemGroup>" ]
+        | None -> []
+    let props = String.concat "\n" ([ "<Project>"; "  <PropertyGroup>"; "    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>"; "    <Nullable>enable</Nullable>"; "  </PropertyGroup>" ] @ fsharpCoreReference @ [ "</Project>"; "" ])
     let layoutCopy =
         match field "executableTests" i.Forma |> Option.map (sOr "eventBuildCopy"), i.AuthoredText |> List.tryFind (fst >> (=) "layout-tests/assertions.mjs") with
         | Some path, Some(_, text) when path <> "" -> [ path, text ]
@@ -1534,6 +1550,7 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
         String.concat "\n"
             ([ "<Project>"; "  <PropertyGroup>"; cpm; "  </PropertyGroup>"; "  <ItemGroup>" ]
              @ (nuget |> List.map (fun (id, v) -> sprintf "    <PackageVersion Include=\"%s\" Version=\"%s\" />" id v))
+             @ (fsharpCore |> Option.map (sprintf "    <PackageVersion Include=\"FSharp.Core\" Version=\"%s\" />") |> Option.toList)
              @ [ "  </ItemGroup>"; "</Project>"; "" ])
     // v4.1.4 (ODR-V414-02): the plan names Playwright projects (chromium, webkit) that nothing defined; Conditor's
     // scaffold config has chromium only (Rehearsal 009: 'Project(s) "webkit" not found'). The bootstrap writes the
@@ -1903,7 +1920,15 @@ let bootstrapCheck (i: Inputs) : Check =
             | None -> [ d, 0, "<unreadable>" ]
             | Some t -> t.Split('\n') |> Array.mapi (fun n l -> d, n + 1, l) |> Array.filter (fun (_, _, l) -> organizerRx.IsMatch l && gateRx.IsMatch l) |> List.ofArray)
     check "X19" "The bootstrap is the first timed task (T0), its duration partly measured and labelled so, every other timed task follows it, every organizer gate the scan finds has a recorded disposition under an owner decision, and the starting-state policy quotes the published rules verbatim, keeps the historical records unchanged and states the residual risk"
-        [ match timed |> List.tryFind (fun t -> t.Id = task) with
+        [ // A pinned FSharp.Core (bootstrap.fsharpCore) is a package the owner adds: an exact version under a recorded
+          // dependency-lock decision with its operator approval ("no other package is added without an owner decision").
+          match field "fsharpCore" spec with
+          | None -> ()
+          | Some fc ->
+              if not (Regex.IsMatch(sOr "version" fc, @"^[0-9]+(\.[0-9]+)+$")) then yield sprintf "bootstrap.fsharpCore version '%s' is not an exact version" (sOr "version" fc)
+              if not (requestOfKind i "dependency-lock" (sOr "decision" fc)) then yield sprintf "bootstrap.fsharpCore names decision '%s', which is not a dependency-lock request" (sOr "decision" fc)
+              if String.IsNullOrWhiteSpace (sOr "approval" fc) then yield "bootstrap.fsharpCore names no operator approval"
+          match timed |> List.tryFind (fun t -> t.Id = task) with
           | None -> yield sprintf "the bootstrap task %s is not in the timed window" task
           | Some t ->
               if t.Owner <> "integration" then yield sprintf "the bootstrap task %s is owned by %s, not integration" task t.Owner
@@ -2024,8 +2049,18 @@ let layerFile (name: string) (existing: string) (generated: string) : Result<str
         | "Directory.Build.props" ->
             let props (s: string) = Regex.Matches(s, @"<([A-Za-z]+)>([^<]*)</\1>") |> Seq.map (fun m -> m.Groups.[1].Value, m.Groups.[2].Value.Trim()) |> List.ofSeq
             let have = props existing
+            // Item groups (the FSharp.Core reference a package pins with bootstrap.fsharpCore) are added before
+            // </Project> when the existing file lacks them; the properties must already agree.
+            let groups (s: string) = Regex.Matches(s.Replace("\r\n", "\n"), @"(?s)  <ItemGroup[ >].*?</ItemGroup>") |> Seq.map (fun m -> m.Value) |> List.ofSeq
+            let norm' (s: string) = Regex.Replace(s, @"\s+", " ").Trim()
+            let addGroups = groups generated |> List.filter (fun g -> not (groups existing |> List.exists (fun e -> norm' e = norm' g)))
             match props generated |> List.filter (fun p -> not (List.contains p have)) with
-            | [] -> Ok None
+            | [] when addGroups.IsEmpty -> Ok None
+            | [] ->
+                let text = existing.Replace("\r\n", "\n")
+                match text.LastIndexOf "</Project>" with
+                | -1 -> Error "Directory.Build.props exists and has no </Project>"
+                | n -> Ok(Some(text.Substring(0, n) + String.concat "\n" addGroups + "\n" + text.Substring n))
             | missing -> Error(sprintf "Directory.Build.props exists and does not set %s" (missing |> List.map (fun (k, v) -> k + "=" + v) |> String.concat ", "))
         | ".gitignore" ->
             let have = existing.Replace("\r\n", "\n").Split('\n') |> Array.map (fun l -> l.Trim()) |> Set.ofArray
