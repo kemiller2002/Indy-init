@@ -460,6 +460,9 @@ jobs:
     # on a slow mirror, used the whole 45-minute budget before any case ran (PR #140, runs 42115761982 and 42122833553).
     container:
       image: mcr.microsoft.com/playwright:v1.63.0-noble
+    defaults:
+      run:
+        shell: bash -e {0}   # what these steps ran with on the runner; a container defaults to sh
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -512,6 +515,9 @@ jobs:
     # on a slow mirror, used the whole 45-minute budget before any case ran (PR #140, runs 42115761982 and 42122833553).
     container:
       image: mcr.microsoft.com/playwright:v1.63.0-noble
+    defaults:
+      run:
+        shell: bash -e {0}   # what these steps ran with on the runner; a container defaults to sh
     timeout-minutes: 45
     steps:
       - name: Tools the image does not carry (git, jq, curl, ICU for .NET)
@@ -606,12 +612,14 @@ jobs:
             diff <(jq -S . "$RUNNER_TEMP/slices.$v.json") <(jq -S . $P/slice-execution-manifest.$v.json) || { echo "::error::$P/slice-execution-manifest.$v.json is stale or edited"; exit 1; }
             diff <(jq -S . "$RUNNER_TEMP/inventory.$v.json") <(jq -S . $P/praxis-work-inventory.$v.json) || { echo "::error::$P/praxis-work-inventory.$v.json is stale or edited"; exit 1; }
           done
+      - name: Gather the evidence under one folder (the artifact keeps the same three top-level folders)
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/r10-evidence"
+          for d in adv-evidence replay-evidence launch-evidence; do [ -d "$RUNNER_TEMP/$d" ] && cp -r "$RUNNER_TEMP/$d" "$RUNNER_TEMP/r10-evidence/"; done; true
       - name: Publish
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: r10-adversarial
-          path: |
-            ${{ runner.temp }}/adv-evidence
-            ${{ runner.temp }}/replay-evidence
-            ${{ runner.temp }}/launch-evidence
+          path: ${{ runner.temp }}/r10-evidence
