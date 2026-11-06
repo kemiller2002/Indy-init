@@ -1276,7 +1276,7 @@ let v41Command (args: string list) : int =
                     let p = Path.Combine(dir, n)
                     Directory.CreateDirectory(Path.GetDirectoryName p) |> ignore
                     File.WriteAllText(p, t)
-                let merged = writes |> List.filter (fun (n, _) -> List.contains n [ "package.json"; ".gitignore"; "Directory.Build.props" ] && File.Exists(Path.Combine(dir, n)))
+                let merged = writes |> List.filter (fun (n, _) -> List.contains n [ "package.json"; ".gitignore" ] && File.Exists(Path.Combine(dir, n)))
                 printfn "bootstrap: %d of %d files written onto the Conditor repository %s (merged: %s)" writes.Length files.Length dir (merged |> List.map fst |> String.concat ", ")
             | Some dir ->
                 let files = V41Package.bootstrapFiles i (V41Package.ownedFiles i) (File.ReadAllText(Path.Combine(m.["--source"], "global.json")))

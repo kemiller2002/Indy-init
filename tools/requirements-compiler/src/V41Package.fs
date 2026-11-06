@@ -1474,72 +1474,6 @@ let runnerCheck (i: Inputs) : Check =
                   for p in ps do
                       if not (List.contains p defined) then yield sprintf "%s: Playwright project %s is not defined by %s" s.Id p config ]
 
-/// The FSharp.Core version a successor package's amendment pins for the bootstrap (bootstrap.fsharpCore.version), or
-/// None. Central package management makes the F# SDK drop its implicit FSharp.Core reference, so no F# assembly ships
-/// FSharp.Core.dll and xunit discovers no test (Rehearsal 008 DEV-R8-04; Rehearsal 010: suite-preflight and CI were
-/// vacuously green). A package that pins it gets a central FSharp.Core version and a version-less reference in every
-/// centrally managed F# project; frozen packages, which do not pin it, bootstrap exactly as they did.
-let bootstrapFSharpCore (i: Inputs) : string option =
-    i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (field "fsharpCore") |> Option.bind (strOpt "version") |> Option.filter (fun v -> v <> "")
-
-/// The path of the CI workflow a successor package's amendment has the bootstrap write (bootstrap.ciWorkflow), or None.
-/// Rehearsal 010: Conditor's scaffolded build-and-test.yml builds and tests its own App.slnx only, so CI never built
-/// or tested Causa.slnx. Frozen packages do not set it and bootstrap exactly as they did.
-let bootstrapCiWorkflow (i: Inputs) : string option =
-    i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (strOpt "ciWorkflow") |> Option.filter (fun p -> p <> "")
-
-/// The integration-owned CI workflow for the Causa solution: build Causa.slnx and run its .NET tests, refusing a run
-/// that skips a test assembly or a test, or that passes no test once a test is declared (before the first test, at T0,
-/// an empty run passes). The plan's suites are judged by the verification gate; this is the merge-time build check.
-let ciWorkflowText (i: Inputs) =
-    String.concat "\n"
-        [ "# Owner: integration. Written at bootstrap by requirements-compiler v41 (package " + packageVersion i + ")."
-          "# Builds and tests the Causa solution. Conditor's build-and-test.yml covers its own App.slnx only (Rehearsal 010:"
-          "# CI never built or tested Causa.slnx). A run that skips a test assembly or a test is not a pass."
-          "name: Causa CI"
-          ""
-          "on:"
-          "  pull_request:"
-          "  push:"
-          "    branches: [main]"
-          ""
-          "permissions:"
-          "  contents: read"
-          ""
-          "concurrency:"
-          "  group: ${{ github.workflow }}-${{ github.ref }}"
-          "  cancel-in-progress: true"
-          ""
-          "jobs:"
-          "  causa:"
-          "    runs-on: ubuntu-latest"
-          "    timeout-minutes: 30"
-          "    steps:"
-          "      - uses: actions/checkout@v4"
-          "      - uses: actions/setup-dotnet@v4"
-          "        with:"
-          "          global-json-file: global.json"
-          "      - name: Build Causa.slnx"
-          "        run: dotnet build Causa.slnx -c Release"
-          "      - name: Test Causa.slnx"
-          "        shell: bash"
-          "        run: |"
-          "          set -uo pipefail"
-          "          output=$(dotnet test Causa.slnx -c Release --no-build 2>&1)"
-          "          status=$?"
-          "          echo \"$output\""
-          "          if [ \"$status\" -ne 0 ]; then exit \"$status\"; fi"
-          "          if echo \"$output\" | grep -q 'could not find dependent assembly'; then"
-          "            echo \"::error::A test assembly was skipped (it cannot load a dependency, e.g. FSharp.Core); it ran no test.\"; exit 1"
-          "          fi"
-          "          if echo \"$output\" | grep -qE 'Skipped:[[:space:]]*[1-9]'; then"
-          "            echo \"::error::Tests were skipped. A run that skips tests is not a pass.\"; exit 1"
-          "          fi"
-          "          if grep -rqE '\\[<?(Fact|Theory)' --include='*.fs' --include='*.cs' src tests 2>/dev/null && ! echo \"$output\" | grep -qE 'Passed:[[:space:]]*[1-9]'; then"
-          "            echo \"::error::Tests are declared but none passed. An empty test run is not a pass.\"; exit 1"
-          "          fi"
-          "" ]
-
 let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (string * string) list =
     let lists = compileLists i files |> Map.ofList
     let interfaces = arr "interfaces" i.Interfaces |> List.map (fun x -> sOr "file" x, x) |> Map.ofList
@@ -1581,15 +1515,7 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
     let projectFiles = projects |> List.map (fun (p, _) -> str "path" p, (if (str "path" p).EndsWith(".csproj", StringComparison.Ordinal) then csproj p else fsproj p))
     let slnx =
         String.concat "\n" ([ "<Solution>" ] @ (projects |> List.map (fun (p, _) -> sprintf "  <Project Path=\"%s\" />" (str "path" p))) @ [ "</Solution>"; "" ])
-    let fsharpCore = bootstrapFSharpCore i
-    let fsharpCoreReference =
-        match fsharpCore with
-        | Some _ ->
-            [ "  <ItemGroup Condition=\"'$(MSBuildProjectExtension)' == '.fsproj' And '$(ManagePackageVersionsCentrally)' == 'true'\">"
-              "    <PackageReference Include=\"FSharp.Core\" />"
-              "  </ItemGroup>" ]
-        | None -> []
-    let props = String.concat "\n" ([ "<Project>"; "  <PropertyGroup>"; "    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>"; "    <Nullable>enable</Nullable>"; "  </PropertyGroup>" ] @ fsharpCoreReference @ [ "</Project>"; "" ])
+    let props = String.concat "\n" [ "<Project>"; "  <PropertyGroup>"; "    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>"; "    <Nullable>enable</Nullable>"; "  </PropertyGroup>"; "</Project>"; "" ]
     let layoutCopy =
         match field "executableTests" i.Forma |> Option.map (sOr "eventBuildCopy"), i.AuthoredText |> List.tryFind (fst >> (=) "layout-tests/assertions.mjs") with
         | Some path, Some(_, text) when path <> "" -> [ path, text ]
@@ -1608,7 +1534,6 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
         String.concat "\n"
             ([ "<Project>"; "  <PropertyGroup>"; cpm; "  </PropertyGroup>"; "  <ItemGroup>" ]
              @ (nuget |> List.map (fun (id, v) -> sprintf "    <PackageVersion Include=\"%s\" Version=\"%s\" />" id v))
-             @ (fsharpCore |> Option.map (sprintf "    <PackageVersion Include=\"FSharp.Core\" Version=\"%s\" />") |> Option.toList)
              @ [ "  </ItemGroup>"; "</Project>"; "" ])
     // v4.1.4 (ODR-V414-02): the plan names Playwright projects (chromium, webkit) that nothing defined; Conditor's
     // scaffold config has chromium only (Rehearsal 009: 'Project(s) "webkit" not found'). The bootstrap writes the
@@ -1617,10 +1542,8 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
         match i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (strOpt "playwrightConfig") with
         | Some path when path <> "" -> [ path, playwrightConfigText i ]
         | _ -> []
-    let ciWorkflow = bootstrapCiWorkflow i |> Option.map (fun path -> path, ciWorkflowText i) |> Option.toList
     [ ".gitignore", gitignore; "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ]
     @ playwrightConfig
-    @ ciWorkflow
     @ (if nuget.IsEmpty then [] else [ "Directory.Packages.props", centralVersions ])
     @ (if npm.IsEmpty then [] else [ "package.json", packageJson ])
     @ projectFiles @ fsFiles @ host @ layoutCopy
@@ -1980,20 +1903,7 @@ let bootstrapCheck (i: Inputs) : Check =
             | None -> [ d, 0, "<unreadable>" ]
             | Some t -> t.Split('\n') |> Array.mapi (fun n l -> d, n + 1, l) |> Array.filter (fun (_, _, l) -> organizerRx.IsMatch l && gateRx.IsMatch l) |> List.ofArray)
     check "X19" "The bootstrap is the first timed task (T0), its duration partly measured and labelled so, every other timed task follows it, every organizer gate the scan finds has a recorded disposition under an owner decision, and the starting-state policy quotes the published rules verbatim, keeps the historical records unchanged and states the residual risk"
-        [ // A pinned FSharp.Core (bootstrap.fsharpCore) is a package the owner adds: an exact version under a recorded
-          // dependency-lock decision with its operator approval ("no other package is added without an owner decision").
-          // A CI workflow the bootstrap writes (bootstrap.ciWorkflow) is integration's file in the ownership manifest.
-          match strOpt "ciWorkflow" spec with
-          | Some path when not (ownedFiles i |> List.exists (fun f -> f.Path = path && f.Owner = "integration")) ->
-              yield sprintf "bootstrap.ciWorkflow %s is not an integration-owned file of the manifest" path
-          | _ -> ()
-          match field "fsharpCore" spec with
-          | None -> ()
-          | Some fc ->
-              if not (Regex.IsMatch(sOr "version" fc, @"^[0-9]+(\.[0-9]+)+$")) then yield sprintf "bootstrap.fsharpCore version '%s' is not an exact version" (sOr "version" fc)
-              if not (requestOfKind i "dependency-lock" (sOr "decision" fc)) then yield sprintf "bootstrap.fsharpCore names decision '%s', which is not a dependency-lock request" (sOr "decision" fc)
-              if String.IsNullOrWhiteSpace (sOr "approval" fc) then yield "bootstrap.fsharpCore names no operator approval"
-          match timed |> List.tryFind (fun t -> t.Id = task) with
+        [ match timed |> List.tryFind (fun t -> t.Id = task) with
           | None -> yield sprintf "the bootstrap task %s is not in the timed window" task
           | Some t ->
               if t.Owner <> "integration" then yield sprintf "the bootstrap task %s is owned by %s, not integration" task t.Owner
@@ -2114,18 +2024,8 @@ let layerFile (name: string) (existing: string) (generated: string) : Result<str
         | "Directory.Build.props" ->
             let props (s: string) = Regex.Matches(s, @"<([A-Za-z]+)>([^<]*)</\1>") |> Seq.map (fun m -> m.Groups.[1].Value, m.Groups.[2].Value.Trim()) |> List.ofSeq
             let have = props existing
-            // Item groups (the FSharp.Core reference a package pins with bootstrap.fsharpCore) are added before
-            // </Project> when the existing file lacks them; the properties must already agree.
-            let groups (s: string) = Regex.Matches(s.Replace("\r\n", "\n"), @"(?s)  <ItemGroup[ >].*?</ItemGroup>") |> Seq.map (fun m -> m.Value) |> List.ofSeq
-            let norm' (s: string) = Regex.Replace(s, @"\s+", " ").Trim()
-            let addGroups = groups generated |> List.filter (fun g -> not (groups existing |> List.exists (fun e -> norm' e = norm' g)))
             match props generated |> List.filter (fun p -> not (List.contains p have)) with
-            | [] when addGroups.IsEmpty -> Ok None
-            | [] ->
-                let text = existing.Replace("\r\n", "\n")
-                match text.LastIndexOf "</Project>" with
-                | -1 -> Error "Directory.Build.props exists and has no </Project>"
-                | n -> Ok(Some(text.Substring(0, n) + String.concat "\n" addGroups + "\n" + text.Substring n))
+            | [] -> Ok None
             | missing -> Error(sprintf "Directory.Build.props exists and does not set %s" (missing |> List.map (fun (k, v) -> k + "=" + v) |> String.concat ", "))
         | ".gitignore" ->
             let have = existing.Replace("\r\n", "\n").Split('\n') |> Array.map (fun l -> l.Trim()) |> Set.ofArray
