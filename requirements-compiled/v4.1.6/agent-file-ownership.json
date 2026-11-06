@@ -2397,6 +2397,7 @@
       "kind": "test",
       "project": "Causa.Contract.Tests",
       "tests": [
+        "dotnet:Causa.Contract.Tests.App.Producer.AdmitEvidenceUnavailableOnV100Investigation",
         "dotnet:Causa.Contract.Tests.App.Producer.CredentialNeverRendered",
         "dotnet:Causa.Contract.Tests.App.Producer.StateIsKeyedByWorkspaceAndId",
         "dotnet:Causa.Contract.Tests.App.Producer.UpdateIsPure"
@@ -2453,11 +2454,16 @@
       "kind": "test",
       "project": "Causa.Contract.Tests",
       "tests": [
+        "dotnet:Causa.Contract.Tests.Domain.Producer.AdmitEvidenceEmitsRevisionInGroup",
         "dotnet:Causa.Contract.Tests.Domain.Producer.DecideIsTotalOverCommands",
         "dotnet:Causa.Contract.Tests.Domain.Producer.FrozenFixturesReplay",
+        "dotnet:Causa.Contract.Tests.Domain.Producer.LatestAssessmentIsCurrent",
         "dotnet:Causa.Contract.Tests.Domain.Producer.RecordConclusionEmitsOneConclusionRecorded",
         "dotnet:Causa.Contract.Tests.Domain.Producer.RecordConclusionRules",
-        "dotnet:Causa.Contract.Tests.Domain.Producer.ReplayRefusesGaps"
+        "dotnet:Causa.Contract.Tests.Domain.Producer.RelationshipKindsNeverSupport",
+        "dotnet:Causa.Contract.Tests.Domain.Producer.ReplayRefusesGaps",
+        "dotnet:Causa.Contract.Tests.Domain.Producer.ReviseEvidenceRules",
+        "dotnet:Causa.Contract.Tests.Domain.Producer.ReviseObservationRules"
       ],
       "requirements": []
     },
@@ -2581,6 +2587,7 @@
         "dotnet:Causa.Contract.Tests.Storage.Producer.EncodeNewVerifiesAndRoundTrips",
         "dotnet:Causa.Contract.Tests.Storage.Producer.EveryCatalogEventRoundTrips",
         "dotnet:Causa.Contract.Tests.Storage.Producer.GoldenFixturesRoundTrip",
+        "dotnet:Causa.Contract.Tests.Storage.Producer.StoredHistoriesReplayUnchanged",
         "dotnet:Causa.Contract.Tests.Storage.Producer.V100InvestigationRefusesV110Events",
         "dotnet:Causa.Contract.Tests.Storage.Producer.V110RevisionsAndKindsRoundTrip",
         "dotnet:Causa.Contract.Tests.Storage.Producer.WorkingCopyNeverNamesACatalogWorkspace",
@@ -2594,8 +2601,10 @@
       "kind": "test",
       "project": "Causa.Contract.Tests",
       "tests": [
+        "dotnet:Causa.Contract.Tests.View.Producer.ConclusionCardShowsStrength",
         "dotnet:Causa.Contract.Tests.View.Producer.CredentialNeverInBindings",
         "dotnet:Causa.Contract.Tests.View.Producer.IndicatorTextMatchesPersist031",
+        "dotnet:Causa.Contract.Tests.View.Producer.LinkCardLatestIsCurrent",
         "dotnet:Causa.Contract.Tests.View.Producer.RoutesRoundTripAndResolveOnlyListedAddresses",
         "dotnet:Causa.Contract.Tests.View.Producer.SevenSaveStatesWithPersist031Words",
         "dotnet:Causa.Contract.Tests.View.Producer.UiContractSurfaceOnlyAllowlistedFrozenTypes",

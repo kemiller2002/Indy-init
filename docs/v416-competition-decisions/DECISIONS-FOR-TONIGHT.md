@@ -49,7 +49,7 @@ them. Each line: id — question — **recommended answer** — why. Reply "acce
 6. **Re-record ODR-R10-01 (scope), commit the lock (ODR-RG-04)**, dispatch the live-provider preflight.
 7. Agent: launch-preflight → READY.
 
-## C. Added after "accept all" (scope-selector fix, Indy-init PR #176) — not yet accepted
+## C. Added after "accept all" (scope-selector fix, Indy-init PR #176) — accepted in session ("accept c"), not yet recorded (ODR-V416-SCOPE-SELECTORS is pending)
 | id | Question | Recommended | Why |
 |---|---|---|---|
 | SS-1 | The fixed compiler yields a different R10 scope (scopeSha256 26e6ff3c… → 6a0e23b0…; 37 → 31 items; WDL-013 now gate-covered by T23). Re-approve R10's scope, or approve only the competition scope? | **Competition only:** compile the v4.1.6 competition scope with the fix and approve it on its own digest; leave R10's approved scope as history | R10 is already running; there's no reason to re-approve it |
