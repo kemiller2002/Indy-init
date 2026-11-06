@@ -3,7 +3,7 @@
   "generatedBy": "tools/contract-readiness (dotnet run -- generate); do not edit by hand",
   "contractPackage": "causa-precompetition 1.0.0-candidate",
   "verdict": "BLOCKED",
-  "blockedReasons": ["owner decision ODR-V415-02 is open: Approve package v4.1.5 (existing request, not created here)", "owner decision OD-CR-01 is open: Adopt the causa-storage 1.1.0 additive extension and a v4.1.6 successor that carries it", "owner decision OD-CR-02 is open: Evidence category on write", "owner decision OD-CR-03 is open: Evidence source reference: optional in the catalog, required on the wire", "owner decision OD-CR-04 is open: Conclusion strength on write", "owner decision OD-CR-05 is open: INV-011 'Hypothesis explanation' maps to HypothesisRecorded.mechanism", "owner decision OD-CR-06 is open: INV-035 for evidence: which parts are editable with the same id", "owner decision OD-CR-08 is open: Adopt this contract package and its validator as owner-controlled verification assets", "owner decision OD-CR-07 is open: Actor identity for UI writes", "14 UI bindings have no defined write path: UB-011 INV-011, UB-012 INV-012, UB-023 INV-023, UB-025 INV-025, UB-027 INV-027, UB-028 INV-028, UB-029 INV-029, UB-030U INV-030, UB-031 INV-031, UB-032 INV-032, UB-033 INV-033, UB-034 INV-034, UB-035 INV-035, UB-037 INV-037", "7 required commands are undefined in the successor candidate: CMD-INV-EDIT, CMD-OBS-EDIT, CMD-HYP-EDIT, CMD-EVD-EDIT, CMD-REL-REVISE, CMD-REL-WITHDRAW, CMD-CONCL-RECORD"],
+  "blockedReasons": ["owner decision OD-CR-01 is open: Adopt the causa-storage 1.1.0 additive extension and a v4.1.6 successor that carries it [open (stale: recorded A in APR-CR-OWNER-1, but pinned content changed since: DOMAIN-CONTRACT.json, COMMAND-EVENT-REGISTRY.json; the owner confirms it again with owner-freeze decide contract-readiness)]", "owner decision OD-CR-08 is open: Adopt this contract package and its validator as owner-controlled verification assets [open (stale: recorded A in APR-CR-OWNER-1, but pinned content changed since: COMMAND-EVENT-REGISTRY.json, DOMAIN-CONTRACT.json, FINAL-REPORT.md, UI-FIELD-MAP.json, Gate.fs, Package.fs, Program.fs; the owner confirms it again with owner-freeze decide contract-readiness)]", "13 UI bindings have no defined write path: UB-012 INV-012, UB-023 INV-023, UB-025 INV-025, UB-027 INV-027, UB-028 INV-028, UB-029 INV-029, UB-030U INV-030, UB-031 INV-031, UB-032 INV-032, UB-033 INV-033, UB-034 INV-034, UB-035 INV-035, UB-037 INV-037", "7 required commands are undefined in the successor candidate: CMD-INV-EDIT, CMD-OBS-EDIT, CMD-HYP-EDIT, CMD-EVD-EDIT, CMD-REL-REVISE, CMD-REL-WITHDRAW, CMD-CONCL-RECORD"],
   "unverifiedReasons": ["CR-LIVE-01: Needs a GitHub credential and a writable repository; none is available to this validator. A provider double tests protocol behaviour only and is not substituted. Run the live-provider preflight (.github/workflows/live-provider-preflight.yml)."],
   "waivers": [],
   "waiverPolicy": "No waiver exists. BLOCKED and UNVERIFIED change only when the cause is removed: an owner record, a released contract, or executed evidence.",
@@ -142,16 +142,16 @@
     },
     "uiBindings": {
       "total": 45,
-      "covered": 30,
-      "blocked": 14,
+      "covered": 31,
+      "blocked": 13,
       "notApplicable": 1
     },
     "verificationObligations": {
       "obligations": 121,
-      "BLOCKED": 28,
+      "BLOCKED": 26,
       "NOT-APPLICABLE": 1,
       "PASS": 49,
-      "PENDING-IMPLEMENTATION": 42,
+      "PENDING-IMPLEMENTATION": 44,
       "UNVERIFIED": 1
     },
     "checks": {
@@ -164,7 +164,7 @@
       "total": 18,
       "failedAsExpected": 18
     },
-    "openBlockingDecisions": ["ODR-V415-02", "OD-CR-01", "OD-CR-02", "OD-CR-03", "OD-CR-04", "OD-CR-05", "OD-CR-06", "OD-CR-08", "OD-CR-07"],
+    "openBlockingDecisions": ["OD-CR-01", "OD-CR-08"],
     "readyToFreeze": false
   },
   "checks": [
@@ -553,8 +553,8 @@
       "outcome": "PASS",
       "details": [],
       "metrics": {
-        "covered": 30,
-        "blocked": 14,
+        "covered": 31,
+        "blocked": 13,
         "notApplicable": 1
       }
     },
@@ -626,8 +626,8 @@
       "outcome": "PASS",
       "details": [],
       "metrics": {
-        "open": 9,
-        "openBlocking": ["ODR-V415-02", "OD-CR-01", "OD-CR-02", "OD-CR-03", "OD-CR-04", "OD-CR-05", "OD-CR-06", "OD-CR-08", "OD-CR-07"]
+        "open": 2,
+        "openBlocking": ["OD-CR-01", "OD-CR-08"]
       }
     },
     {

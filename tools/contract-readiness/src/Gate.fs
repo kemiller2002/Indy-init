@@ -58,7 +58,7 @@ module Gate =
             (failed |> List.map (fun c -> sprintf "%s failed: %s" c.CheckId c.Title))
             @ (controlsBad |> List.map (fun r -> sprintf "%s not detected by %A" r.Control.ControlId r.DidNotFail))
             @ (if reproducible then [] else [ "generated package files differ from the committed ones" ])
-            @ (openBlocking |> List.map (fun d -> sprintf "owner decision %s is open: %s" d.DecisionId d.Title))
+            @ (openBlocking |> List.map (fun d -> sprintf "owner decision %s is open: %s [%s]" d.DecisionId d.Title d.Status))
             @ (if List.isEmpty blockedBindings then [] else [ sprintf "%d UI bindings have no defined write path: %s" blockedBindings.Length (String.Join(", ", blockedBindings |> List.map (fun b -> b.BindingId + " " + b.RequirementId))) ])
             @ (if List.isEmpty proposedCommands then [] else [ sprintf "%d required commands are undefined in the successor candidate: %s" proposedCommands.Length (String.Join(", ", proposedCommands |> List.map (fun c -> c.CommandId))) ])
         let verdict =

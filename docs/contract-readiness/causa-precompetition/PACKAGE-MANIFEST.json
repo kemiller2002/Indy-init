@@ -1,7 +1,7 @@
 {
   "schema": "causa.contract-readiness.package-manifest/1",
   "contractPackage": "causa-precompetition 1.0.0-candidate",
-  "packageChecksum": "1df907cec2cf62e7cf0105a07612dbad5023d213651d1369432d8b3ddd9a8b2c",
+  "packageChecksum": "3a9030401fbb98d59980e035e4d3f259c3fb0f4e182a6d08748ad3d6597711c8",
   "checksumRule": "sha256 of the lines '<sha256>  <path>\\n' for every package file (except this manifest) and every validator source file, in this order",
   "dependencies": {
     "causaDataRepository": "https://github.com/kemiller2002/causa-data",
@@ -27,7 +27,7 @@
   "files": [
     {
       "path": "COMMAND-EVENT-REGISTRY.json",
-      "sha256": "af086bacb7d835cabe82d60a59f2c33c83946e579eca223155bce9daa728be74"
+      "sha256": "5b9e29359387fa88d317a7752bae9a8facb6a5ad043efd0c06cd3ba032cd7de9"
     },
     {
       "path": "COMPETITION-CONSUMPTION.md",
@@ -35,11 +35,11 @@
     },
     {
       "path": "CONTRACT-READINESS.json",
-      "sha256": "c5871ca147f90ec7d473fd969b801ef66ea8496d66277a542cb60fccd1eea2a6"
+      "sha256": "292d80b590bcdc5acaee72c77112acc22cafef3354cf1cf50bcb0714b5062304"
     },
     {
       "path": "DOMAIN-CONTRACT.json",
-      "sha256": "7cc549694cf302dd600222a2edd478de9c49ff8145b68b7a2de86fbcd0a9bad9"
+      "sha256": "8f4deaec62c8053361f261ce4140316f730b1ddda5e6cca981971e7d828599b9"
     },
     {
       "path": "FIELD-REGISTRY.json",
@@ -47,7 +47,7 @@
     },
     {
       "path": "FINAL-REPORT.md",
-      "sha256": "d32b562f7a5f387bc2a7ac92c0c4a6977d229e100230b6942e2c69964599ea52"
+      "sha256": "915d5a11c453882407a560b6b147cc1bb6ac5f1d7f2492de85ce0d5c3d2ecd25"
     },
     {
       "path": "HISTORICAL-COMPATIBILITY.md",
@@ -75,11 +75,11 @@
     },
     {
       "path": "UI-FIELD-MAP.json",
-      "sha256": "e025b73b551c6d99946e698b3152331c0ba7c7e4d45ac9aff1de752d23840f05"
+      "sha256": "0adcd30aaab462849d2809edd4290856feaee027911734794cc2cbc0670088b0"
     },
     {
       "path": "VERIFICATION-MATRIX.json",
-      "sha256": "adb0c701cdd5b9613d83f14447582455a64003fefa8e2608b0322f6f81071f01"
+      "sha256": "ab9e29040d0986cfe40ce065cdaaefab6a99d7ba42d206df0e574d44789a618d"
     },
     {
       "path": "evidence/clean-checkout-9e42aba.txt",
@@ -117,7 +117,7 @@
     },
     {
       "path": "tools/contract-readiness/src/Gate.fs",
-      "sha256": "2378b37ba03c2cd623c91e5daba7cacf00a4b65caffeb5b1b3bcfd6dc8239c8f"
+      "sha256": "81068428ab293b1a8f754ae9d4737fb7f462361e84563b1f76a1a25e7d355818"
     },
     {
       "path": "tools/contract-readiness/src/Historical.fs",
@@ -133,11 +133,11 @@
     },
     {
       "path": "tools/contract-readiness/src/Package.fs",
-      "sha256": "51e4ca473838f8d34b3e0cda109e8a290621c2eea8187720c8679cf6dd73b97d"
+      "sha256": "84116eb81339efcf126b02599e343d34142935ad7d800e1471db0bb0aa8c5697"
     },
     {
       "path": "tools/contract-readiness/src/Program.fs",
-      "sha256": "5bda90a7f764256120847ef18935e7b31fa6438eddac7f854c45ac4fa93e65f9"
+      "sha256": "2cf362875e40a03b5d7f4a283d2b1d24f1a7a5c9f70823a1dfed6a8f48d59657"
     },
     {
       "path": "tools/contract-readiness/src/Schema.fs",

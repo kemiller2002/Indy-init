@@ -4,10 +4,10 @@
   "note": "contract-validation and negative-control rows were executed by this validator. implementation rows are obligations for the competition build: they are not results.",
   "counts": {
     "obligations": 121,
-    "BLOCKED": 28,
+    "BLOCKED": 26,
     "NOT-APPLICABLE": 1,
     "PASS": 49,
-    "PENDING-IMPLEMENTATION": 42,
+    "PENDING-IMPLEMENTATION": 44,
     "UNVERIFIED": 1
   },
   "obligations": [
@@ -490,7 +490,7 @@
       "statement": "T-IMPL-CMD-HYP-ADD-01",
       "subject": "CMD-HYP-ADD",
       "executedBy": "competition implementation (Dokimos / domain tests)",
-      "status": "BLOCKED"
+      "status": "PENDING-IMPLEMENTATION"
     },
     {
       "obligationId": "T-IMPL-CMD-HYP-EDIT-01",
@@ -742,7 +742,7 @@
       "statement": "INV-011 Hypothesis explanation: CMD-HYP-ADD -> F.Payload.HypothesisRecorded.mechanism, F.Entity.hypothesis.mechanism; verified by CATALOG:INV-011",
       "subject": "INV-011",
       "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
-      "status": "BLOCKED"
+      "status": "PENDING-IMPLEMENTATION"
     },
     {
       "obligationId": "UI-UB-012",
