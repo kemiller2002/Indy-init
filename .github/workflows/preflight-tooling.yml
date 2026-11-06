@@ -4,6 +4,8 @@ name: Preflight tooling
 # no browser (on 2026-11-05 `playwright install --with-deps` on the runner used the whole 45-minute budget three times
 # before any case ran). The other browser steps install on the runner with a step time limit: a stall fails that step,
 # named, rather than consuming the job; there is no in-script kill or retry (killing apt mid-install is not safe).
+# The remaining runner browser steps restore a Playwright 1.63.0 Chromium/WebKit cache keyed to ubuntu-24.04: on a hit they install
+# without apt and launch both browsers; on a miss or a failed launch they install --with-deps under the same step time limit.
 # Directive workstream C: a PR commit ran this workflow twice (push and pull_request events, same commit, every job),
 # doubling runner load while three sessions had PRs open. Push now runs only on main; PRs run on pull_request (the
 # merge result), and a newer commit on the same PR cancels the older run (its checks are on the old commit, so the new
@@ -18,7 +20,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   offline-contract-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -35,7 +37,7 @@ jobs:
   # Compiled package v4 is frozen at tag indy-init-requirements-v4.0.0 and is never recompiled with a later compiler:
   # its files on this commit must equal the tagged ones, and the tagged compiler and test suite reproduce them.
   frozen-v4:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -95,7 +97,7 @@ jobs:
         working-directory: ${{ runner.temp }}/v4-frozen
         run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v4 --source . --package requirements-compiled/v4 --registry "$GITHUB_WORKSPACE/.echelon-registry" --r7-evidence "$CAUSA_R7_EVIDENCE" --verify-test-record "$RUNNER_TEMP/v4-frozen-record.json" --check
   fsharp-tooling:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -279,6 +281,12 @@ jobs:
           dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered415"
           dotnet build "$RUNNER_TEMP/layered415/Causa.slnx" -c Release
           dotnet build "$RUNNER_TEMP/layered415/App.slnx" -c Release
+      - name: Restore pinned Playwright browser cache
+        id: playwright-browser-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
       - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
         # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget. No retry, so a
         # cancelled apt leaves no lock behind for a second attempt (the problem 8d58246 removed); nothing is skipped. Trade-off: on a very
@@ -287,7 +295,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
           tar -xzf "$RUNNER_TEMP/forma.tgz" -C "$RUNNER_TEMP/forma"
-          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && npx playwright install --with-deps chromium webkit > /dev/null
+          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ] && npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))"; then echo "Cached browsers launched"; else echo "::notice::no usable browser cache; installing with OS dependencies (bounded by this step's time limit)"; npx playwright install --with-deps chromium webkit; fi) > /dev/null
           cd "$GITHUB_WORKSPACE"
           cp -r requirements-compiled/v4.1/layout-tests/. "$RUNNER_TEMP/layout/"
           node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --browsers chromium,webkit
@@ -310,7 +318,7 @@ jobs:
   release-gate-repair:
     # docs/release-gate-repair: the suite-command defects Rehearsal 009 hit stay refused, the corrected v4.1.4 runners
     # execute, the Praxis ordering gate and the acceptance levels behave as specified.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -359,7 +367,7 @@ jobs:
           path: ${{ runner.temp }}/rg-evidence
 
   r9-readiness-gates:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -390,13 +398,19 @@ jobs:
   # suite of v4.1.5 (whose commands equal its predecessor v4.1.4's) lists and runs, WebKit included. The release-gate-repair harness lists the same
   # commands; this job also executes them (docs/rehearsal-010-readiness/INTEGRATION-REPORT.md).
   suite-commands:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
+      - name: Restore pinned Playwright browser cache
+        id: playwright-browser-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
       - name: Fixture trees (with and without the webkit project)
         # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget. No retry, so a
         # cancelled apt leaves no lock behind for a second attempt (the problem 8d58246 removed); nothing is skipped. Trade-off: on a very
@@ -405,7 +419,7 @@ jobs:
         run: |
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx"
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx-nowebkit" --without-webkit true
-          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && npx playwright install --with-deps chromium webkit)
+          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ] && npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))"; then echo "Cached browsers launched"; else echo "::notice::no usable browser cache; installing with OS dependencies (bounded by this step's time limit)"; npx playwright install --with-deps chromium webkit; fi))
           cp -r "$RUNNER_TEMP/fx/node_modules" "$RUNNER_TEMP/fx-nowebkit/"
       - name: The frozen v4.1.2 commands are refused (MSB1008), and a missing webkit project is refused
         run: |
