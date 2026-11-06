@@ -160,8 +160,8 @@ document.addEventListener('submit', async (ev) => {
   }
   if (form.id === 'obs') return edit((inv) => addObservation(inv, f));
   if (form.id === 'hyp') return edit((inv) => addHypothesis(inv, f));
-  if (form.id === 'ev') return f.category ? edit((inv) => addEvidence(inv, f)) : set((s) => ({ ...s, message: 'Choose an evidence category.' }));
-  if (form.id === 'conc') return f.strength ? edit((inv) => conclude(inv, f)) : set((s) => ({ ...s, message: 'Choose a conclusion strength.' }));
+  if (form.id === 'ev') return edit((inv) => addEvidence(inv, f));
+  if (form.id === 'conc') return edit((inv) => conclude(inv, f));
   if (form.id === 'link') {
     if (!f.kind || !f.rationale?.trim()) return set((s) => ({ ...s, message: 'Choose a relationship kind and give a rationale.' }));
     const r = op === 'reassess' ? reassess(state.inv, f) : link(state.inv, f);
