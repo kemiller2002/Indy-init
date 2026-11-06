@@ -936,6 +936,21 @@
           ]
         }
       ]
+    },
+    {
+      "id": "APR-R10-OWNER-5",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "ODR-R10-34",
+          "action": "decide",
+          "option": "B"
+        }
+      ]
     }
   ]
 }
