@@ -824,7 +824,7 @@
  "contractChanges": [
   {
    "file": "contracts/00-DOMAIN-STUBS.fs",
-   "sha256": "5c7848dfb04ea7380f8b0053c3706850ce647dc1b03d6e097e2833a84cb78ee2",
+   "sha256": "9da7a94cbd5c56c7b7b54847f5c7c9b4e7261d476ad4fd82ccbd6a582dd2d349",
    "decision": "ODR-V416-01",
    "approval": "APR-V416-OWNER-1",
    "summary": "RecordConclusion (RC-7 A: after RecordVerification), ReviseObservation and ReviseEvidence commands; ObservationRevised and EvidenceRevised events (causa-storage 1.1.0, S-1 B)."

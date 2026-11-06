@@ -602,6 +602,7 @@ let supplementProblems (i: Inputs) : string list =
           let what = sprintf "the supplementary plan entry %s" rid
           if not (requestOfKind i "scope" (sOr "decision" s)) then yield sprintf "%s names decision '%s', which is not a scope request" what (sOr "decision" s)
           if String.IsNullOrWhiteSpace(sOr "approval" s) then yield sprintf "%s names no operator approval" what
+          if String.IsNullOrWhiteSpace(sOr "supersedes" s) then yield sprintf "%s names no decision it supersedes" what
           if (supplementaryPlan i |> List.filter (fun x -> sOr "requirement" x = rid)).Length > 1 then yield sprintf "%s is declared twice" what
           match baselineRequirement i rid with
           | None -> yield sprintf "%s: %s is not a baseline requirement" what rid
@@ -613,6 +614,7 @@ let supplementProblems (i: Inputs) : string list =
               for b in arr "testBindings" s do
                   if arr "tests" b |> List.isEmpty then yield sprintf "%s: %s names no test" what (str "obligation" b)
                   for t in arr "tests" b do
+                      if not (List.contains (sOr "kind" t) EvidenceCategories.testKinds) then yield sprintf "%s: %s has test kind '%s', not one of %s" what (str "id" t) (sOr "kind" t) (String.concat ", " EvidenceCategories.testKinds)
                       match suiteOf true (str "id" t) |> List.map (fun x -> x.Id) with
                       | [ suite ] when suite = sOr "suite" s -> ()
                       | ids -> yield sprintf "%s: %s runs in %s, not in %s" what (str "id" t) (if ids.IsEmpty then "no plan suite" else String.concat ", " ids) (sOr "suite" s)

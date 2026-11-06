@@ -1,10 +1,11 @@
 {
-    "round": 0,
-    "package": "requirements-compiled/v4.1.6",
-    "commit": null,
-    "verdict": "PENDING",
-    "reviewer": null,
-    "scope": "v4.1.6 (RecordConclusion; causa-storage 1.1.0 minimal, S-1 B; ConclusionCard.Strength, RC-6 A)",
-    "summary": "Not reviewed yet. FREEZE step 2 needs an independent review by an agent other than the package author, recorded here, before ODR-V416-02.",
-    "previousRounds": []
+ "round": 1,
+ "package": "requirements-compiled/v4.1.6",
+ "commit": "4c8c5ceb9d8cec3f2fb91b9fc51fd8fa079c5bef",
+ "verdict": "PASS",
+ "reviewer": "An independent Claude Code session (session_01G1iECf6kCjWM5Bw24b7kfF) spawned by the package author for this review, given only the diff, FREEZE.md and the owner's record, not the author's conclusions; separate from the package author (session_01G1iECchk3KML9c4HT1wdsB). Recorded here by the package author from the reviewer's report.",
+ "scope": "FREEZE step 2 (PR #181): approval ids, the WDL-013 supplementary plan entry, the v4.1.6 owner-record check, CI",
+ "summary": "PASS. Reproduced v4.1.6 byte for byte with X01-X21 PASS; v4.1-v4.1.5 --check pass; frozen packages equal their tags; offline suite all passed; v4.1.6 CI bootstrap (empty repo and Conditor fixture), contract typecheck and FS1093 negative controls green; the WDL-013 entry is the baseline verbatim (P1) with WDL-012's rules, gates and categories; every recorded option matches the package; the new owner-record check refused every substantive tamper (wrong approval, a later RC6 B, an agent approvals commit, an owner rewrite of APR-V416-OWNER-1). M1 (Medium): 00-DOMAIN-STUBS.fs had been set back to applies.A's 5c7848df, which the owner-freeze tool never showed, while the ODR-V416-01 question names the contractChanges digest (9da7a94c at 24615a0^); doc comment only, and it reintroduced a broken citation. L1 (Low): FREEZE.md claimed an independent review that was still PENDING. L2 (Low): the WDL-013 entry's test kind and supersedes were unchecked. Info: X09 checks only that an approval is named (the owner's id is checked offline, as for contract changes); WI-GEN-WDL is left to step 5.",
+ "resolution": "M1: the package follows the question the owner was shown: 00 stays at 9da7a94c (the contractChanges digest at 24615a0^, with the correct proposals/ citation), and v416OwnerRecords reads the selected digests from contractChanges at the parent of the record's commit; applies.A's stale 5c7848df is a refused control. L1: this record. L2: X09 requires a known test kind and a superseded decision; the owner-record check requires kind deterministic (as WDL-012's) and supersedes naming ODR-V4-10, each with a control.",
+ "previousRounds": []
 }

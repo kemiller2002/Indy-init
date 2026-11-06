@@ -739,17 +739,20 @@ let v415OwnerRecordsWith (approvals: Json list) (amendment: Json) (machines: Jso
           | Some a -> yield sprintf "v4.1.5: %s records %s other than option A" (get "id" a) decision
           | None -> yield sprintf "v4.1.5: %s is not recorded by the owner" decision ]
 
-/// The requests of `package` (a requirements-compiled version) the owner selected with `approval`: the requests file at
-/// the parent of the commit that first recorded that approval id (review caveat on #137: the owner's records carry no
-/// digests).
-let decidedRequestsOf (package: string) (source: string) (approval: string) : Result<Json list, string> =
+/// A file as it was at the parent of the commit that first recorded the approval id `approval` (review caveat on #137:
+/// the owner's records carry no digests, so what a record selected is read there).
+let atRecordParent (source: string) (approval: string) (path: string) : Result<byte[], string> =
     let approvalsPath = "kickoff/rehearsal-007/approvals.causa.json"
     let text (b: byte[]) = System.Text.Encoding.UTF8.GetString b
     let git args = Git.run source args
     git [ "log"; "--format=%H"; "-S"; sprintf "\"%s\"" approval; "--"; approvalsPath ]
     |> Result.map (fun b -> (text b).Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray)
     |> Result.bind (function [] -> Error "no commit records it" | cs -> Ok (List.last cs))
-    |> Result.bind (fun c -> git [ "show"; sprintf "%s^:requirements-compiled/%s/proposals/owner-decision-requests.json" c package ] |> Result.map (parseBytes >> arr "requests"))
+    |> Result.bind (fun c -> git [ "show"; sprintf "%s^:%s" c path ])
+
+/// The requests of `package` (a requirements-compiled version) the owner selected with `approval`.
+let decidedRequestsOf (package: string) (source: string) (approval: string) : Result<Json list, string> =
+    atRecordParent source approval (sprintf "requirements-compiled/%s/proposals/owner-decision-requests.json" package) |> Result.map (parseBytes >> arr "requests")
 
 let v415DecidedRequests (source: string) (approval: string) : Result<Json list, string> = decidedRequestsOf "v4.1.5" source approval
 
@@ -895,12 +898,15 @@ let v416Decisions =
 /// The owner's record against v4.1.6 (RDP-003, FREEZE.md step 2), as a pure check over the records. Every ODR-V416
 /// decision is recorded by the owner (operator kemiller2002) with its request's recommended option, which v4.1.6 is
 /// built on (ODR-V416-01, -RC6, -FSCORE and -WDL013: A, the option step 2 applies). Each contract
-/// change names the decision whose option A pinned it, as the requests read at the parent of the record's commit
-/// (`pinsAt`) stated it, and that decision's latest owner record; the file on disk is exactly what was pinned; and no
-/// change is unpinned. `bootstrap.fsharpCore` names ODR-V416-FSCORE's record, whose recorded packages hold that exact
+/// change names the decision whose option A selected it, as the requests read at the parent of the record's commit
+/// (`pinsAt`) state it, and that decision's latest owner record; the file on disk is exactly what was selected; and no
+/// change is unpinned. The digest selected is the one the request's question shows the owner ("at the digests
+/// analysis/amendment.json contractChanges pins"), read from the amendment at the parent of the record's commit
+/// (`changesAt`). For 00, `applies.A` held a stale digest then (5c7848df, from before review 3's one-line citation fix,
+/// ef195ce); the owner was never shown it and it is not what the question names, so it is not used. `bootstrap.fsharpCore` names ODR-V416-FSCORE's record, whose recorded packages hold that exact
 /// version. Each supplementaryPlan entry names ODR-V416-WDL013's record, and its suite and every test identity are the
 /// ones the decided request states verbatim.
-let v416OwnerRecordsWith (approvals: Json list) (amendment: Json) (pinsAt: string -> Result<Json list, string>) (fileSha: string -> string) : string list =
+let v416OwnerRecordsWith (approvals: Json list) (amendment: Json) (pinsAt: string -> Result<Json list, string>) (changesAt: string -> Result<Json list, string>) (fileSha: string -> string) : string list =
     let get k j = strOpt k j |> Option.defaultValue ""
     let operator (a: Json) =
         let authority = field "authority" a
@@ -926,10 +932,20 @@ let v416OwnerRecordsWith (approvals: Json list) (amendment: Json) (pinsAt: strin
               match recordedA decision with
               | Error e -> yield Error e
               | Ok (approval, _) ->
-                  match requestAt decision approval |> Result.map (fun r -> field "applies" r |> Option.bind (field "A")) with
-                  | Error e -> yield Error (sprintf "v4.1.6: what %s selected cannot be read: %s" approval e)
-                  | Ok None -> yield Error (sprintf "v4.1.6: %s had no option A when %s was recorded" decision approval)
-                  | Ok (Some pins) -> yield Ok (decision, approval, pins) ]
+                  match requestAt decision approval |> Result.map (fun r -> field "applies" r |> Option.bind (field "A")), changesAt approval with
+                  | Error e, _ | _, Error e -> yield Error (sprintf "v4.1.6: what %s selected cannot be read: %s" approval e)
+                  | Ok None, _ -> yield Error (sprintf "v4.1.6: %s had no option A when %s was recorded" decision approval)
+                  | Ok (Some a), Ok decidedChanges ->
+                      // The files option A names, at the digests contractChanges pinned when the owner recorded it.
+                      let selected =
+                          [ for c in arr "contracts" a do
+                                let file = get "file" c
+                                match decidedChanges |> List.filter (fun x -> get "file" x = file && get "decision" x = decision) with
+                                | [ x ] -> yield Ok (JObj [ "file", JStr file; "sha256", JStr (get "sha256" x) ])
+                                | _ -> yield Error (sprintf "v4.1.6: when %s was recorded, contractChanges did not pin %s under %s exactly once" approval file decision) ]
+                      match selected |> List.choose (function Error e -> Some e | Ok _ -> None) with
+                      | e :: _ -> yield Error e
+                      | [] -> yield Ok (decision, approval, JObj [ "contracts", JArr (selected |> List.choose (function Ok j -> Some j | Error _ -> None)) ]) ]
     [ // Every decision is recorded with the option v4.1.6 is built on: its request's recommended option (FREEZE step 1),
       // as the request read at the parent of the record's commit states it.
       for decision in v416Decisions do
@@ -989,13 +1005,21 @@ let v416OwnerRecordsWith (approvals: Json list) (amendment: Json) (pinsAt: strin
                   let expected = [ for n in 1..3 -> sprintf "WDL-013-O%d" n, sprintf "playwright:acceptance/WDL-013.spec.js > WDL-013-O%d [chromium]" n ]
                   if tests |> List.map (fun (o, t) -> o, get "id" t) |> List.sort <> expected then
                       yield sprintf "v4.1.6: the supplementary plan entry %s binds %A, not the three identities %s selected" rid (tests |> List.map (fun (o, t) -> o, get "id" t)) approval
+                  if not ((get "supersedes" e).Contains "ODR-V4-10") then yield sprintf "v4.1.6: the supplementary plan entry %s supersedes '%s', not ODR-V4-10 A" rid (get "supersedes" e)
                   for (o, t) in tests do
+                      if get "kind" t <> "deterministic" then yield sprintf "v4.1.6: %s has kind '%s', not deterministic (as WDL-012's Chromium tests)" (get "id" t) (get "kind" t)
                       let quoted = if get "id" t = snd expected.Head then get "id" t else "... > " + o + " [chromium]"
                       if not (question.Contains quoted) then yield sprintf "v4.1.6: %s is not a test identity %s selected" (get "id" t) approval
                       if strs "categories" t |> List.sort <> [ "accessibility"; "browser" ] then yield sprintf "v4.1.6: %s declares categories %A, not browser and accessibility (as for WDL-012)" (get "id" t) (strs "categories" t) ]
 
-/// The real v4.1.6 record: the committed approvals and amendment, the requests each record selected (read at the
-/// parent of the record's commit), the package files' digests on disk, and the approvals file's history.
+/// The v4.1.6 contractChanges at the parent of the commit that first recorded `approval`: the digests the ODR-V416-01
+/// and -RC6 questions refer the owner to.
+let v416DecidedChanges (source: string) (approval: string) : Result<Json list, string> =
+    atRecordParent source approval "requirements-compiled/v4.1.6/analysis/amendment.json" |> Result.map (parseBytes >> arr "contractChanges")
+
+/// The real v4.1.6 record: the committed approvals and amendment, the requests and contractChanges each record
+/// selected (read at the parent of the record's commit), the package files' digests on disk, and the approvals file's
+/// history.
 let v416OwnerRecords (source: string) : string list =
     let package = "requirements-compiled/v4.1.6"
     let fileSha (path: string) =
@@ -1006,7 +1030,7 @@ let v416OwnerRecords (source: string) : string list =
         v416OwnerRecordsWith
             (parseFile (Path.Combine(source, "kickoff/rehearsal-007/approvals.causa.json")) |> arr "approvals")
             (parseFile (Path.Combine(source, package, "analysis/amendment.json")))
-            (decidedRequestsOf "v4.1.6" source) fileSha
+            (decidedRequestsOf "v4.1.6" source) (v416DecidedChanges source) fileSha
     | problems -> problems
 
 /// The v4.1.6 guard refuses what it exists for. Starting from the committed records, each mutation must be refused, and
@@ -1029,12 +1053,14 @@ let v416OwnerRecordControls (source: string) : string list =
     let file00, file07 = "contracts/00-DOMAIN-STUBS.fs", "contracts/07-IF41-VIEW.fs"
     let fakeSha = String('0', 64)
     let asDecided = decidedRequestsOf "v4.1.6" source
+    let changesDecided = v416DecidedChanges source
     let editedPin = amendment |> onList "contractChanges" (isFile file07) (set "sha256" (JStr fakeSha))
     let editedFile f = if f = file07 then fakeSha else fileSha f
-    // The one-line citation edit of review 3 (ef195ce), made after ODR-V416-01 A pinned 00; contractChanges following it.
-    let reviewThree = "9da7a94cbd5c56c7b7b54847f5c7c9b4e7261d476ad4fd82ccbd6a582dd2d349"
-    let afterDecision f = if f = file00 then reviewThree else fileSha f
-    let followed = amendment |> onList "contractChanges" (isFile file00) (set "sha256" (JStr reviewThree))
+    // 00 before review 3's citation fix (ef195ce): the stale digest applies.A still held when the owner recorded
+    // ODR-V416-01, which is not what the question pointed the owner to; contractChanges following it.
+    let staleApplies = "5c7848dfb04ea7380f8b0053c3706850ce647dc1b03d6e097e2833a84cb78ee2"
+    let afterDecision f = if f = file00 then staleApplies else fileSha f
+    let followed = amendment |> onList "contractChanges" (isFile file00) (set "sha256" (JStr staleApplies))
     let swap (decision: string) (option: string) (a: Json) =
         set "changes" (JArr (arr "changes" a |> List.map (fun c -> if strOpt "decision_id" c = Some decision then set "option" (JStr option) c else c))) a
     let withoutRecord (decision: string) = approvals |> List.map (fun a -> set "changes" (JArr (arr "changes" a |> List.filter (fun c -> strOpt "decision_id" c <> Some decision))) a)
@@ -1044,7 +1070,7 @@ let v416OwnerRecordControls (source: string) : string list =
     let cases =
         [ "a pin edited after the decision (contract and contractChanges follow it)", approvals, editedPin, editedFile
           "a contract changed after the decision", approvals, amendment, editedFile
-          "00 as review 3 left it (9da7a94c), with contractChanges following it", approvals, followed, afterDecision
+          "00 at applies.A's stale digest (5c7848df), with contractChanges following it", approvals, followed, afterDecision
           "a change naming the wrong approval", approvals, amendment |> onList "contractChanges" (isFile file00) (set "approval" (JStr "APR-V416-OWNER-9")), fileSha
           "a change naming no approval", approvals, amendment |> onList "contractChanges" (isFile file07) (set "approval" (JStr "")), fileSha
           "07 relabelled to ODR-V416-01 (decision mismatch)", approvals, amendment |> onList "contractChanges" (isFile file07) (set "decision" (JStr "ODR-V416-01")), fileSha
@@ -1063,24 +1089,28 @@ let v416OwnerRecordControls (source: string) : string list =
           "the WDL-013 entry for another requirement", approvals, supplement (set "requirement" (JStr "WDL-012")), fileSha
           "a WDL-013 test identity the owner did not select", approvals, firstTest (set "id" (JStr "playwright:acceptance/WDL-013.spec.js > WDL-013-O1 [webkit]")), fileSha
           "a WDL-013 test with an added category", approvals, firstTest (set "categories" (jstrs [ "accessibility"; "browser"; "independent-acceptance" ])), fileSha
-          "the WDL-013 entry removed", approvals, set "supplementaryPlan" (JArr []) amendment, fileSha ]
-    [ match v416OwnerRecordsWith approvals amendment asDecided fileSha with
+          "the WDL-013 entry removed", approvals, set "supplementaryPlan" (JArr []) amendment, fileSha
+          "a WDL-013 test of another kind", approvals, firstTest (set "kind" (JStr "review")), fileSha
+          "the WDL-013 entry superseding another decision", approvals, supplement (set "supersedes" (JStr "ODR-V4-11 A")), fileSha ]
+    [ match v416OwnerRecordsWith approvals amendment asDecided changesDecided fileSha with
       | [] -> ()
       | ps -> yield sprintf "v4.1.6 owner-record control: the committed records fail: %A" ps
       for name, aps, a, sha in cases do
-          if v416OwnerRecordsWith aps a asDecided sha |> List.isEmpty then yield sprintf "v4.1.6 owner-record control: '%s' was not refused" name
+          if v416OwnerRecordsWith aps a asDecided changesDecided sha |> List.isEmpty then yield sprintf "v4.1.6 owner-record control: '%s' was not refused" name
       // HEAD's requests, the contract and contractChanges re-pinned together after the decision: judged against the
       // requests at the parent of the record's commit, it is refused although HEAD's requests agree with the edit.
       let headRepinned = requests |> List.map (fun q -> if strOpt "id" q = Some "ODR-V416-RC6" then (match field "applies" q |> Option.bind (field "A") with Some a -> set "applies" (JObj [ "A", onList "contracts" (isFile file07) (set "sha256" (JStr fakeSha)) a ]) q | None -> q) else q)
-      if v416OwnerRecordsWith approvals editedPin (fun _ -> Ok headRepinned) editedFile |> List.isEmpty |> not then
+      let headChanges = arr "contractChanges" editedPin
+      if v416OwnerRecordsWith approvals editedPin (fun _ -> Ok headRepinned) (fun _ -> Ok headChanges) editedFile |> List.isEmpty |> not then
           yield "v4.1.6 owner-record control: a re-pin consistent with HEAD's requests is refused even when judged against them (the fixture is wrong)"
-      if v416OwnerRecordsWith approvals editedPin asDecided editedFile |> List.isEmpty then
+      if v416OwnerRecordsWith approvals editedPin asDecided changesDecided editedFile |> List.isEmpty then
           yield "v4.1.6 owner-record control: 'HEAD requests, contract and contractChanges re-pinned together after the decision' was not refused"
-      // The decided requests are the ones at the parent of the record's commit: there, ODR-V416-01 pins 00 at 5c7848df.
-      match asDecided "APR-V416-OWNER-1" with
-      | Ok rs when rs |> List.exists (fun r -> strOpt "id" r = Some "ODR-V416-02") -> ()
-      | Ok _ -> yield "v4.1.6 owner-record control: the decided requests lack ODR-V416-02"
-      | Error e -> yield sprintf "v4.1.6 owner-record control: the decided requests cannot be read: %s" e ]
+      // What was decided is read at the parent of the record's commit: there contractChanges pins 00 at 9da7a94c (the
+      // digest the question names) while applies.A still held 5c7848df.
+      match asDecided "APR-V416-OWNER-1", changesDecided "APR-V416-OWNER-1" with
+      | Ok rs, Ok cs when rs |> List.exists (fun r -> strOpt "id" r = Some "ODR-V416-02") && cs |> List.exists (fun c -> strOpt "file" c = Some file00 && strOpt "sha256" c = Some "9da7a94cbd5c56c7b7b54847f5c7c9b4e7261d476ad4fd82ccbd6a582dd2d349" && strOpt "approval" c = Some "") -> ()
+      | Ok _, Ok _ -> yield "v4.1.6 owner-record control: what was decided is not read at the parent of the record's commit"
+      | Error e, _ | _, Error e -> yield sprintf "v4.1.6 owner-record control: what was decided cannot be read: %s" e ]
 
 /// The committed v4.1.4 package is what the compiler produces from its inputs (`v41 --check`).
 let committedPackage (source: string) : string list =
