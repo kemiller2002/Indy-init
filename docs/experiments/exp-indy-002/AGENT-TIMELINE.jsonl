@@ -1,0 +1,17 @@
+{"t":"2026-11-05T21:20:35Z","agent":"domain","event":"dispatched","detail":"worktree agent, groups in release order"}
+{"t":"2026-11-05T21:20:35Z","agent":"ui","event":"dispatched","detail":"worktree agent, temporary stub ports"}
+{"t":"2026-11-05T21:20:35Z","agent":"coordinator+verification","event":"start","detail":"releases CG-2..5, monitors traceability"}
+{"t":"2026-11-05T21:20:53Z","agent":"domain","event":"first-code","detail":"CG-1 start, 2.1 min after first release (21:18:50Z)"}
+{"t":"2026-11-05T21:21:06Z","agent":"ui","event":"first-code","detail":"setup + Limen protocol study; CG-1 start"}
+{"t":"2026-11-05T21:22:32Z","agent":"domain","event":"group-complete","detail":"CG-1 complete, 14 tests"}
+{"t":"2026-11-05T21:29:40Z","agent":"domain","event":"wave1-complete","detail":"CG-1..5 complete, 58 tests; CR request filed"}
+{"t":"2026-11-05T21:31:34Z","agent":"ui","event":"wave1-complete","detail":"3 screens, 16 tests, binding check PASS, 5 mismatches worked around"}
+{"t":"2026-11-05T21:32:47Z","agent":"domain","event":"rework-complete","detail":"CR-3 50 s"}
+{"t":"2026-11-05T21:32:37Z","agent":"ui","event":"rework-complete","detail":"CR-3 60 s"}
+{"t":"2026-11-05T21:33:30Z","agent":"coordinator","event":"integration-start","detail":"INT-1"}
+{"t":"2026-11-05T21:36:41Z","agent":"ui","event":"repair-complete","detail":"D-3 60 s"}
+{"t":"2026-11-05T21:38:05Z","agent":"coordinator","event":"accepted","detail":"INT-1 accepted, 37 requirements"}
+{"t":"2026-11-05T21:40:13Z","agent":"domain","event":"wave2-start","detail":"CG-6, 24 s after release"}
+{"t":"2026-11-05T21:40:13Z","agent":"ui","event":"wave2-start","detail":"CG-6, 24 s after release"}
+{"t":"2026-11-05T21:43:21Z","agent":"coordinator","event":"accepted","detail":"INT-2 accepted, 39 requirements"}
+{"summary":"max concurrently active agents 4 (coordinator, domain, ui, explore at 21:20-21:21); 3 for 21:20:53-21:29:40; blocked-on-release idle 0 for both workers; unassigned (agent finished, no compute) domain 21:29:40-21:31:56 and 21:32:47-21:40:13, ui 21:33:00-21:35:40 and 21:36:41-21:40:13"}

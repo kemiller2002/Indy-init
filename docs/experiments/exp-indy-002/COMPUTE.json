@@ -1,0 +1,13 @@
+{
+  "schema": "exp-indy-002.compute/1",
+  "container": { "vcpu": 4, "ramGB": 15 },
+  "cpuSeconds": { "T+12..T+28 (all agents, builds, browser)": { "value": 812, "source": "/proc/stat user+system ticks 67833 -> 149031 at 100 Hz", "measured": true }, "boot..T+12 (preparation incl. SDK install, baseline builds, offline suite)": { "value": 678, "measured": true } },
+  "agents": [
+    { "agent": "domain (worktree)", "sessions": 3, "wallSeconds": 810.5, "tokens": 167100, "toolUses": 94, "measured": true },
+    { "agent": "ui (worktree)", "sessions": 3, "wallSeconds": 942.1, "tokens": 216629, "toolUses": 108, "measured": true },
+    { "agent": "explore (historical evidence search)", "sessions": 1, "wallSeconds": 64.7, "tokens": 114994, "toolUses": 18, "measured": true },
+    { "agent": "coordinator + verification (this session)", "wallSeconds": "whole run", "tokens": "unavailable to the session", "measured": false }
+  ],
+  "ci": { "runnerMinutes": "see CI-RUNS.json; per-job minutes from run timestamps", "measured": "partial" },
+  "perVerifiedRequirement": { "workerTokens": "(167100 + 216629) / 39 = 9839 tokens per requirement (workers only)", "cpuSeconds": "812 / 39 = 20.8 CPU-s per requirement (T+12..T+28)", "measured": true }
+}
