@@ -1,4 +1,9 @@
 name: Preflight tooling
+# Playwright browsers (docs/ci-playwright-mitigation/FINAL-REPORT.md): the adversarial jobs run in Microsoft's
+# mcr.microsoft.com/playwright:v1.63.0-noble image, which carries Chromium, WebKit and their OS libraries, so they install
+# no browser (on 2026-11-05 `playwright install --with-deps` on the runner used the whole 45-minute budget three times
+# before any case ran). The other browser steps install on the runner with a step time limit: a stall fails that step,
+# named, rather than consuming the job; there is no in-script kill or retry (killing apt mid-install is not safe).
 # Directive workstream C: a PR commit ran this workflow twice (push and pull_request events, same commit, every job),
 # doubling runner load while three sessions had PRs open. Push now runs only on main; PRs run on pull_request (the
 # merge result), and a newer commit on the same PR cancels the older run (its checks are on the old commit, so the new
@@ -311,6 +316,8 @@ jobs:
           dotnet build "$RUNNER_TEMP/layered415/Causa.slnx" -c Release
           dotnet build "$RUNNER_TEMP/layered415/App.slnx" -c Release
       - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
+        # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget; no retry, nothing skipped.
+        timeout-minutes: 15
         run: |
           mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
           tar -xzf "$RUNNER_TEMP/forma.tgz" -C "$RUNNER_TEMP/forma"
@@ -425,6 +432,8 @@ jobs:
         with:
           global-json-file: global.json
       - name: Fixture trees (with and without the webkit project)
+        # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget; no retry, nothing skipped.
+        timeout-minutes: 12
         run: |
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx"
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx-nowebkit" --without-webkit true
@@ -472,7 +481,9 @@ jobs:
       - name: Tools the image does not carry (git, jq, curl, ICU for .NET)
         timeout-minutes: 6
         run: |
-          apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null
+          # Bounded and labelled: an unreachable apt mirror fails here, by name, before any case runs (never as a pass).
+          timeout -k 15 300 sh -c 'apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null' \
+            || { echo "::error::phase=container-tools: apt could not install git, jq, curl and ICU within 5 minutes; no case ran"; exit 1; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -523,7 +534,9 @@ jobs:
       - name: Tools the image does not carry (git, jq, curl, ICU for .NET)
         timeout-minutes: 6
         run: |
-          apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null
+          # Bounded and labelled: an unreachable apt mirror fails here, by name, before any case runs (never as a pass).
+          timeout -k 15 300 sh -c 'apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null' \
+            || { echo "::error::phase=container-tools: apt could not install git, jq, curl and ICU within 5 minutes; no case ran"; exit 1; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Every adversarial shard succeeded
         run: |

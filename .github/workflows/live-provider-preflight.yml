@@ -72,6 +72,8 @@ jobs:
           test "$(api "/repos/$OWNER/$REPO/branches/$BRANCH" | jq -r .name)" = "$BRANCH" || { echo "::error::$OWNER/$REPO has no branch $BRANCH"; exit 1; }
           echo "token scope: $repos only"
       - name: Browsers and the test runner (no credential in this step)
+        # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget; no retry, nothing skipped.
+        timeout-minutes: 12
         run: |
           mkdir -p "$RUNNER_TEMP/pw" "$RUNNER_TEMP/live" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
