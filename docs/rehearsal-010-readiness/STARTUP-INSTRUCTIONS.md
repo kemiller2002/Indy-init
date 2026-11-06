@@ -44,7 +44,20 @@ Build to what they check. The names they look for are listed in `SRC/verificatio
    {"schema": "indy-init.t0/1", "t0": "<T0 UTC>", "deadline": "<T0 + 420 min>", "windowMinutes": 420}
    ```
    It is never changed. Every recovery and every replacement agent uses it. A different T0 or window is refused as DEADLINE_RESET.
-3. **Before you push, run `npm ci`, then §3 step 1 (the suite preflight), on this tree.** If it refuses, fix the bootstrap in this same commit. `r9.fsx check-sequencing` exempts only the bootstrap commit: a later commit before both checkpoints that touches an implementation path (`isImplementationPath`, r9.fsx: `src/`, `tests/`, `web/`, any project or solution file, `Directory.*.props`/`.targets`, `package.json`, `package-lock.json`, `playwright.config.*`, `global.json`, `build.fsx`) is refused as application code. If the bootstrap was already published and the preflight refuses, do not repair it in a later commit: record the defect and ask the owner through `stop-decision` (reason `owner-authorized`), §6.
+3. **Before you push, run `npm ci`, then the two steps below, then §3 step 1 (the suite preflight), on this tree.**
+   - **Pinned SDK in the generated CI** (owner decision ODR-ESU-03 A, 2026-11-06). Conditor 0.10.20 generates `.github/workflows/build-and-test.yml` and `candidate-acceptance.yml` with `dotnet-version: "10.0.x"`. The bootstrap's `global.json` pins 10.0.402 with `rollForward: disable`, so a runner whose newest 10.0.x SDK is not 10.0.402 fails the build (HF-029: R8 and R9 each lost a CI cycle). In every workflow, replace the line `dotnet-version: "10.0.x"` with `global-json-file: global.json`, in the bootstrap commit. The governed gate workflow `govern` writes already uses `global-json-file`.
+   - **Stack-drift preflight** (owner decision ODR-ESU-04 A, 2026-11-06). It must report `READY` (exit 0) before the bootstrap is pushed, and so before the scope checkpoint. `CONDITOR` is the binary `install-conditor` wrote, and `ECHELON_HOME` is the `--home` the workstation was installed into.
+     ```
+     git init --quiet ECHELON_HOME/registry
+     git -C ECHELON_HOME/registry fetch --quiet --depth 1 https://github.com/kemiller2002/echelon-registry 575240233d1fc32b57cfa827ea1031b68609fc58
+     dotnet fsi SRC/tools/stack-drift/stack-drift.fsx -- check --lock SRC/docs/optimization/echelon-stack-upgrade/lock/dependency-lock.json \
+       --registry ECHELON_HOME/registry --toolchain-lock SRC/kickoff/rehearsal-010/toolchain.lock.json --workspace . --sdk-root . \
+       --bin ECHELON_HOME/.local/bin --conditor CONDITOR --fetch ECHELON_HOME/artifacts --json evidence/t0/stack-drift.json
+     ```
+     The registry checkout and the downloaded artifacts stay outside the repository.
+     Commit `evidence/t0/stack-drift.json` with the bootstrap. A finding in this tree (DRIFT or BLOCKED on a workspace file) is fixed in the bootstrap commit. A finding in the installation (a tool, the SDK, Conditor or an artifact) is fixed by reinstalling from the lock as the finding's correction says. Never substitute another version. If it cannot be made READY, do not push: ask the owner through `stop-decision` (reason `owner-authorized`), §6. The lock is echelon-current 1.37.0, the set the toolchain lock installs (OD-INDY-8). If the owner adopts a successor package's dependency lock (ODR-ESU-01), use that lock instead.
+
+   If the suite preflight refuses, fix the bootstrap in this same commit. `r9.fsx check-sequencing` exempts only the bootstrap commit: a later commit before both checkpoints that touches an implementation path (`isImplementationPath`, r9.fsx: `src/`, `tests/`, `web/`, any project or solution file, `Directory.*.props`/`.targets`, `package.json`, `package-lock.json`, `playwright.config.*`, `global.json`, `build.fsx`) is refused as application code. If the bootstrap was already published and the preflight refuses, do not repair it in a later commit: record the defect and ask the owner through `stop-decision` (reason `owner-authorized`), §6.
 4. Commit, then publish as duty 1 says (`conditor repo create`). Publishing protects main: from here on every commit reaches main through a pull request.
 
 ## 3. Before any application code

@@ -53,7 +53,7 @@ Each one is the latest stable published release; see [RELEASE-EVIDENCE.json](REL
 | Real-provider integration | Read path: PASS (executed) against the real causa-data, 1,315 events, digests equal. Write path: PASS against the in-process double (31/31). **Real GitHub write: NOT RUN** (owner token) |
 | Version-drift preflight | Implemented (`tools/stack-drift/stack-drift.fsx`, F#). 30/30 self-tests. Real runs: DP-01 NOT READY (CA-01 only); DP-02 READY after correction; 4 negative controls fail closed |
 | Full CI | Pending on this branch's pull request. This change adds no workflow step |
-| Remaining owner decisions | ODR-ESU-01 (lock to 1.37.0), -02 (Forma 0.13.0 inventory), -03 (generated-CI SDK), -04 (adopt stack-drift at T0), -05 (0.10.20 scaffold fixture) |
+| Remaining owner decisions | ODR-ESU-01 (lock to 1.37.0), -02 (Forma 0.13.0 inventory), -05 (0.10.20 scaffold fixture). ODR-ESU-03 A and -04 A were applied on the owner instruction of 2026-11-06 (STARTUP §2 step 3; `fsharp-tooling` CI step) |
 
 ## PR #141 claim check
 
@@ -70,8 +70,8 @@ Each one is the latest stable published release; see [RELEASE-EVIDENCE.json](REL
 |---|---|---|---|---|
 | App lock → echelon-current 1.37.0 (Forma, Praxis, Dokimos, Ordo, percepta-semantic, Conditor; add Percepta) | yes | lock generated (proposal) | yes (DP-01/02, builds, browser) | no |
 | Layout contract → Forma 0.13.0 inventory | yes | no (successor not compiled) | yes (contract run on 0.13.0) | no |
-| Generated-CI SDK correction | yes | no (kickoff step) | yes (DP-02) | no |
-| Version-drift preflight | yes | yes (tool, tests, evidence) | yes | no (not gated) |
+| Generated-CI SDK correction | yes | yes (STARTUP §2 step 3) | yes (DP-02, DP-10) | owner instruction 2026-11-06 (ODR-ESU-03 A) |
+| Version-drift preflight | yes | yes (tool, CI self-test, T0 step) | yes | owner instruction 2026-11-06 (ODR-ESU-04 A) |
 | 0.10.20 scaffold fixture | yes | no | yes (layering executed) | no |
 
 ## Readiness

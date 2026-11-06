@@ -104,6 +104,11 @@ jobs:
           global-json-file: global.json
       - name: CTP-001 readiness check holds its cases and its EXP-INDY-002 replay (docs/execution/contract-triggered-parallel)
         run: dotnet fsi tools/execution/ctp-check.fsx -- test --indy-init .
+      - name: Echelon stack-drift preflight holds its cases, negative controls and v4 lock equivalence (ODR-ESU-04 A)
+        run: |
+          git init --quiet "$RUNNER_TEMP/echelon-registry"
+          git -C "$RUNNER_TEMP/echelon-registry" fetch --quiet --depth 1 https://github.com/kemiller2002/echelon-registry 575240233d1fc32b57cfa827ea1031b68609fc58 7a2c27a3db7cab4337ea47536f3e1fc22d257f03
+          dotnet fsi tools/stack-drift/stack-drift.fsx -- test --registry "$RUNNER_TEMP/echelon-registry"
       - name: Build the F# requirements compiler and its tests
         run: dotnet build tools/requirements-compiler/tests -c Release
       - name: Check out the five Rehearsal 7 evidence files the v4 lesson analysis quotes (evidence only, never a build input)
