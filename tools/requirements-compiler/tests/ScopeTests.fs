@@ -387,6 +387,26 @@ let bootstrapFSharpCore (source: string) : string list =
       | other -> yield sprintf "FSharp.Core: layering onto Conditor's Directory.Build.props gave %A" other
       if V41Package.layerFile "Directory.Build.props" conditorProps ((boot v415).["Directory.Build.props"]) <> Ok None then yield "FSharp.Core: layering a frozen package's props is no longer a no-op" ]
 
+/// Rehearsal 010 (Fix 10): Conditor's build-and-test.yml builds and tests App.slnx only. A successor package that sets
+/// bootstrap.ciWorkflow gets an integration-owned workflow that builds and tests Causa.slnx; frozen packages do not.
+let bootstrapCiWorkflow (source: string) : string list =
+    let inputs v = Program.v41Inputs source (Path.Combine(source, "requirements-compiled", v)) (Path.Combine(source, "requirements-compiled", "v4")) None
+    let v415 = inputs "v4.1.5"
+    let withCi (path: string) = { v415 with Amendment = v415.Amendment |> Option.map (fun a -> setIn "bootstrap" (setIn "ciWorkflow" (JStr path) (field "bootstrap" a |> Option.defaultValue (JObj []))) a) }
+    let boot (i: V41Package.Inputs) = V41Package.bootstrapFiles i (V41Package.ownedFiles i) "{}" |> Map.ofList
+    let x19 (i: V41Package.Inputs) = (V41Package.build i).Checks |> List.filter (fun c -> c.Id = "X19") |> List.collect (fun c -> c.Problems)
+    [ for v in [ "v4.1.4"; "v4.1.5" ] do
+          if boot (inputs v) |> Map.exists (fun n _ -> n.StartsWith ".github/") then yield sprintf "CI: the frozen %s bootstrap writes a workflow" v
+      let pinned = withCi ".github/workflows/ci.yml"
+      match (boot pinned).TryFind ".github/workflows/ci.yml" with
+      | None -> yield "CI: a package with bootstrap.ciWorkflow writes no workflow"
+      | Some text ->
+          for needed in [ "dotnet build Causa.slnx -c Release"; "dotnet test Causa.slnx -c Release --no-build"; "could not find dependent assembly"; "Skipped:"; "Owner: integration" ] do
+              if not (text.Contains needed) then yield sprintf "CI: the bootstrapped workflow lacks '%s'" needed
+          if text.Contains "build App.slnx" || text.Contains "test App.slnx" then yield "CI: the bootstrapped workflow builds or tests App.slnx"
+      if x19 pinned |> List.exists (fun p -> p.Contains "ciWorkflow") then yield sprintf "CI: X19 refuses the integration-owned ci.yml: %A" (x19 pinned)
+      if not (x19 (withCi ".github/workflows/elsewhere.yml") |> List.exists (fun p -> p.Contains "ciWorkflow")) then yield "CI control: X19 accepts a workflow that is not an integration-owned manifest file" ]
+
 /// The owner's record against v4.1.4's corrected runners (RDP-003, FREEZE.md step 2), as a pure check over the records:
 /// each runner names its decision and the operator approval whose latest record of that decision selects option A; its
 /// content (every field but the approval) equals the runner of that suite in the amendment the owner decided on, so a
@@ -1058,4 +1078,4 @@ let cf07Deferral (source: string) : string list =
 
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "bootstrap FSharp.Core" (fun () -> bootstrapFSharpCore source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source)
+    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "bootstrap FSharp.Core" (fun () -> bootstrapFSharpCore source) @ guard "bootstrap CI workflow" (fun () -> bootstrapCiWorkflow source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source)
