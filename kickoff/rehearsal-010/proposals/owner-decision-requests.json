@@ -621,6 +621,23 @@
         "B",
         "C"
       ]
+    },
+    {
+      "id": "ODR-R10-35",
+      "kind": "decision",
+      "title": "Launch scope for Rehearsal 010: defer the successor scope (ODR-R10-19) to Rehearsal 011",
+      "question": "ODR-R10-19 is recorded as A (APR-R10-OWNER-4: adopt the 53-item successor scope, 8baf049b...), but the lock (scope.scopeSha256 26e6ff3c...) and ODR-R10-01 launch the 37-item scope, and no agent has applied -19. The analysis recommended -19 A only together with ODR-R10-22 (speculative verification), which is not built; without it the split helps at fast CI and hurts at slow CI (docs/rehearsal-010-optimization/OWNER-DECISIONS-REQUIRED.md). Should Rehearsal 010 launch on the 37-item scope, with -19 deferred to Rehearsal 011?",
+      "options": [
+        "A: launch Rehearsal 010 on the 37-item scope ODR-R10-01 approves (26e6ff3c...); ODR-R10-19 A is not applied to Rehearsal 010 and is carried to Rehearsal 011 with ODR-R10-22; no lock, scope or slice file changes",
+        "B: apply ODR-R10-19 A before T0: an agent switches the lock's scope, slice manifest, work inventory and the launch docs to the successor (8baf049b...), with an independent review, and the owner then re-approves the lock's scope"
+      ],
+      "recommendation": "A: it is the launch the lock already describes, and it keeps -19's split with the queue it was designed for.",
+      "rationale": "A recorded decision that is not applied must say so, so the record and the launched scope agree.",
+      "impact": "A: none to the launch; -19 stays recorded for Rehearsal 011. B: the scope pin moves and launch preflight LP-04 must pass on the new scope before T0.",
+      "launchable": [
+        "A",
+        "B"
+      ]
     }
   ]
 }
