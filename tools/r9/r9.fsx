@@ -21,7 +21,7 @@
 //        assembly xunit skips (could not find dependent assembly, e.g. FSharp.Core) is refused in every mode.
 //   dotnet fsi tools/r9/r9.fsx -- suite-fixture --out NEW-DIR [--without-webkit true] [--empty-project NAME] [--without-fsharp-core NAME]
 //        A deterministic tree with the plan's test layout (one trivial test per suite, no application code).
-//   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F --scope-sha256 HEX [--scope-checkpoint F]
+//   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F --scope-sha256 HEX [--scope-checkpoint F] [--scope-manifest F]
 //        --spec-preflight F --acceptance-preflight F [--work-plan F] [--manifest F] [--scope F] [--praxis EXE]
 //        Pre-implementation gate (Praxis ordering); writes the immutable .echelon/r9-initialization-checkpoint.json.
 //   dotnet fsi tools/r9/r9.fsx -- check-sequencing --target REPO [--scope-manifest F] [--out F]
@@ -991,14 +991,30 @@ let authorizeImplementation () =
             let reqs = scopeRequirements |> Set.ofList
             (catalogObligations |> Map.toList) @ (planObligations |> Map.toList) |> List.filter (fun (_, r) -> reqs.Contains r) |> List.map fst
     let linked = items |> List.collect (fun w -> strList w "obligations") |> Set.ofList
+    // The approved scope manifest's coordination items: its work items without requirements. Without the manifest, or
+    // with one whose scopeSha256 is not the approved one, no item is exempt.
+    let scopeManifest = opt "--scope-manifest" |> Option.filter exists |> Option.map readJson
+    let coordinationItems =
+        match scopeManifest with
+        | Some m when opt "--scope-sha256" = Some(str m "scopeSha256") ->
+            arr m "workItems" |> List.filter (fun w -> (strList w "requirements").IsEmpty) |> List.map (fun w -> str w "id") |> Set.ofList
+        | _ -> Set.empty
+    let manifestCauses =
+        match opt "--scope-manifest", scopeManifest with
+        | Some f, None -> [ $"4 links: the scope manifest {f} does not exist" ]
+        | Some _, Some m when opt "--scope-sha256" <> Some(str m "scopeSha256") ->
+            [ $"""4 links: the scope manifest has scopeSha256 {str m "scopeSha256"}, not the approved {defaultArg (opt "--scope-sha256") "(none)"}: no coordination item is exempt""" ]
+        | _ -> []
     let step4 =
         scopeCauses
+        @ manifestCauses
         @ (items |> List.collect (fun w ->
             let id = str w "id"
             let reqs, obls = strList w "requirements", strList w "obligations"
-            // A coordination item the generated scope work plan gives neither requirements nor obligations (T14, T17,
-            // ...) links nothing and is not refused; an item with requirements must still name its obligations.
-            let coordination = reqs.IsEmpty && obls.IsEmpty
+            // A coordination item links nothing and is not refused: only an item the approved scope manifest
+            // (--scope-manifest, bound to --scope-sha256) itself gives no requirements (T14, T17, ...), and only while the
+            // work plan also gives it neither requirements nor obligations. Any other item must name both.
+            let coordination = reqs.IsEmpty && obls.IsEmpty && coordinationItems.Contains id
             check (coordination || not reqs.IsEmpty) $"4 links: {id} names no requirement"
             @ check (coordination || not obls.IsEmpty) $"4 links: {id} names no verification obligation"
             @ (strList w "obligations" |> List.filter (known >> not) |> List.map (fun o -> $"4 links: {id} names obligation {o}, which neither the catalog manifest nor the plan defines"))))

@@ -244,6 +244,29 @@ r9case "authorize-refuses-without-a-scope-checkpoint" [ 4 ] [ "7 scope: .echelon
 write (Path.Combine(app, ".echelon", "scope-checkpoint.json")) """{"schema":"indy-init.scope-checkpoint/1","scopeSha256":"scope-approved"}"""
 commitAll app "scope checkpoint (every work item in Praxis)" |> ignore
 r9case "authorize-refuses-a-scope-checkpoint-of-another-scope" [ 4 ] [ "7 scope: the scope checkpoint pins scope-approved, not the approved scope scope-other" ] (authorize [] @ [ "--scope-sha256"; "scope-other" ]) app |> ignore
+// Review F1 (669fe04): Praxis "[ID] title" items count for exactly that id, and only the approved scope manifest's
+// coordination items (its work items without requirements) may link nothing.
+let planWith (extra: string) =
+    write (Path.Combine(app, ".echelon", "r9-work-plan.json")) ($"""{{"schema":"indy-init.r9-work-plan/1","workItems":[{{"id":"WI-CONTENT-1","requirements":["INV-001","SMK-001"],"obligations":[{String.Join(",", catalogObligations)},"SMK-001-O1"]}}{extra}]}}""")
+let scopeManifestFile = Path.Combine(work, "scope-manifest.json")
+write scopeManifestFile """{"schema":"indy-init.scope-manifest/1","scopeSha256":"scope-approved","workItems":[{"id":"WI-CONTENT-1","requirements":["INV-001","SMK-001"]},{"id":"T10","requirements":[]},{"id":"T12","requirements":["SMK-001"]},{"id":"T13","requirements":["SMK-001"]},{"id":"WI-CONTENT-2","requirements":["SMK-001"]}]}"""
+let withApprovedManifest = authorize [] @ [ "--scope-sha256"; "scope-approved"; "--scope-manifest"; scopeManifestFile ]
+// WI-CONTENT-2 (emptied, but the manifest gives it requirements) keeps every case refused, so none writes a checkpoint.
+run praxis [ "add"; "[WI-CONTENT-2] emptied" ] app |> ignore
+planWith """,{"id":"T10","requirements":[],"obligations":[]},{"id":"WI-CONTENT-2","requirements":[],"obligations":[]}"""
+run praxis [ "add"; "[T1] another item" ] app |> ignore
+case "authorize-a-[T1]-title-does-not-count-for-T10" [ 4 ] [ "3 work items: T10 is in the work plan but not in Praxis" ] [] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
+run praxis [ "add"; "[T10] coordination item" ] app |> ignore
+case "authorize-a-[T10]-title-counts-and-the-coordination-item-is-accepted" [ 4 ] [ "4 links: WI-CONTENT-2 names no requirement" ] [ "T10 is in the work plan"; "4 links: T10" ] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
+case "authorize-a-coordination-item-needs-the-approved-manifest" [ 4 ] [ "4 links: T10 names no requirement" ] [] "dotnet" ([ "fsi"; r9; "--" ] @ authorize [] @ [ "--scope-sha256"; "scope-approved" ]) app |> ignore
+case "authorize-a-manifest-of-another-scope-exempts-nothing" [ 4 ] [ "4 links: T10 names no requirement"; "the scope manifest has scopeSha256 scope-approved, not the approved scope-other" ] [] "dotnet" ([ "fsi"; r9; "--" ] @ authorize [] @ [ "--scope-sha256"; "scope-other"; "--scope-manifest"; scopeManifestFile ]) app |> ignore
+run praxis [ "add"; "[T12] requirements, no obligations" ] app |> ignore
+run praxis [ "add"; "[T13] obligations, no requirements" ] app |> ignore
+planWith """,{"id":"T10","requirements":[],"obligations":[]},{"id":"T12","requirements":["SMK-001"],"obligations":[]},{"id":"T13","requirements":[],"obligations":["SMK-001-O1"]},{"id":"WI-CONTENT-2","requirements":[],"obligations":[]}"""
+case "authorize-refuses-requirements-without-obligations" [ 4 ] [ "4 links: T12 names no verification obligation" ] [] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
+case "authorize-refuses-obligations-without-requirements" [ 4 ] [ "4 links: T13 names no requirement" ] [] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
+case "authorize-refuses-an-emptied-non-coordination-item" [ 4 ] [ "4 links: WI-CONTENT-2 names no requirement"; "4 links: WI-CONTENT-2 names no verification obligation" ] [ "4 links: T10" ] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
+planWith ""
 r9case "authorize-passes-and-writes-the-checkpoint" [ 0 ] [ "checkpoint"; "1 work item(s)" ] (authorize [] @ [ "--scope-sha256"; "scope-approved" ]) app |> ignore
 let checkpointSha = commitAll app "initialization checkpoint"
 r9case "authorize-refuses-a-second-checkpoint" [ 4 ] [ "is immutable" ] (authorize []) app |> ignore

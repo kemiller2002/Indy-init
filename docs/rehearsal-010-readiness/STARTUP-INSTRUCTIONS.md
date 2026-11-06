@@ -92,9 +92,9 @@ Main is protected (the Conditor scaffold requires pull requests). Each record be
    dotnet fsi SRC/tools/r9/r9.fsx -- authorize-implementation --target . --catalog SRC/requirements/catalogs/causa-investigation.requirement-catalog.json \
      --obligations .echelon/obligations.json --suite-preflight evidence/t0/suite-preflight.json \
      --spec-preflight evidence/t0/spec-preflight.json --acceptance-preflight evidence/t0/acceptance.log \
-     --scope-sha256 <lock scope.scopeSha256>
+     --scope-sha256 <lock scope.scopeSha256> --scope-manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json
    ```
-   `--scope-sha256` is required: a scope checkpoint of any other scope does not authorize.
+   `--scope-sha256` is required: a scope checkpoint of any other scope does not authorize. `--scope-manifest` (the approved manifest, whose scopeSha256 must be that one) names the coordination items (its work items without requirements); only those may link nothing.
    Commit `.echelon/r9-initialization-checkpoint.json`. It is immutable.
 5. **Sequencing.** `r9.fsx check-sequencing --scope-manifest` and `requirements-compiler scope order` must PASS on every commit. The governed gate runs `check-sequencing --scope-manifest` first. It refuses:
    - application code committed before the later of the two checkpoints, on any branch, merged or not;
