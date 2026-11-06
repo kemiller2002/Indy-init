@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.v41-validation-report/1",
-  "verdict": "FAIL",
+  "verdict": "PASS",
   "checks": [
     {
       "id": "X01",
@@ -101,12 +101,8 @@
     {
       "id": "X17",
       "title": "The interface contracts are specifications: types and signatures only, except reviewed boundary code each allowlist entry names with its rationale and requirements; the compile control and negative controls are classified",
-      "result": "FAIL",
-      "problems": [
-        "the change of contracts/00-DOMAIN-STUBS.fs names no operator approval",
-        "the change of contracts/02-IF41-STORAGE.fs names no operator approval",
-        "the change of contracts/07-IF41-VIEW.fs names no operator approval"
-      ]
+      "result": "PASS",
+      "problems": []
     },
     {
       "id": "X18",

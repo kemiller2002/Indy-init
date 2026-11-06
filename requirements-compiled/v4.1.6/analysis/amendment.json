@@ -43,6 +43,11 @@
    "id": "V416-TESTS",
    "area": "verification",
    "summary": "Producer tests for the rest of the new behaviour (independent review of v4.1.6): Domain ReviseEvidenceRules, ReviseObservationRules, AdmitEvidenceEmitsRevisionInGroup (S-3 A), RelationshipKindsNeverSupport, LatestAssessmentIsCurrent (S-8 B); View ConclusionCardShowsStrength (RC-6 A), LinkCardLatestIsCurrent; Storage StoredHistoriesReplayUnchanged (stored 1.0.0 histories and catalog events replay to the same digests); App AdmitEvidenceUnavailableOnV100Investigation (S-6 A: Unavailable with CAUSA.UNREPRESENTABLE on a 1.0.0 investigation)."
+  },
+  {
+   "id": "V416-WDL013",
+   "area": "verification",
+   "summary": "ODR-V416-WDL013 A (APR-V416-OWNER-1), superseding ODR-V4-10 A for WDL-013 only: WDL-013 is verified per obligation. supplementaryPlan derives its plan entry from the baseline verbatim (WDL-013-O1..O3, no new obligation, no rewording, priority P1) by the v4 plan rules (VR-LEDGER, VR-PRESERVATION, VR-UI; gates G0, G5; categories browser and accessibility, as for WDL-012) into verification-plan-supplement.json, and binds playwright:acceptance/WDL-013.spec.js > WDL-013-O1..O3 [chromium] in SU-BROWSER-CHROMIUM. No praxis:independent-review binding (Q1, the minimum). The implementation unit WI-GEN-WDL (Q2) is a scope fact, applied when the competition scope is recompiled (FREEZE step 5). The v4 plan is unchanged byte for byte. Not verified: no test exists yet."
   }
  ],
  "supersededObligations": [
@@ -52,6 +57,56 @@
    "supersededBy": [
     "ODR-V416-S8",
     "INV-030"
+   ]
+  }
+ ],
+ "supplementaryPlan": [
+  {
+   "requirement": "WDL-013",
+   "decision": "ODR-V416-WDL013",
+   "approval": "APR-V416-OWNER-1",
+   "supersedes": "ODR-V4-10 A (gate-level verification of every non-P0 requirement), for WDL-013 only",
+   "suite": "SU-BROWSER-CHROMIUM",
+   "testBindings": [
+    {
+     "obligation": "WDL-013-O1",
+     "tests": [
+      {
+       "id": "playwright:acceptance/WDL-013.spec.js > WDL-013-O1 [chromium]",
+       "kind": "deterministic",
+       "categories": [
+        "browser",
+        "accessibility"
+       ]
+      }
+     ]
+    },
+    {
+     "obligation": "WDL-013-O2",
+     "tests": [
+      {
+       "id": "playwright:acceptance/WDL-013.spec.js > WDL-013-O2 [chromium]",
+       "kind": "deterministic",
+       "categories": [
+        "browser",
+        "accessibility"
+       ]
+      }
+     ]
+    },
+    {
+     "obligation": "WDL-013-O3",
+     "tests": [
+      {
+       "id": "playwright:acceptance/WDL-013.spec.js > WDL-013-O3 [chromium]",
+       "kind": "deterministic",
+       "categories": [
+        "browser",
+        "accessibility"
+       ]
+      }
+     ]
+    }
    ]
   }
  ],
@@ -67,7 +122,12 @@
    "git commit (the initial bootstrap commit), conditor repo create, push; first green CI"
   ],
   "playwrightConfig": "playwright.config.ts",
-  "ciWorkflow": ".github/workflows/ci.yml"
+  "ciWorkflow": ".github/workflows/ci.yml",
+  "fsharpCore": {
+   "version": "10.1.402",
+   "decision": "ODR-V416-FSCORE",
+   "approval": "APR-V416-OWNER-1"
+  }
  },
  "contractControls": [
   {
@@ -764,23 +824,23 @@
  "contractChanges": [
   {
    "file": "contracts/00-DOMAIN-STUBS.fs",
-   "sha256": "9da7a94cbd5c56c7b7b54847f5c7c9b4e7261d476ad4fd82ccbd6a582dd2d349",
+   "sha256": "5c7848dfb04ea7380f8b0053c3706850ce647dc1b03d6e097e2833a84cb78ee2",
    "decision": "ODR-V416-01",
-   "approval": "",
+   "approval": "APR-V416-OWNER-1",
    "summary": "RecordConclusion (RC-7 A: after RecordVerification), ReviseObservation and ReviseEvidence commands; ObservationRevised and EvidenceRevised events (causa-storage 1.1.0, S-1 B)."
   },
   {
    "file": "contracts/02-IF41-STORAGE.fs",
    "sha256": "df1793acad247e0ab0cfa6c29274ef5a36b229a2a8c725bb57819a9ba8f941cd",
    "decision": "ODR-V416-01",
-   "approval": "",
+   "approval": "APR-V416-OWNER-1",
    "summary": "IF41-STORAGE pinned to causa-storage 1.1.0: 1.0.0 file sets read unchanged; a 1.0.0 investigation refuses events it cannot store (S-6 A); mixed versions refused. Doc comment only; no type changes."
   },
   {
    "file": "contracts/07-IF41-VIEW.fs",
    "sha256": "b322053a9e52144a778bdd4497e7a03f1ebc37c736fd6508166307d8d2c63b68",
    "decision": "ODR-V416-RC6",
-   "approval": "",
+   "approval": "APR-V416-OWNER-1",
    "summary": "RC-6 A: ConclusionCard.Strength (the stored conclusionStrength, shown with the residual uncertainty); EvidenceCard.Label comment names causa-storage 1.1.0."
   }
  ],

@@ -35,7 +35,7 @@ type RecordVerification = class end
 type ReopenInvestigation = class end
 type RecordProposal = class end
 /// v4.1.6 (ODR-V416-01): the commands OD-CR-01 A names that v4.1.6 carries (RC-1 A, S-1 B). RecordConclusion emits
-/// exactly one ConclusionRecorded, which causa-storage v1.0.0 already stores (proposals/RECORD-CONCLUSION.md section 4); its
+/// exactly one ConclusionRecorded, which causa-storage v1.0.0 already stores (RECORD-CONCLUSION.md section 4); its
 /// payload is exactly the Conclusion wire record. ReviseEvidence and ReviseObservation emit the causa-storage 1.1.0
 /// events EvidenceRevised and ObservationRevised (descriptive metadata only; admitted content is never revised,
 /// OD-CR-06 A). Opaque like every command payload; the domain owner defines them.
