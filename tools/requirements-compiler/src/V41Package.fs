@@ -1482,6 +1482,64 @@ let runnerCheck (i: Inputs) : Check =
 let bootstrapFSharpCore (i: Inputs) : string option =
     i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (field "fsharpCore") |> Option.bind (strOpt "version") |> Option.filter (fun v -> v <> "")
 
+/// The path of the CI workflow a successor package's amendment has the bootstrap write (bootstrap.ciWorkflow), or None.
+/// Rehearsal 010: Conditor's scaffolded build-and-test.yml builds and tests its own App.slnx only, so CI never built
+/// or tested Causa.slnx. Frozen packages do not set it and bootstrap exactly as they did.
+let bootstrapCiWorkflow (i: Inputs) : string option =
+    i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (strOpt "ciWorkflow") |> Option.filter (fun p -> p <> "")
+
+/// The integration-owned CI workflow for the Causa solution: build Causa.slnx and run its .NET tests, refusing a run
+/// that skips a test assembly or a test, or that passes no test once a test is declared (before the first test, at T0,
+/// an empty run passes). The plan's suites are judged by the verification gate; this is the merge-time build check.
+let ciWorkflowText (i: Inputs) =
+    String.concat "\n"
+        [ "# Owner: integration. Written at bootstrap by requirements-compiler v41 (package " + packageVersion i + ")."
+          "# Builds and tests the Causa solution. Conditor's build-and-test.yml covers its own App.slnx only (Rehearsal 010:"
+          "# CI never built or tested Causa.slnx). A run that skips a test assembly or a test is not a pass."
+          "name: Causa CI"
+          ""
+          "on:"
+          "  pull_request:"
+          "  push:"
+          "    branches: [main]"
+          ""
+          "permissions:"
+          "  contents: read"
+          ""
+          "concurrency:"
+          "  group: ${{ github.workflow }}-${{ github.ref }}"
+          "  cancel-in-progress: true"
+          ""
+          "jobs:"
+          "  causa:"
+          "    runs-on: ubuntu-latest"
+          "    timeout-minutes: 30"
+          "    steps:"
+          "      - uses: actions/checkout@v4"
+          "      - uses: actions/setup-dotnet@v4"
+          "        with:"
+          "          global-json-file: global.json"
+          "      - name: Build Causa.slnx"
+          "        run: dotnet build Causa.slnx -c Release"
+          "      - name: Test Causa.slnx"
+          "        shell: bash"
+          "        run: |"
+          "          set -uo pipefail"
+          "          output=$(dotnet test Causa.slnx -c Release --no-build 2>&1)"
+          "          status=$?"
+          "          echo \"$output\""
+          "          if [ \"$status\" -ne 0 ]; then exit \"$status\"; fi"
+          "          if echo \"$output\" | grep -q 'could not find dependent assembly'; then"
+          "            echo \"::error::A test assembly was skipped (it cannot load a dependency, e.g. FSharp.Core); it ran no test.\"; exit 1"
+          "          fi"
+          "          if echo \"$output\" | grep -qE 'Skipped:[[:space:]]*[1-9]'; then"
+          "            echo \"::error::Tests were skipped. A run that skips tests is not a pass.\"; exit 1"
+          "          fi"
+          "          if grep -rqE '\\[<?(Fact|Theory)' --include='*.fs' --include='*.cs' src tests 2>/dev/null && ! echo \"$output\" | grep -qE 'Passed:[[:space:]]*[1-9]'; then"
+          "            echo \"::error::Tests are declared but none passed. An empty test run is not a pass.\"; exit 1"
+          "          fi"
+          "" ]
+
 let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (string * string) list =
     let lists = compileLists i files |> Map.ofList
     let interfaces = arr "interfaces" i.Interfaces |> List.map (fun x -> sOr "file" x, x) |> Map.ofList
@@ -1559,8 +1617,10 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
         match i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (strOpt "playwrightConfig") with
         | Some path when path <> "" -> [ path, playwrightConfigText i ]
         | _ -> []
+    let ciWorkflow = bootstrapCiWorkflow i |> Option.map (fun path -> path, ciWorkflowText i) |> Option.toList
     [ ".gitignore", gitignore; "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ]
     @ playwrightConfig
+    @ ciWorkflow
     @ (if nuget.IsEmpty then [] else [ "Directory.Packages.props", centralVersions ])
     @ (if npm.IsEmpty then [] else [ "package.json", packageJson ])
     @ projectFiles @ fsFiles @ host @ layoutCopy
@@ -1922,6 +1982,11 @@ let bootstrapCheck (i: Inputs) : Check =
     check "X19" "The bootstrap is the first timed task (T0), its duration partly measured and labelled so, every other timed task follows it, every organizer gate the scan finds has a recorded disposition under an owner decision, and the starting-state policy quotes the published rules verbatim, keeps the historical records unchanged and states the residual risk"
         [ // A pinned FSharp.Core (bootstrap.fsharpCore) is a package the owner adds: an exact version under a recorded
           // dependency-lock decision with its operator approval ("no other package is added without an owner decision").
+          // A CI workflow the bootstrap writes (bootstrap.ciWorkflow) is integration's file in the ownership manifest.
+          match strOpt "ciWorkflow" spec with
+          | Some path when not (ownedFiles i |> List.exists (fun f -> f.Path = path && f.Owner = "integration")) ->
+              yield sprintf "bootstrap.ciWorkflow %s is not an integration-owned file of the manifest" path
+          | _ -> ()
           match field "fsharpCore" spec with
           | None -> ()
           | Some fc ->
