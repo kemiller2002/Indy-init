@@ -1,0 +1,9 @@
+<Project>
+  <!-- Isolated preview build: imports no Indy-init build settings. -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Deterministic>true</Deterministic>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+</Project>

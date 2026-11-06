@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Runner.fs" />
+    <Compile Include="StartTests.fs" />
+    <Compile Include="DomainTests.fs" />
+    <Compile Include="PersistenceTests.fs" />
+    <Compile Include="ConclusionTests.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Exp002.Contracts/Exp002.Contracts.fsproj" />
+    <ProjectReference Include="../../src/Exp002.Engine/Exp002.Engine.fsproj" />
+  </ItemGroup>
+</Project>

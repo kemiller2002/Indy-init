@@ -1,0 +1,68 @@
+PASS UT-INV-001 problem statement is carried into InvestigationStarted.details
+PASS UT-INV-001 problem statement keeps unicode and inner whitespace exactly
+PASS UT-INV-002 title is optional: blank -> None
+PASS UT-INV-006 valid UUID accepted (any case)
+PASS UT-INV-006 invalid or blank identifier rejected with INV-006
+PASS UT-INV-019 empty or whitespace problem statement rejected with INV-001
+PASS UT-INV-019 decide refuses blank problem statement with Invalid INV-001; no event
+PASS UT-INV-020 title length boundary 200 accepted, 201 rejected with INV-002
+PASS UT-INV-021 problem statement length boundary 10000 accepted, 10001 rejected with INV-001
+PASS UT-INV-023 primary question optional, blank -> None, <= 10000
+PASS UT-INV-023 all field errors are accumulated, not just the first
+PASS UT-INV-004 start emits exactly one InvestigationStarted with id, details and timestamp
+PASS UT-INV-004 replayed start is Open, CreatedAt = start time, empty content, one history entry
+PASS UT-INV-004 second start refused with AlreadyStarted
+PASS UT-INV-007 CreatedAt is the start timestamp and is unchanged by later edits
+PASS UT-INV-008 problem statement shown from state reflects start then edit
+PASS UT-INV-018 investigation state is Open after start and stays Open after edits
+PASS UT-INV-034 edit details replaces details, keeps id, blank title -> None
+PASS UT-INV-034 edit details validates like start (INV-001/002/023 accumulated)
+PASS UT-INV-034 edit details before start refused with NotStarted
+PASS UT-INV-035 edits keep entity IDs and append to history with sequence numbers
+PASS UT-INV-035 editing an unknown entity is refused
+PASS UT-INV-014 record observation emits ObservationRecorded with O-1, O-2
+PASS UT-INV-014 record observation before start refused with NotStarted
+PASS UT-INV-024 observation text required, not blank, <= 10000
+PASS UT-INV-025 observation source reference optional, blank -> None, <= 10000
+PASS UT-INV-009 record hypothesis emits HypothesisRecorded with H-1
+PASS UT-INV-009 invalid hypothesis refused; no event
+PASS UT-INV-010 hypotheses listed in recording order; edit keeps position
+PASS UT-INV-026 hypothesis statement required, <= 10000
+PASS UT-INV-011 hypothesis explanation required, <= 10000
+PASS UT-INV-013 admit evidence emits EvidenceAdmitted E-1 with all fields; evidence listed
+PASS UT-INV-013 admit evidence before start refused; invalid evidence refused
+PASS UT-INV-027 evidence label required, <= 200
+PASS UT-INV-012 evidence original content required, <= 10000, kept verbatim
+PASS UT-INV-028 evidence source reference optional, <= 10000
+PASS UT-INV-029 source URL optional; http/https accepted; bad scheme, spaces, >2000 rejected
+PASS UT-INV-029 all evidence field errors accumulated
+PASS UT-INV-030 link evidence records a Current relationship R-1
+PASS UT-INV-030 unknown evidence or hypothesis refused
+PASS UT-INV-030 duplicate current link for the same pair refused with DuplicateRelationship
+PASS UT-INV-030 revise: old becomes Revised(R-2), new Current R-2 recorded; history keeps both
+PASS UT-INV-030 revise a non-current or unknown relationship refused
+PASS UT-INV-030 withdraw: Current -> Withdrawn(reason); pair can then be linked again
+PASS UT-INV-031 kind must be selected (None refused with INV-031); all four kinds accepted
+PASS UT-INV-031 link with no kind refused by decide; no relationship
+PASS UT-INV-038 rationale required, <= 10000, for link, revise and withdraw reason
+PASS UT-INV-044 a link is visible from both its evidence and its hypothesis
+PASS UT-INV-017 encode -> decode round-trips every event case and field exactly
+PASS UT-INV-017 save -> load -> replay restores every entered value
+PASS UT-INV-017 decode failures are Corrupt, never exceptions
+PASS UT-INV-017 load of an unknown id is NotFound; corrupt stored text is Corrupt
+PASS UT-INV-015 save with the expected version writes version+1; stale expected version is VersionConflict
+PASS UT-INV-015 happy save path: Unsaved -> Saving -> (write confirmed) Saving -> (read-back) Saved(v,t)
+PASS UT-INV-015 Saved is never entered before the read-back
+PASS UT-INV-015 failure paths: conflict, rejection, unknown outcome, read-back mismatch
+PASS UT-INV-016 Edited marks Unsaved from Saved/Saving/SaveFailed/UnknownOutcome; Conflict and Offline kept
+PASS UT-INV-016 retry allowed from SaveFailed and UnknownOutcome; inapplicable events leave state unchanged
+PASS UT-INV-016 Engine.ports wires the real implementations
+PASS UT-INV-033 conclusion statement required, not blank, <= 10000
+PASS UT-INV-033 decide refuses a blank conclusion with Invalid INV-033; no event
+PASS UT-INV-032 record conclusion before start refused with NotStarted
+PASS UT-INV-032 conclusion C-1 with no links has empty BasedOn; history appended; State stays Open
+PASS UT-INV-032 BasedOn snapshots Current relationships in order and is unaffected by later reassessment
+PASS UT-INV-032 withdrawn relationships are excluded from BasedOn
+PASS UT-INV-032 conclusions round-trip through encode/decode/replay and the store
+PASS UT-INV-032 corrupt basedOn is reported as Corrupt
+TOTAL 67 PASS 67 FAIL 0

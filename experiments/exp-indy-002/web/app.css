@@ -1,0 +1,19 @@
+/* Layout glue only; visual language comes from Forma (forma/all.css). */
+.exp-main { padding-inline: 16px; padding-block: 1rem 3rem; max-width: 60rem; margin-inline: auto; box-sizing: border-box; }
+.exp-screen { display: block; }
+.exp-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.exp-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; }
+.exp-item { padding: 0.75rem; display: grid; gap: 0.35rem; justify-items: start; }
+.exp-item p { margin: 0; overflow-wrap: anywhere; }
+.exp-meta, .exp-links, .exp-saved-to { font-size: 0.9em; }
+.exp-content { white-space: pre-wrap; }
+.exp-facts { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; margin: 0; }
+.exp-facts dd { margin: 0; overflow-wrap: anywhere; }
+.exp-editor { padding: 1rem; }
+.exp-radios { border: 0; padding: 0; margin: 0; display: grid; gap: 0.35rem; }
+.exp-history { padding-inline-start: 1.25rem; overflow-wrap: anywhere; }
+input, textarea, select { max-width: 100%; box-sizing: border-box; }
+@media (max-width: 30rem) {
+  .exp-facts { grid-template-columns: 1fr; }
+  .exp-actions .ef-button { flex: 1 1 auto; }
+}

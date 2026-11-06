@@ -1,0 +1,89 @@
+{
+  "schema": "exp-indy-002.contract-changes/1",
+  "changes": [
+    {
+      "id": "CR-1",
+      "contracts": [
+        "INV-009",
+        "INV-013",
+        "INV-014",
+        "INV-030",
+        "INV-034",
+        "INV-039",
+        "INV-040"
+      ],
+      "groups": {
+        "CG-2-HEADER": "v1-\u003Ev2",
+        "CG-3-CONTENT": "v1-\u003Ev2",
+        "CG-4-RELATIONSHIP": "v1-\u003Ev2",
+        "CG-5-PERSISTENCE": "v1-\u003Ev2"
+      },
+      "raisedBy": "verification agent (coordinator) while writing the independent browser acceptance test",
+      "cause": "The registry gave labels for fields and primary actions, but no accessible names for editor submit, per-item Edit, Reassess, Withdraw, the evidence and link openers, New investigation, or the open link. An independent test cannot find those controls, and the UI agent would have had to invent names.",
+      "change": "Added submitLabel=Confirm, itemEditLabel=Edit, openLabel, reviseLabel=Reassess, withdrawLabel=Withdraw, newActionLabel=New investigation, and accessibleName for open links. No F# type changed; Contracts.fs hash unchanged.",
+      "detectedAt": "2026-11-05T21:22:40Z",
+      "releasedAt": "2026-11-05T21:23:23Z",
+      "repairMinutes": {
+        "coordinator": 2,
+        "uiAgent": "measured at integration",
+        "domainAgent": 0
+      },
+      "couldHaveBeenDetectedEarlier": "yes: the registry schema had no field for the accessible names of secondary controls, and contract-check did not require one for actions",
+      "notified": [
+        "ui agent (SendMessage)"
+      ],
+      "affectedCode": "ui agent\u0027s web/index.html, if it had already written those controls"
+    },
+    {
+      "id": "CR-2",
+      "contracts": [
+        "INV-030",
+        "INV-031"
+      ],
+      "groups": {
+        "CG-4-RELATIONSHIP": "v2-\u003Ev3"
+      },
+      "raisedBy": "verification agent while writing the independent browser acceptance test",
+      "cause": "RelationshipInput.EvidenceId and HypothesisId were typed and bound but had no UI label or component, and the INV-031 options had catalog values but no display labels",
+      "change": "INV-030 fields get labels \u0027Evidence item\u0027 and \u0027Hypothesis to assess\u0027 as selects with no preselection; INV-031 gains optionLabels. No F# type changed.",
+      "detectedAt": "2026-11-05T21:25:51Z",
+      "releasedAt": "2026-11-05T21:26:01Z",
+      "repairMinutes": {
+        "coordinator": 2,
+        "uiAgent": "measured at integration",
+        "domainAgent": 0
+      },
+      "couldHaveBeenDetectedEarlier": "yes: contract-check C2 checks nested fields\u0027 F# binding but not that they carry a UI label",
+      "notified": [
+        "ui agent (SendMessage)"
+      ]
+    },
+    {
+      "id": "CR-3",
+      "contracts": [
+        "INV-015",
+        "INV-016"
+      ],
+      "groups": {
+        "CG-5-PERSISTENCE": "v2-\u003Ev3",
+        "CG-1..CG-4": "re-hashed only (the hash covers the whole Contracts.fs)"
+      },
+      "raisedBy": "domain agent (contract-change-request at 21:29Z in agents/domain-timeline.jsonl)",
+      "cause": "SaveEvent.ReadBackMatched carried no data and SaveState.Saving none, so \u0027write confirmed, read-back pending\u0027 could not keep the version and time Saved needs. The domain agent\u0027s workaround (Saved on WriteConfirmed) would claim Saved before the read-back, which PERSIST-007 / UI-006 forbid.",
+      "change": "SaveEvent.ReadBackMatched becomes ReadBackMatched of version:int * at:Timestamp; WriteConfirmed keeps Saving; only ReadBackMatched enters Saved. F# type change: breaks callers.",
+      "detectedAt": "2026-11-05T21:29:00Z",
+      "releasedAt": "2026-11-05T21:31:37Z",
+      "coordinatorRepairStart": "2026-11-05T21:30:56Z",
+      "repairMinutes": {
+        "coordinator": 2,
+        "domainAgent": "measured (resumed)",
+        "uiAgent": "measured"
+      },
+      "couldHaveBeenDetectedEarlier": "yes: a unit-test specification of the save state machine written in Phase A, or a property in contract-check that every state-entering event carries the state\u0027s payload",
+      "notified": [
+        "domain agent (resumed)",
+        "ui agent (SendMessage)"
+      ]
+    }
+  ]
+}
