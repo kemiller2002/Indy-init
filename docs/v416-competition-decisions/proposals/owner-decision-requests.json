@@ -231,6 +231,23 @@
    "approvalRecord": {
     "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P13\", \"action\": \"decide\", \"option\": \"A\", \"pins\": [{\"path\": \"docs/v416-competition-decisions/TEST-DEPLOY-KEY.md\", \"sha256\": \"<at origin/main>\"}]}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
    }
+  },
+  {
+    "id": "ODR-COMP-P14",
+    "kind": "decision",
+    "title": "forma-workflow in the indy-init preset and the competition lock",
+    "question": "forma-workflow is not an echelon-current 1.37.0 selection, and the Conditor indy-init preset test requires every preset component to be one. How does the competition lock it?",
+    "options": [
+      "A: owner exemption: the indy-init preset pins forma-workflow 1.2.0 and its test exempts exactly that component and version (Conditor PR #134, released in v0.10.21); the competition toolchain lock pins Conditor v0.10.21",
+      "B: Registry route: add forma-workflow to an echelon-current 1.38.0 cut first",
+      "C: day-of manual: add it to conditor.json after init during the timed run"
+    ],
+    "recommendation": "A: the owner answered \"A\" in session on 2026-11-06 (that answer is not a record; this request is how it is recorded). Conditor #132 and #134 are merged and v0.10.21 is released (commit 528ef4576fc79540953226b7dcfd3957654e3a29); `conditor components` of the released linux-x64 binary lists forma-workflow@1.2.0.",
+    "rationale": "VER-001 refuses any @echelon-foundry package outside the locked set; P03 approved the dependency but the lock could not contain it.",
+    "impact": "With B the Registry cut must happen before kickoff; with C the timed run carries manual lock steps.",
+    "approvalRecord": {
+      "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P14\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+    }
   }
  ]
 }
