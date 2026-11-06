@@ -31,7 +31,7 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.5 --repo Indy-init  # ODR-V415-01, -03, -04 and -IF-VIEW; then the agent compiles v4.1.5
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.5 --repo Indy-init # ODR-V415-02, after the compiled package is reviewed
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.5 --repo Indy-init --commit <merge commit of the ODR-V415-02 pull request>
-//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide rehearsal-010 --repo Indy-init  # ODR-RG-03, -05 and ODR-R10-01..34
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide rehearsal-010 --repo Indy-init  # ODR-RG-03, -05 and ODR-R10-01..35
 //        (kickoff/rehearsal-010/proposals/owner-decision-requests.json). A request that pins a file records the sha256
 //        of that file at origin/main, shown before you answer; ODR-R10-01 is asked only once v4.1.5 is tagged. A recorded
 //        decision whose pinned file has changed since is asked again, with what changed (as ODR-R10-01 and -19 were for

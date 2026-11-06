@@ -135,7 +135,7 @@
  },
  "ownerDecisionRequests": {
   "path": "kickoff/rehearsal-010/proposals/owner-decision-requests.json",
-  "sha256": "123444766c856734ca81818bfdfdbc92d7436f649ba49e9c55f677878fc6dfde",
+  "sha256": "2f3a7063936ad5c31516f1912ff4ed3c4b117d22589c01f584c5065df4d4d5d3",
   "rule": "the questions the owner answers are these, pinned by the owner's lock (launch-preflight LP-03)"
  }
 }
