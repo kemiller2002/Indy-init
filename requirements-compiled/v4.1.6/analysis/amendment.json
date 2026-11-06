@@ -14,7 +14,9 @@
  ],
  "documents": [
   "STARTING-STATE.md",
-  "AMENDMENT-4.1.6.md"
+  "AMENDMENT-4.1.6.md",
+  "proposals/RECORD-CONCLUSION.md",
+  "proposals/STORAGE-1.1.md"
  ],
  "changes": [
   {
@@ -31,6 +33,26 @@
    "id": "V416-VIEW",
    "area": "contracts",
    "summary": "ODR-V416-RC6 (RC-6 A): 07-IF41-VIEW.fs ConclusionCard gains Strength."
+  },
+  {
+   "id": "V416-S8",
+   "area": "obligations",
+   "summary": "ODR-V416-S8 B: a new EvidenceRelationshipRecorded for the same evidence-hypothesis pair is the reassessment and the latest is current (LinkCard.Current). The contract-readiness obligation T-IMPL-CMD-REL-LINK-02 (second link for the pair refused; docs/contract-readiness/causa-precompetition/VERIFICATION-MATRIX.json, COMMAND-EVENT-REGISTRY.json CMD-REL-LINK) is superseded (supersededObligations), and the successor catalog's INV-030 note says so (ODR-V416-CAT)."
+  },
+  {
+   "id": "V416-TESTS",
+   "area": "verification",
+   "summary": "Producer tests for the rest of the new behaviour (independent review of v4.1.6): Domain ReviseEvidenceRules, ReviseObservationRules, AdmitEvidenceEmitsRevisionInGroup (S-3 A), RelationshipKindsNeverSupport, LatestAssessmentIsCurrent (S-8 B); View ConclusionCardShowsStrength (RC-6 A), LinkCardLatestIsCurrent; Storage StoredHistoriesReplayUnchanged (stored 1.0.0 histories and catalog events replay to the same digests); App AdmitEvidenceUnavailableOnV100Investigation (S-6 A: Unavailable with CAUSA.UNREPRESENTABLE on a 1.0.0 investigation)."
+  }
+ ],
+ "supersededObligations": [
+  {
+   "previous": "T-IMPL-CMD-REL-LINK-02",
+   "previousText": "T-IMPL-CMD-REL-LINK-02 second link for the pair refused",
+   "supersededBy": [
+    "ODR-V416-S8",
+    "INV-030"
+   ]
   }
  ],
  "bootstrap": {
@@ -40,11 +62,12 @@
   "order": [
    "Record the start timestamp; git init -b main in the empty competition repository (git metadata only)",
    "conditor init --preset indy-init --target . (Conditor 0.10.18: Echelon scaffold, Praxis init, requirements import)",
-   "requirements-compiler v41 --source INDY-INIT --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --bootstrap . (layers onto Conditor's repository: merges package.json, Directory.Build.props and .gitignore, refuses any other overlap)",
-   "dotnet build Causa.slnx; conditor ci-policy check --target .",
+   "requirements-compiler v41 --source INDY-INIT --package requirements-compiled/v4.1.6 --base requirements-compiled/v4 --bootstrap . (layers onto Conditor's repository: merges package.json, Directory.Build.props and .gitignore, refuses any other overlap)",
+   "dotnet build Causa.slnx; conditor ci-policy check --target . (v4.1.6: the integration-owned .github/workflows/ci.yml the bootstrap writes builds and tests Causa.slnx, bootstrap.ciWorkflow)",
    "git commit (the initial bootstrap commit), conditor repo create, push; first green CI"
   ],
-  "playwrightConfig": "playwright.config.ts"
+  "playwrightConfig": "playwright.config.ts",
+  "ciWorkflow": ".github/workflows/ci.yml"
  },
  "contractControls": [
   {
@@ -741,7 +764,7 @@
  "contractChanges": [
   {
    "file": "contracts/00-DOMAIN-STUBS.fs",
-   "sha256": "5c7848dfb04ea7380f8b0053c3706850ce647dc1b03d6e097e2833a84cb78ee2",
+   "sha256": "9da7a94cbd5c56c7b7b54847f5c7c9b4e7261d476ad4fd82ccbd6a582dd2d349",
    "decision": "ODR-V416-01",
    "approval": "",
    "summary": "RecordConclusion (RC-7 A: after RecordVerification), ReviseObservation and ReviseEvidence commands; ObservationRevised and EvidenceRevised events (causa-storage 1.1.0, S-1 B)."
