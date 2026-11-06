@@ -74,18 +74,14 @@ There is no warm-versus-cold distinction for the container: every run pulls the 
 
 ## 6. Remaining risks
 
-1. **The competition gate, `tools/r9/verification-gate.yml`.** It runs on every competition PR and merge. It installs browsers twice on `ubuntu-latest`, with no retry:
-   - its browser step (line 170) runs `npx playwright install --with-deps chromium webkit`, bounded to 10 minutes (`timeout-minutes: 10`);
-   - its J1–J3 step runs a second `npx playwright install --with-deps chromium webkit` for the journeys (line 274). That one has no step limit, so it is bounded only by the job's 40 minutes (line 49). A stall there costs up to the whole gate budget before the run fails.
-
-   The gate's exposure is therefore larger than one 10-minute install. It is governed (`r9.fsx govern` writes it; `check-governance` requires it to equal Indy-init's; it is pinned in `kickoff/rehearsal-010/observer-pins.json`), so it is not changed here.
+1. **The competition gate, `tools/r9/verification-gate.yml`.** It runs on every competition PR and merge. It does `npx playwright install --with-deps chromium webkit` on `ubuntu-latest`, bounded to 10 minutes (`timeout-minutes: 10`) with no retry, so a stall fails the gate run after 10 minutes. It is governed (`r9.fsx govern` writes it; `check-governance` requires it to equal Indy-init's; it is pinned in `kickoff/rehearsal-010/observer-pins.json`), so it is not changed here.
    - **Recommendation:** run its `verify` job in the same image, validated in a rehearsal repository before T0. This needs the owner's go-ahead and a re-pin; see "Owner decisions".
 2. **Live-provider preflight.** It is owner-dispatched, so its new step limit is **unverified** in CI.
 3. **mcr.microsoft.com availability.** This is a single external dependency, as GitHub's runner images also are.
 
 ## 7. Owner decisions
 
-- **Whether to apply the container to the competition gate** (`tools/r9/verification-gate.yml`, governed, pinned) before T0. That covers both of its installs, including the J1–J3 one that is bounded only by the 40-minute job.
+- **Whether to apply the container to the competition gate** (`tools/r9/verification-gate.yml`, governed, pinned) before T0.
 - Branch protection / CODEOWNERS for workflows is unchanged (OWNER-BATCH item 8).
 
 ## Result
