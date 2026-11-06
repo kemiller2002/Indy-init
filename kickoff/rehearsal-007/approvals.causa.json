@@ -894,6 +894,48 @@
           "review_sha256": "39bf30aaee5eb3840205d9e6eb916b91e2af3d43f0e36535d3e90dfcc3ac196f"
         }
       ]
+    },
+    {
+      "id": "APR-R10-OWNER-4",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "ODR-R10-01",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/rehearsal-010-readiness/scope-manifest.json",
+              "sha256": "c845da6376c53ba70ed48ccf8952364b5bda91f5a0639423bc5b94a512802101",
+              "field": "scopeSha256",
+              "value": "\"26e6ff3cde467ca97ba9c2eda869947a367854a63dbd221db3987790d949f71f\""
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-19",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/rehearsal-010-optimization/proposals/scope-manifest.successor.json",
+              "sha256": "7afbd42880366efa0df847de4eb24188ae50445e1970fe5d236f57477073d412",
+              "field": "scopeSha256",
+              "value": "\"8baf049b4e643f48e33a718eabe709e21b74e740524d284a62a63629a1babfb2\""
+            },
+            {
+              "path": "docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json",
+              "sha256": "bd77f2ffa5141002b9ef974810baa036dfa15990d6972f9c142a861cc6ed5a0f",
+              "field": "scopeSha256",
+              "value": "\"abf544d60cdcfd05c1d54d1e37c60d36d56b24ce0ff2fef3ffe5b6704f6ae576\""
+            }
+          ]
+        }
+      ]
     }
   ]
 }
