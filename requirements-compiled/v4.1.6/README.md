@@ -1,6 +1,6 @@
 # Compiled package v4.1.6: RecordConclusion and causa-storage 1.1.0
 
-**Status: CANDIDATE.** It is not approved, not frozen and not pinned by any rehearsal lock. The owner has recorded every ODR-V416 decision except the package approval, each with its recommended option, as APR-V416-OWNER-1 (PR #179). FREEZE step 2 wrote that approval id in (the three contract changes, `bootstrap.fsharpCore`, the WDL-013 supplementary plan entry) and it validates fully (X01-X21 PASS). It awaits its independent review record and its approval, ODR-V416-02.
+**Status: CANDIDATE.** It is not approved, not frozen and not pinned by any rehearsal lock. The owner has recorded every ODR-V416 decision except the package approval, each with its recommended option, as APR-V416-OWNER-1 (PR #179). FREEZE step 2 wrote that approval id in (the three contract changes, `bootstrap.fsharpCore`, the WDL-013 supplementary plan entry) and it validates fully (X01-X21 PASS). An independent review is recorded (`analysis/independent-review.json`, round 2 PASS at 3701c2b). It awaits its approval, ODR-V416-02.
 
 v4.1.6 is the successor amendment of v4.1.5, which the owner approved as APR-V415-OWNER-3 (tag `indy-init-requirements-v4.1.5`). v4.1.5 is not edited.
 
