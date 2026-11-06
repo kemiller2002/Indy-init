@@ -32,7 +32,8 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.5 --repo Indy-init  # ODR-V415-01, -03, -04 and -IF-VIEW; then the agent compiles v4.1.5
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.5 --repo Indy-init # ODR-V415-02, after the compiled package is reviewed
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.5 --repo Indy-init --commit <merge commit of the ODR-V415-02 pull request>
-//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.6 --repo Indy-init  # ODR-V416-01, -RC1, -RC3..-RC7, -S1..-S9, -CAT
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.6 --repo Indy-init  # ODR-V416-01, -RC1, -RC3..-RC7, -S1..-S9, -CAT,
+//        -WDL013 and -SCOPE-SELECTORS
 //        (section A of docs/v416-competition-decisions/DECISIONS-FOR-TONIGHT.md); a request that pins a file (ODR-V416-CAT,
 //        the successor catalog) records its sha256 at origin/main, shown before you answer; then the agent completes v4.1.6
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.6 --repo Indy-init # ODR-V416-02, after the compiled package is reviewed

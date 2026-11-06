@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.v41-owner-decision-requests/1",
- "status": "Requests of v4.1 to v4.1.5 are carried as recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2, APR-V412-OWNER-1..3, APR-V414-OWNER-1/2, APR-V415-OWNER-1..3). Pending (none recorded; agents never record, RDP-003): ODR-V416-01 (the contract change), ODR-V416-RC1, -RC3..-RC7, -S1..-S9 and -CAT (section A of the decisions sheet), then ODR-V416-02 (approve v4.1.6) for the package as compiled and independently reviewed.",
+ "status": "Requests of v4.1 to v4.1.5 are carried as recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2, APR-V412-OWNER-1..3, APR-V414-OWNER-1/2, APR-V415-OWNER-1..3). Pending (none recorded; agents never record, RDP-003): ODR-V416-01 (the contract change), ODR-V416-RC1, -RC3..-RC7, -S1..-S9, -CAT, -WDL013 and -SCOPE-SELECTORS (section A of the decisions sheet), then ODR-V416-02 (approve v4.1.6) for the package as compiled and independently reviewed.",
  "requests": [
   {
    "id": "ODR-V41-01",
@@ -984,6 +984,40 @@
     "INV-046",
     "INV-047"
    ]
+  },
+  {
+   "id": "ODR-V416-WDL013",
+   "kind": "scope",
+   "title": "Verify WDL-013 per obligation (supersedes ODR-V4-10 A for WDL-013 only)",
+   "question": "The frozen v4 package already defines WDL-013-O1..O3 verbatim (requirements-compiled/v4/requirements-inventory.json, from docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md:36) and VM-WDL-013 (VR-LEDGER, VR-PRESERVATION, VR-UI; gates G0, G5), but ODR-V4-10 A keeps every P1 requirement gate-level, with no per-obligation test. For WDL-013 only, supersede ODR-V4-10 A: WDL-013 is verified per obligation; O1..O3 are carried verbatim (no new obligation, no rewording, no weakening); priority stays P1; tests 'playwright:acceptance/WDL-013.spec.js > WDL-013-O1 [chromium]', '... > WDL-013-O2 [chromium]' and '... > WDL-013-O3 [chromium]' in SU-BROWSER-CHROMIUM (the suite of WDL-001..015), required categories browser and accessibility as for WDL-012; Q1: no additional praxis:independent-review binding (the minimum); Q2: implementation unit WI-GEN-WDL (the approved scope). Every other non-P0 requirement stays under ODR-V4-10 A. The recompiled competition scope moves WDL-013 from gateLevelScope to requirements with three obligations (a new scopeSha256 the owner re-approves, ODR-R10-01).",
+   "options": [
+    "A: as stated (per-obligation, O1..O3 verbatim, P1, SU-BROWSER-CHROMIUM, no extra review binding, WI-GEN-WDL)",
+    "B: as A, and also bind praxis:independent-review to O2 and O3 (Q1, an added category)",
+    "C: as A, with implementation unit T23 (the frozen DAG) instead of WI-GEN-WDL (Q2)",
+    "D: keep ODR-V4-10 A for WDL-013 (gate-level)"
+   ],
+   "recommendation": "A: the minimum change that gives O1..O3 test identities; it removes WDL-015-O2's failure once the scope is recompiled. Status: not verified (no test exists yet). The owner directed this in session on 2026-11-06 ('derive WDL-013 obligations; if a frozen-plan change is needed, it goes into v4.1.6'); that direction is not a record. This request is how it is recorded.",
+   "rationale": "It changes the frozen verification contract decided by ODR-V4-10 A, so only the owner can make it (docs/v416-competition-decisions/WDL-013-OBLIGATIONS.md).",
+   "impact": "After it is recorded, the agent adds the supplementary plan entry and execution-plan binding to v4.1.6 and recompiles (FREEZE step 2), and the competition scope is recompiled. Related defect D1 (WDL-015's lane test reads .echelon/scope-checkpoint.json) is not fixed by it.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V416-WDL013\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.6. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-V416-SCOPE-SELECTORS",
+   "kind": "scope",
+   "title": "Scope compiler: DAG covers use the full selector grammar",
+   "question": "tools/requirements-compiler/src/Scope.fs `covers` handles only bare requirement ids and `regex:`, while the frozen selector grammar (Model.fs `matches`: all, id:, prefix:, regex:, doc:, origin:) is what the v4.1.5 DAG uses. So T18 `prefix:PF-`, T20 `prefix:EXT-DATA-`, T25 `origin:external` and every `doc:` cover (T23 `doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md`) link no requirement, and the WI-GEN-* work items pick them up instead. Approve the separately drafted scope-compiler fix (covers uses the frozen grammar), so tomorrow's scope compile maps requirements to the DAG tasks that cover them? The recompiled competition scope gets a new scopeSha256 (and different work-item mapping), which the owner re-approves anyway (ODR-R10-01).",
+   "options": [
+    "A: approve the fix; the competition scope is recompiled with it",
+    "B: keep the current mapping (bare ids and regex: only)"
+   ],
+   "recommendation": "A: tomorrow's scope compile must map each requirement to the task that covers it. The fix itself is in a separate pull request and is reviewed there; this records only the decision to adopt it. The owner directed this in session on 2026-11-06 (via the coordinator); that direction is not a record. This request is how it is recorded.",
+   "rationale": "It changes which work items the approved scope assigns, an owner-controlled re-scope (ScopeTests requires the committed scope manifest to equal the compile output).",
+   "impact": "With A, the P0 work items are re-mapped and the scope manifest changes; with B, the WI-GEN-* items keep absorbing the requirements the DAG's prefix:/doc:/origin: covers miss.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V416-SCOPE-SELECTORS\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.6. Agents never write an owner record (RDP-003)."
+   }
   },
   {
    "id": "ODR-V416-02",
