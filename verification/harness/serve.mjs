@@ -10,4 +10,4 @@ http.createServer((req, res) => {
   if (!file.startsWith(dir) || !fs.existsSync(file)) { res.writeHead(404); return res.end('not found'); }
   res.writeHead(200, { 'content-type': types[path.extname(file)] || 'application/octet-stream' });
   fs.createReadStream(file).pipe(res);
-}).listen(port, '127.0.0.1', () => console.log(`serving ${dir} on ${port}`));
+}).listen(port, '127.0.0.1', function () { console.log(`serving ${dir} on ${this.address().port}`); });

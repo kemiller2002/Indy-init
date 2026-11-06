@@ -551,6 +551,8 @@ jobs:
           node verification/harness/github-double.mjs 4610 & node verification/harness/serve.mjs verification/harness/fixture-app/web 4620 & sleep 1
           ln -sfn "$RUNNER_TEMP/pw/node_modules" verification/journeys/node_modules
           ln -sfn "$RUNNER_TEMP/pw/node_modules" verification/design-contract/node_modules
+          # J3-06/J3-07 reach a GraphQL-saving application: the GraphQL fixture passes J3, its always-Saved variant fails it.
+          node --test verification/harness/graphql-fixture.test.mjs
           export CAUSA_PROVIDER=harness-double CAUSA_APP_URL=http://127.0.0.1:4620/ CAUSA_CANDIDATE=fixture
           (cd verification/journeys && CAUSA_JOURNEY_RESULTS="$RUNNER_TEMP/adv-evidence/journeys-fixture.json" npx playwright test)
           (cd verification/design-contract && CAUSA_DESIGN_RENDERED="$RUNNER_TEMP/adv-evidence/design-rendered-fixture.json" CAUSA_SCREENSHOTS="$RUNNER_TEMP/adv-evidence/screenshots" npx playwright test)
