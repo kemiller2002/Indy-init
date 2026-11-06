@@ -1,6 +1,6 @@
 # Playwright CI mitigation: final report
 
-**Status: RUN-PENDING.** It is filled in from PR #150's run at 321b51a; see "Result" at the end.
+**Status: READY FOR MERGE**, pending the workflow owner's independent review; see "Result".
 
 **Scope.** Indy-init's `preflight-tooling.yml` and `live-provider-preflight.yml`. The competition repository's gate, `tools/r9/verification-gate.yml`, is covered under "Remaining risks". It is governed and pinned, so it is not changed here.
 
@@ -52,7 +52,7 @@ There is no warm-versus-cold distinction for the container: every run pulls the 
 ## 4. Selected: PR #150, plus a step time limit on the runner installs
 
 - **Adversarial jobs** (3 shards and the aggregate) run in `mcr.microsoft.com/playwright:v1.63.0-noble`. This is #150 unchanged: no browser download and no browser apt install.
-- **Runner installs** (fsharp-tooling layout assertions, suite-commands fixtures, live-provider journeys) keep `npx playwright install --with-deps` with a step-level `timeout-minutes` of 15 each. A stall fails that step early and by name. The runner cancels the step, with no in-script kill, no retry and no skip. This replaces fsharp-tooling's current lack of any bound. **Trade-off, stated plainly:** on a very slow mirror, a run that today is slow but green (the slowest measured success was 664 s, about 11 minutes) could turn red at the 15-minute limit. 15 minutes leaves that margin. A red step is then re-run once, as a job. This is safe where 8d58246's wrapper was not, because there is no second attempt inside the same job, so a cancelled apt leaves no dpkg lock behind for anything to trip on.
+- **Runner installs** (fsharp-tooling layout assertions, suite-commands fixtures, live-provider journeys) keep `npx playwright install --with-deps` with a step-level `timeout-minutes`: fsharp-tooling 25 (its install plus the layout run took 803 s on run 42138265759), suite-commands 15 (50 s measured) and live journeys 15 (unverified, owner-dispatched). A stall fails that step early and by name. The runner cancels the step, with no in-script kill, no retry and no skip. This replaces fsharp-tooling's current lack of any bound. **Trade-off, stated plainly:** on a very slow mirror, a run that today is slow but green (the slowest measured runner install was 664 s; the fsharp-tooling step, install plus layout run, took 803 s) could turn red at its limit. The limits leave that margin. A red step is then re-run once, as a job. This is safe where 8d58246's wrapper was not, because there is no second attempt inside the same job, so a cancelled apt leaves no dpkg lock behind for anything to trip on.
 - **The container tools step** (git, jq, curl, ICU) is bounded to 5 minutes, with `::error::phase=container-tools`.
 
 **Rejected:**
@@ -69,7 +69,7 @@ There is no warm-versus-cold distinction for the container: every run pulls the 
 | Browser install (runner jobs) | step `timeout-minutes` | the step is cancelled at its limit, by name | job fails; re-run once |
 | Browser launch / tests | the test steps | test failures | real failures, never passes |
 
-- **Budgets:** step limits are below their job limits (15 < 20 for suite-commands, 15 < 30 for live, 15 < 360 for fsharp-tooling), and there are no nested retries.
+- **Budgets:** step limits are below their job limits (15 < 20 for suite-commands, 15 < 30 for live, 25 < 360 for fsharp-tooling), and there are no nested retries.
 - **If mcr.microsoft.com is unavailable:** no validated alternative execution path exists. The adversarial jobs then fail at image pull with GitHub's own diagnostics, and no readiness is claimed. Reverting to the runner install is the fallback, and it is the known stall-prone path.
 
 ## 6. Remaining risks
@@ -86,4 +86,22 @@ There is no warm-versus-cold distinction for the container: every run pulls the 
 
 ## Result
 
-(Filled in from PR #150's CI at 321b51a.)
+**PR #150 at 6579f5a, run [42138265759](https://github.com/kemiller2002/Indy-init/actions/runs/42138265759): every job succeeded.**
+
+| Job | Result | Duration | Evidence |
+|---|---|---|---|
+| r10-adversarial-cases (0) | success | 8 min 29 s | container 26 s, tools 147 s, browsers 3 s; `12 case(s): 12 validated, 0 not run, 0 failed` |
+| r10-adversarial-cases (1) | success | 7 min 15 s | container 20 s, tools 9 s, browsers 4 s; `12 validated, 0 not run, 0 failed` |
+| r10-adversarial-cases (2) | success | 4 min 08 s | container 32 s, tools 9 s, browsers 4 s; `12 validated, 0 not run, 0 failed` |
+| r10-adversarial (aggregate) | success | 5 min 37 s | <ul><li>J1–J3: **Chromium 3 ✓, WebKit 3 ✓**</li><li>positive control: 2 passed</li><li>delegated authority: 79/79</li><li>union check: passed</li></ul> |
+| fsharp-tooling | success | 19 min 33 s | layout assertions on Chromium and WebKit, runner install: 803 s, inside its limit (now 25) |
+| suite-commands | success | 2 min 21 s | fixture trees with the runner install: 50 s |
+| offline-contract-tests, frozen-v4, r9-readiness-gates, release-gate-repair | success | — | unchanged jobs |
+
+- **Image:** every container job pulled `sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27`, the pinned digest.
+- **Earlier runs:** two more container runs of #150's adversarial jobs were also all green. Run 42134469740 (ef82102) had shards of 6:25, 6:00 and 3:42 and an aggregate of 7:41. Run 42136695891 (8d58246) had shards of 6:20, 7:23 and 3:48 and an aggregate of 5:25.
+- **Head after the run:** a later commit raises fsharp-tooling's step limit from 15 to 25 (803 s measured) and records these results. Its own run is linked from the PR.
+- **Merge and readiness evidence:** not merged. Merge follows the workflow owner's independent review. After the merge:
+  - confirm the workflow on main;
+  - merge main into #143;
+  - re-run #140 against the accepted workflow.

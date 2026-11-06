@@ -318,8 +318,8 @@ jobs:
       - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
         # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget. No retry, so a
         # cancelled apt leaves no lock behind for a second attempt (the problem 8d58246 removed); nothing is skipped. Trade-off: on a very
-        # slow mirror (slowest measured success 664 s) this can turn a slow green run red; 15 minutes leaves that margin.
-        timeout-minutes: 15
+        # slow mirror this can turn a slow green run red. This step (install plus the layout run) took 803 s on run 42138265759, so 25.
+        timeout-minutes: 25
         run: |
           mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
           tar -xzf "$RUNNER_TEMP/forma.tgz" -C "$RUNNER_TEMP/forma"
