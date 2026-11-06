@@ -1,0 +1,7 @@
+{
+  "schema": "exp-indy-002.integration-results/1",
+  "integrations": [
+    { "id": "INT-1", "wave": 1, "groups": ["CG-1-START v2", "CG-2-HEADER v3", "CG-3-CONTENT v3", "CG-4-RELATIONSHIP v4", "CG-5-PERSISTENCE v3"], "versionCheck": "both agents merged the coordinator branch carrying the same Contracts.fs hash before staging; no mismatched version", "start": "2026-11-05T21:33:30Z", "mergeConflicts": 0, "crossComponentCompile": "PASS first time (real Engine.ports swapped for Stub.ports on one line)", "firstAcceptanceRun": "2026-11-05T21:35:20Z: 10/11 then 20/21", "defectsFound": ["D-1", "D-2", "D-3"], "realMismatchDetected": "D-3: UI auto-saved on start against the registry's INV-004 transition; caught only by the independent browser test", "accepted": "2026-11-05T21:38:05Z", "elapsedMinutes": 4.6, "repairMinutes": 3.0 },
+    { "id": "INT-2", "wave": 2, "groups": ["CG-6-CONCLUSION v1"], "released": "2026-11-05T21:39:49Z", "domainStaged": "2026-11-05T21:41:57Z", "uiStaged": "2026-11-05T21:41:37Z", "start": "2026-11-05T21:42:19Z", "mergeConflicts": 0, "crossComponentCompile": "PASS first time", "defectsFound": [], "accepted": "2026-11-05T21:43:21Z", "elapsedMinutes": 1.0, "releaseToAcceptedMinutes": 3.5 }
+  ]
+}

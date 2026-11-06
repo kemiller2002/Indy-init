@@ -1,0 +1,23 @@
+{
+  "schema": "exp-indy-002.ci-runs/1",
+  "policy": "Push to the experiment branch triggers no workflow; the draft PR (kemiller2002/Indy-init#140) triggers 'Preflight tooling' (cancel-in-progress per PR) and 'Indy Init offline factory rehearsal'. Required CI = both, on the final candidate head.",
+  "baseline": {
+    "localOfflineSuite": { "command": "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source .", "build": "23 s", "run": "96 s", "result": "PASS (after git fetch --unshallow, D-0)", "measured": true },
+    "previewWasmPublish": { "secs": 53, "measured": true }
+  },
+  "runs": [
+    { "workflow": "Indy Init offline factory rehearsal", "runId": 42114254798, "head": "2f7ebf7", "created": "2026-11-05T21:37:01Z", "updated": "2026-11-05T21:38:39Z", "conclusion": "success" },
+    { "workflow": "Preflight tooling", "runId": 42114254814, "head": "2f7ebf7", "created": "2026-11-05T21:37:01Z", "updated": "2026-11-05T21:40:00Z", "conclusion": "cancelled", "note": "superseded by my push of c7e97c4 (cancel-in-progress); its r10-adversarial aggregator reported the cancelled shards as a failure" },
+    { "workflow": "Indy Init offline factory rehearsal", "runId": 42114535653, "head": "c7e97c4", "created": "2026-11-05T21:38:55Z", "updated": "2026-11-05T21:40:11Z", "conclusion": "success" },
+    { "workflow": "Preflight tooling", "runId": 42114535679, "head": "c7e97c4", "created": "2026-11-05T21:38:55Z", "updated": "2026-11-05T21:39:56Z", "conclusion": "cancelled", "note": "superseded by 99824ee" },
+    { "workflow": "Preflight tooling", "runId": 42114677228, "head": "99824ee", "created": "2026-11-05T21:39:54Z", "conclusion": "superseded by 43d1b28 (expected cancel)" },
+    { "workflow": "Indy Init offline factory rehearsal", "runId": 42114677327, "head": "99824ee", "created": "2026-11-05T21:39:54Z", "conclusion": "in progress at 21:41Z" },
+    { "workflow": "Preflight tooling", "runId": 42114773787, "head": "43d1b28", "created": "2026-11-05T21:40:32Z", "conclusion": "pending at 21:41Z" },
+    { "workflow": "Indy Init offline factory rehearsal", "runId": 42114773794, "head": "43d1b28", "created": "2026-11-05T21:40:32Z", "conclusion": "in progress at 21:41Z" }
+  ],
+  "findings": [
+    "CI-F3: at 21:47Z the stop hook forced a push of the docs-only commit, cancelling Preflight on 76d88cd mid-run (offline-factory, offline-contract-tests and frozen-v4 had already passed there). The docs-only head (identical application code) became the final candidate.",
+    "CI-F2: the session stop hook requires every commit to be pushed before the coordinator waits, so batching pushes is not possible while waiting on agents; each push re-triggers both PR workflows and cancels Preflight on the superseded head.",
+    "CI-F1 (agent coordination / CI waste): four pushes within 4 minutes while the PR was open cancelled three Preflight runs before they finished. From 21:41Z the coordinator commits locally and pushes only the final candidate."
+  ]
+}
