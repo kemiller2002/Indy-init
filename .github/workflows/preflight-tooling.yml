@@ -4,8 +4,7 @@ name: Preflight tooling
 # no browser (on 2026-11-05 `playwright install --with-deps` on the runner used the whole 45-minute budget three times
 # before any case ran). The other browser steps install on the runner with a step time limit: a stall fails that step,
 # named, rather than consuming the job; there is no in-script kill or retry (killing apt mid-install is not safe).
-# The remaining runner browser steps restore a Playwright 1.63.0 Chromium/WebKit cache keyed to ubuntu-24.04: on a hit they install
-# without apt and launch both browsers; on a miss or a failed launch they install --with-deps under the same step time limit.
+# The Forma layout assertions and the suite-command fixture trees run in the same image (no browser install on the runner).
 # Directive workstream C: a PR commit ran this workflow twice (push and pull_request events, same commit, every job),
 # doubling runner load while three sessions had PRs open. Push now runs only on main; PRs run on pull_request (the
 # merge result), and a newer commit on the same PR cancels the older run (its checks are on the old commit, so the new
@@ -322,25 +321,6 @@ jobs:
             grep -q FS1093 "$RUNNER_TEMP/negative416.log" || { echo "$name failed for another reason"; cat "$RUNNER_TEMP/negative416.log"; exit 1; }
             rm "$RUNNER_TEMP/contracts416/Negative.fsproj"
           done
-      - name: Restore pinned Playwright browser cache
-        id: playwright-browser-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
-      - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
-        # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget. No retry, so a
-        # cancelled apt leaves no lock behind for a second attempt (the problem 8d58246 removed); nothing is skipped. Trade-off: on a very
-        # slow mirror this can turn a slow green run red. This step (install plus the layout run) took 803 s on run 42138265759, so 25.
-        timeout-minutes: 25
-        run: |
-          mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
-          tar -xzf "$RUNNER_TEMP/forma.tgz" -C "$RUNNER_TEMP/forma"
-          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ] && npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))"; then echo "Cached browsers launched"; else echo "::notice::no usable browser cache; installing with OS dependencies (bounded by this step's time limit)"; npx playwright install --with-deps chromium webkit; fi) > /dev/null
-          cd "$GITHUB_WORKSPACE"
-          cp -r requirements-compiled/v4.1/layout-tests/. "$RUNNER_TEMP/layout/"
-          node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --browsers chromium,webkit
-          node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --catch-rate
       - name: Check out maintained Causa Data tooling
         uses: actions/checkout@v4
         with:
@@ -356,6 +336,44 @@ jobs:
   # Rehearsal 009 readiness gates (docs/rehearsal-009-preflight-smoke/FINAL-CORRECTIONS.md): the pinned Conditor, the
   # resolved set from echelon-current, the governed Praxis policy, the Dokimos coverage gate with its candidate-SHA
   # checks and the non-empty Percepta preflight, each proven by positive and negative cases on the released binaries.
+  # The executable Forma layout assertions (was a step of fsharp-tooling), in Playwright's image: no apt browser install.
+  forma-layout:
+    runs-on: ubuntu-24.04
+    # Browsers and their OS libraries come preinstalled in Playwright's image (the tag must equal @playwright/test 1.63.0).
+    # On the runner, `playwright install --with-deps` pulled ~100 apt packages from azure.archive.ubuntu.com and timed out
+    # (PR #174 run 42297161983, PR #178 run 42302294105, PR #181 run 42313025038); the browser cache could not help,
+    # because it holds the browsers but not their OS libraries.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+    defaults:
+      run:
+        shell: bash -e {0}   # what these steps ran with on the runner; a container defaults to sh
+    timeout-minutes: 30
+    steps:
+      - name: Tools the image does not carry (git, jq, curl, ICU for .NET)
+        timeout-minutes: 6
+        run: |
+          # Bounded and labelled: an unreachable apt mirror fails here, by name, before anything runs (never as a pass).
+          timeout -k 15 300 sh -c 'apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null' \
+            || { echo "::error::phase=container-tools: apt could not install git, jq, curl and ICU within 5 minutes"; exit 1; }
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
+        timeout-minutes: 20
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/forma.tgz" https://registry.npmjs.org/@echelon-foundry/design-system/-/design-system-0.12.0.tgz
+          echo "b824568d528562658ded3d53ecd06504e907f7d42129facd86a8f298d1cb7aae  $RUNNER_TEMP/forma.tgz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
+          tar -xzf "$RUNNER_TEMP/forma.tgz" -C "$RUNNER_TEMP/forma"
+          # Chromium and WebKit are already in the container image (no per-run download or apt install).
+          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null
+          cd "$GITHUB_WORKSPACE"
+          cp -r requirements-compiled/v4.1/layout-tests/. "$RUNNER_TEMP/layout/"
+          node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --browsers chromium,webkit
+          node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --catch-rate
   release-gate-repair:
     # docs/release-gate-repair: the suite-command defects Rehearsal 009 hit stay refused, the corrected v4.1.4 runners
     # execute, the Praxis ordering gate and the acceptance levels behave as specified.
@@ -440,27 +458,38 @@ jobs:
   # commands; this job also executes them (docs/rehearsal-010-readiness/INTEGRATION-REPORT.md).
   suite-commands:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    # Browsers and their OS libraries come preinstalled in Playwright's image (the tag must equal @playwright/test 1.63.0).
+    # On the runner, `playwright install --with-deps` pulled ~100 apt packages from azure.archive.ubuntu.com and timed out
+    # (PR #174 run 42297161983, PR #178 run 42302294105, PR #181 run 42313025038); the browser cache could not help,
+    # because it holds the browsers but not their OS libraries.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+    defaults:
+      run:
+        shell: bash -e {0}   # what these steps ran with on the runner; a container defaults to sh
+    timeout-minutes: 30
     steps:
+      - name: Tools the image does not carry (git, jq, curl, ICU for .NET)
+        timeout-minutes: 6
+        run: |
+          # Bounded and labelled: an unreachable apt mirror fails here, by name, before anything runs (never as a pass).
+          timeout -k 15 300 sh -c 'apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null' \
+            || { echo "::error::phase=container-tools: apt could not install git, jq, curl and ICU within 5 minutes"; exit 1; }
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - name: Restore pinned Playwright browser cache
-        id: playwright-browser-cache
-        uses: actions/cache@v4
+      - uses: actions/setup-node@v4
         with:
-          path: ~/.cache/ms-playwright
-          key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
+          node-version: "22"
       - name: Fixture trees (with and without the webkit project)
-        # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget. No retry, so a
-        # cancelled apt leaves no lock behind for a second attempt (the problem 8d58246 removed); nothing is skipped. Trade-off: on a very
-        # slow mirror (slowest measured success 664 s) this can turn a slow green run red; 15 minutes leaves that margin.
+        # Chromium and WebKit come with the container image, so nothing is downloaded or installed with apt here.
         timeout-minutes: 15
         run: |
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx"
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx-nowebkit" --without-webkit true
-          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ] && npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))"; then echo "Cached browsers launched"; else echo "::notice::no usable browser cache; installing with OS dependencies (bounded by this step's time limit)"; npx playwright install --with-deps chromium webkit; fi))
+          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund)
           cp -r "$RUNNER_TEMP/fx/node_modules" "$RUNNER_TEMP/fx-nowebkit/"
       - name: The frozen v4.1.2 commands are refused (MSB1008), and a missing webkit project is refused
         run: |
