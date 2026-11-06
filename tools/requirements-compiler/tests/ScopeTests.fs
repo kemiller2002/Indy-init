@@ -1023,6 +1023,68 @@ let cf07Deferral (source: string) : string list =
       let verdict = Ledger.sliceVerdictJson (Ledger.deferredAssertions s deferredCase) deferredCase []
       if strs "deferredToRelease" verdict <> [ "J1-03" ] then yield "cf07: the slice verdict does not record the deferred assertion" ]
 
+/// `covers` judges every form of the frozen selector grammar (Model.matches) the execution DAG uses: T18 `prefix:PF-`,
+/// T20 `prefix:EXT-DATA-`, T23 `doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md`, T25 `origin:external`. Each form
+/// has a requirement it must cover and one it must not, both directly and through a compiled scope.
+let selectorGrammar () : string list =
+    let wdl = selectorSubject "WDL-013" "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md" "baseline"
+    let pf = selectorSubject "PF-001" "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md" "baseline"
+    let ext = selectorSubject "HISTORICAL-CASE-CATALOG§catalog-policy" "docs/HISTORICAL-CASE-CATALOG.md" "external"
+    let task (selector: string) = JObj [ "id", JStr "T"; "covers", jstrs [ selector ] ]
+    let cases =
+        [ "all", wdl, true
+          "id:WDL-013", wdl, true
+          "id:WDL-013", pf, false
+          "id:WDL-01", wdl, false
+          "prefix:PF-", pf, true
+          "prefix:PF-", wdl, false
+          "prefix:F-", pf, false
+          "regex:^WDL-0\\d+$", wdl, true
+          "regex:^WDL-0\\d+$", pf, false
+          "doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md", wdl, true
+          "doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md", pf, false
+          "doc:WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md", wdl, false
+          "origin:external", ext, true
+          "origin:external", wdl, false
+          "origin:baseline", wdl, true
+          "origin:baseline", ext, false
+          "WDL-013", wdl, true
+          "WDL-013", pf, false
+          "WDL", wdl, false ]
+    let direct =
+        [ for selector, r, expected in cases do
+              if covers (task selector) r <> expected then
+                  yield sprintf "selector grammar: '%s' %s %s" selector (if expected then "does not cover" else "covers") r.Id ]
+    // Through compile: plan requirements carry their document, gate-level ones take it from the baseline.
+    let planReq id doc = JObj [ "requirement", JStr id; "priority", JStr "P0"; "title", JStr id; "document", JStr doc; "dependencies", JObj [ "requirements", JArr []; "contracts", JArr [] ]; "obligations", JArr [ JObj [ "sourceObligation", JStr(id + "-O1") ] ] ]
+    let dagTask id (covers: string list) = JObj [ "id", JStr id; "title", JStr id; "owner", JStr "domain"; "covers", jstrs covers; "dependsOn", JArr [] ]
+    let s =
+        { sources with
+            Plan = JObj [ "requirements", JArr [ planReq "PF-001" "docs/PF.md"; planReq "EXT-DATA-001" "docs/EXT.md"; planReq "WDL-001" "docs/WDL.md"; planReq "R1.1" "docs/REQUIREMENTS.md"; planReq "Z-001" "docs/Z.md" ] ]
+            ExecutionPlan = JObj [ "suites", JArr [] ]
+            Dag =
+              JObj
+                  [ "tasks",
+                    JArr
+                        [ dagTask "T17" []
+                          dagTask "T18" [ "prefix:PF-" ]
+                          dagTask "T20" [ "prefix:EXT-DATA-" ]
+                          dagTask "T23" [ "doc:docs/WDL.md" ]
+                          dagTask "T25" [ "origin:external" ]
+                          dagTask "T26" [ "id:R1.1" ] ] ]
+            Baseline = JObj [ "requirements", JArr [ JObj [ "id", JStr "WDL-013"; "document", JStr "docs/WDL.md" ]; JObj [ "id", JStr "PF-099"; "document", JStr "docs/PF.md" ]; JObj [ "id", JStr "U-001"; "document", JStr "docs/U.md" ] ] ] }
+    let m = compile s
+    let itemsOf id = arr "requirements" m |> List.tryFind (fun r -> str "id" r = id) |> Option.map (strs "workItems") |> Option.defaultValue []
+    let gateOf wi = arr "workItems" m |> List.tryFind (fun w -> str "id" w = wi) |> Option.map (strs "gateRequirements") |> Option.defaultValue []
+    let compiled =
+        [ for id, expected in [ "PF-001", [ "T18" ]; "EXT-DATA-001", [ "T20" ]; "WDL-001", [ "T23" ]; "R1.1", [ "T26" ]; "Z-001", [ "WI-GEN-RECORDS" ] ] do
+              if itemsOf id <> expected then yield sprintf "selector grammar: compiled %s maps to %A, expected %A" id (itemsOf id) expected
+          for wi, expected in [ "T23", [ "WDL-013" ]; "T18", [ "PF-099" ]; "T20", []; "T25", []; "T26", [] ] do
+              if gateOf wi <> expected then yield sprintf "selector grammar: compiled %s has gate requirements %A, expected %A" wi (gateOf wi) expected
+          for gone in [ "WI-GEN-PF"; "WI-GEN-EXT-DATA"; "WI-GEN-WDL" ] do
+              if arr "workItems" m |> List.exists (fun w -> str "id" w = gone) then yield sprintf "selector grammar: %s is generated although a DAG task's selector covers its requirements" gone ]
+    direct @ compiled
+
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source)
+    guard "adversarial" adversarial @ guard "selector grammar" selectorGrammar @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source)

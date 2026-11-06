@@ -91,10 +91,24 @@ let private bindings (executionPlan: Json) =
     |> List.map (fun (o, xs) -> o, xs |> List.map snd)
     |> Map.ofList
 
-/// Does a DAG task cover a requirement id (`covers`: exact ids, `regex:` patterns)?
-let covers (task: Json) (requirement: string) =
-    strs "covers" task
-    |> List.exists (fun c -> if c.StartsWith("regex:", StringComparison.Ordinal) then Regex.IsMatch(requirement, c.Substring 6) else c = requirement)
+/// What a `covers` selector is judged against: a requirement's id, source document and origin. Every requirement of
+/// the scope's plan and baseline is a baseline requirement (external ones are not in these sources).
+let selectorSubject (id: string) (document: string) (origin: string) : Model.Requirement =
+    { Id = id; Title = ""; Priority = ""; Document = document; Heading = ""; SectionSha256 = ""; Repository = ""; Commit = ""; Origin = origin; Obligations = [] }
+
+/// The selector subject of every plan and baseline requirement id; the plan's `document` wins, then the baseline's.
+let private subjects (s: Sources) : string -> Model.Requirement =
+    let docs =
+        (arr "requirements" s.Baseline |> List.map (fun r -> str "id" r, strOpt "document" r))
+        @ (arr "requirements" s.Plan |> List.map (fun r -> str "requirement" r, strOpt "document" r))
+        |> List.choose (fun (id, d) -> d |> Option.map (fun d -> id, d))
+        |> Map.ofList
+    fun id -> selectorSubject id (docs.TryFind id |> Option.defaultValue "") "baseline"
+
+/// Does a DAG task cover a requirement? Its `covers` selectors use the frozen grammar of the execution DAG and the
+/// verification rules (`all`, `id:`, `prefix:`, `regex:`, `doc:`, `origin:`, a bare id), judged by Model.matches.
+let covers (task: Json) (requirement: Model.Requirement) =
+    strs "covers" task |> List.exists (fun selector -> Model.matches selector requirement)
 
 /// The requirement family of an id ("UI-001" -> "UI", "EXT-DATA-001" -> "EXT-DATA"): generated work items group
 /// uncovered requirements of one family, so overlapping obligations become one implementation unit, not 660 tasks.
@@ -108,6 +122,7 @@ let private levelOf =
 
 let private planRequirements (s: Sources) (dagTasks: Json list) : Requirement list =
     let bound = bindings s.ExecutionPlan
+    let subject = subjects s
     arr "requirements" s.Plan
     |> List.map (fun r ->
         let id = str "requirement" r
@@ -121,7 +136,7 @@ let private planRequirements (s: Sources) (dagTasks: Json list) : Requirement li
                   Kind = (if bs |> List.exists (fun (_, _, exe) -> exe) then Executable else Record)
                   Producers = bs |> List.map (fun (suite, _, _) -> suite) |> List.distinct |> List.sort
                   Tests = bs |> List.map (fun (_, t, _) -> t) |> List.distinct |> List.sort })
-        let tasks = dagTasks |> List.filter (fun t -> covers t id) |> List.map (str "id")
+        let tasks = dagTasks |> List.filter (fun t -> covers t (subject id)) |> List.map (str "id")
         let executable = obligations |> List.exists (fun o -> o.Kind = Executable)
         { Id = id
           Origin = "v4-plan"
@@ -174,7 +189,7 @@ let private catalogRequirements (s: Sources) : Requirement list =
 
 /// The work items: every DAG task that covers a requirement or is a timed task, plus one generated item per
 /// requirement family no task covers and one per catalog screen.
-let private workItems (dagTasks: Json list) (requirements: Requirement list) (gateLevel: string list) : WorkItem list =
+let private workItems (subject: string -> Model.Requirement) (dagTasks: Json list) (requirements: Requirement list) (gateLevel: string list) : WorkItem list =
     let reqsOf (wi: string) = requirements |> List.filter (fun r -> List.contains wi r.WorkItems) |> List.map (fun r -> r.Id)
     let fromDag =
         dagTasks
@@ -185,7 +200,7 @@ let private workItems (dagTasks: Json list) (requirements: Requirement list) (ga
               Owner = strOpt "owner" t |> Option.defaultValue ""
               DependsOn = strs "dependsOn" t
               Requirements = reqsOf (str "id" t)
-              GateRequirements = gateLevel |> List.filter (covers t) })
+              GateRequirements = gateLevel |> List.filter (subject >> covers t) })
     let generated =
         requirements
         |> List.collect (fun r -> r.WorkItems)
@@ -367,7 +382,7 @@ let private build (s: Sources) (transform: WorkItem list -> Requirement list -> 
         |> List.filter (fun r -> not (planIds.Contains(str "id" r)))
         |> List.map (fun r -> str "id" r)
         |> List.sort
-    let items, requirements = transform (workItems dagTasks (planReqs0 @ catalogReqs0) gateLevel) (planReqs0 @ catalogReqs0)
+    let items, requirements = transform (workItems (subjects s) dagTasks (planReqs0 @ catalogReqs0) gateLevel) (planReqs0 @ catalogReqs0)
     let planReqs = requirements |> List.filter (fun r -> r.Origin = "v4-plan")
     let catalogReqs = requirements |> List.filter (fun r -> r.Origin = "catalog")
     let producers =
@@ -442,7 +457,7 @@ let compileWithSplit (s: Sources) (plan: Json) (planPath: string) (planSha256: s
     let reqs = planRequirements s dagTasks @ catalogRequirements s
     let planIds = planRequirements s dagTasks |> List.map (fun r -> r.Id) |> Set.ofList
     let gateLevel = arr "requirements" s.Baseline |> List.filter (fun r -> not (planIds.Contains(str "id" r))) |> List.map (fun r -> str "id" r) |> List.sort
-    match applySplit plan (workItems dagTasks reqs gateLevel) reqs with
+    match applySplit plan (workItems (subjects s) dagTasks reqs gateLevel) reqs with
     | Error e -> Error e
     | Ok _ ->
         build s (fun items rs -> match applySplit plan items rs with Ok x -> x | Error e -> failwithf "%A" e)
