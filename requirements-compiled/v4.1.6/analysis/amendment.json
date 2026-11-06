@@ -62,11 +62,12 @@
   "order": [
    "Record the start timestamp; git init -b main in the empty competition repository (git metadata only)",
    "conditor init --preset indy-init --target . (Conditor 0.10.18: Echelon scaffold, Praxis init, requirements import)",
-   "requirements-compiler v41 --source INDY-INIT --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --bootstrap . (layers onto Conditor's repository: merges package.json, Directory.Build.props and .gitignore, refuses any other overlap)",
-   "dotnet build Causa.slnx; conditor ci-policy check --target .",
+   "requirements-compiler v41 --source INDY-INIT --package requirements-compiled/v4.1.6 --base requirements-compiled/v4 --bootstrap . (layers onto Conditor's repository: merges package.json, Directory.Build.props and .gitignore, refuses any other overlap)",
+   "dotnet build Causa.slnx; conditor ci-policy check --target . (v4.1.6: the integration-owned .github/workflows/ci.yml the bootstrap writes builds and tests Causa.slnx, bootstrap.ciWorkflow)",
    "git commit (the initial bootstrap commit), conditor repo create, push; first green CI"
   ],
-  "playwrightConfig": "playwright.config.ts"
+  "playwrightConfig": "playwright.config.ts",
+  "ciWorkflow": ".github/workflows/ci.yml"
  },
  "contractControls": [
   {

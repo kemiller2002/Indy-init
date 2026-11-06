@@ -1022,6 +1022,22 @@
    }
   },
   {
+   "id": "ODR-V416-FSCORE",
+   "kind": "dependency-lock",
+   "title": "FSharp.Core 10.1.402 as a central package in the bootstrap (P-2)",
+   "question": "Under central package management the F# SDK drops its implicit FSharp.Core reference, so no F# test assembly ships FSharp.Core.dll and xunit discovers no test (Rehearsal 010, PR #174 fix 2). Should the v4.1.6 bootstrap pin FSharp.Core 10.1.402 centrally (Directory.Packages.props) with a conditional reference for centrally managed F# projects (Directory.Build.props), as analysis/amendment.json bootstrap.fsharpCore {version 10.1.402, decision ODR-V416-FSCORE, approval}?",
+   "options": [
+    "A: pin FSharp.Core 10.1.402 in the v4.1.6 bootstrap",
+    "B: do not pin it; the F# test projects stay without FSharp.Core.dll"
+   ],
+   "recommendation": "A. It is P-2 of the decisions sheet (docs/v416-competition-decisions/DECISIONS-FOR-TONIGHT.md, section B), which the owner accepted in session on 2026-11-06; that answer is not a record. This request is how it is recorded for v4.1.6.",
+   "rationale": "A package version the bootstrap adds is a dependency-lock decision of the owner (X16, X19). The pin is written into analysis/amendment.json with the recorded approval id at FREEZE step 2: a pin without a recorded owner approval fails X19 and the offline fsharpCoreOwnerRecords check.",
+   "impact": "With B, Causa's F# test assemblies run no test under central package management.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V416-FSCORE\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.6. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
    "id": "ODR-V416-02",
    "kind": "package-approval",
    "title": "Approve compiled package v4.1.6 (RC-2, S-10)",
