@@ -268,13 +268,17 @@ let private scopePackage (source: string) =
 
 let real (source: string) : string list =
     let s = ScopeCommands.sourcesOf source (scopePackage source)
-    let m = compile s
     let committed = parseFile (manifestPath source)
+    // The approved Rehearsal 010 scope is a historical record of the Legacy selector semantics (its v4.1.5 package).
+    let semantics = recordedSemantics committed
+    let m = compileWith semantics s
     let reqs = arr "requirements" m
     let ids = reqs |> List.map (str "id") |> Set.ofList
     let p0 = arr "requirements" s.Plan |> List.map (str "requirement")
     let inv = arr "requirements" s.Catalog |> List.map (str "id")
-    [ if not (preflight m committed).IsEmpty then yield sprintf "real: the committed scope manifest is stale or altered: %A" (preflight m committed |> List.truncate 5)
+    [ if semantics <> Legacy then yield sprintf "real: the committed scope manifest selects %A selectors, not Legacy" semantics
+      if str "scopeSha256" m <> str "scopeSha256" committed then yield sprintf "real: compiles to %s, the committed manifest has %s" (str "scopeSha256" m) (str "scopeSha256" committed)
+      if not (preflight m committed).IsEmpty then yield sprintf "real: the committed scope manifest is stale or altered: %A" (preflight m committed |> List.truncate 5)
       // The ratified CAT-CAUSA-INVESTIGATION successor (ODR-R10-02 = A, APR-R10-OWNER-1) has 44 requirements: Rehearsal 009's
       // 38, unchanged, and INV-039..INV-044.
       if p0.Length <> 161 || inv.Length <> 44 then yield sprintf "real: %d P0 and %d catalog requirements (expected 161, 44)" p0.Length inv.Length
@@ -831,6 +835,12 @@ let splitScope (source: string) : string list =
     let planPath = "docs/rehearsal-010-optimization/inputs/work-item-split.proposed.json"
     let plan = parseFile (Path.Combine(source, planPath))
     let sources = ScopeCommands.sourcesOf source (scopePackage source)
+    // The plan splits generated work items of the approved Rehearsal 010 scope, a Legacy-semantics record: it and its
+    // controls are judged with the semantics that scope records (the committed successor records the same package).
+    let semantics = recordedSemantics (parseFile (manifestPath source))
+    let successorSemantics = recordedSemantics (parseFile (Path.Combine(source, "docs/rehearsal-010-optimization/proposals/scope-manifest.successor.json")))
+    let compile = compileWith semantics
+    let compileWithSplit = compileWithSplitWith semantics
     let approved = compile sources
     let content (m: Json) = arr "requirements" m |> List.map (fun r -> str "id" r, serialize (JObj [ "o", (field "obligations" r |> Option.defaultValue (JArr [])); "p", JStr(strOpt "priority" r |> Option.defaultValue ""); "m", (field "mandatory" r |> Option.defaultValue JNull) ])) |> Map.ofList
     let mapSplits (f: Json -> Json) (j: Json) =
@@ -865,7 +875,8 @@ let splitScope (source: string) : string list =
           // review RVO-2-1: a cycle across two splits (LANDING -> PF-SECURITY -> UI-VERIFY -> ... -> LANDING)
           "SPLIT_CYCLE", (onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "dependsOn" (reqs [ "WI-GEN-PF-BOUNDARY"; "WI-GEN-UI-VERIFY" ]))
                           |> fun pl -> pl |> mapSplits (fun sp -> if str "workItem" sp = "WI-GEN-UI" then setField "parts" (JArr(arr "parts" sp |> List.map (fun p -> if str "id" p = "WI-GEN-UI-LANDING" then setField "dependsOn" (reqs [ "T17"; "WI-GEN-PF-SECURITY" ]) p else p))) sp else sp)) ]
-    [ match compileWithSplit sources plan planPath "test" with
+    [ if semantics <> Legacy || successorSemantics <> Legacy then yield sprintf "split: the approved scope and its successor select %A and %A selectors, not Legacy" semantics successorSemantics
+      match compileWithSplit sources plan planPath "test" with
       | Error ps -> yield sprintf "split: the proposed plan is refused: %A" (List.truncate 3 ps)
       | Ok successor ->
           if content successor <> content approved then yield "split: the successor's requirements, obligations, priorities or mandatory flags differ from the approved scope"
@@ -905,7 +916,12 @@ let milestoneAlignedSplit (source: string) : string list =
     let content (m: Json) = arr "requirements" m |> List.map (fun r -> str "id" r, serialize (JObj [ "o", (field "obligations" r |> Option.defaultValue (JArr [])); "p", JStr(strOpt "priority" r |> Option.defaultValue ""); "m", (field "mandatory" r |> Option.defaultValue JNull) ])) |> Map.ofList
     let committed = parseFile (Path.Combine(source, "docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json"))
     let planSha = Git.sha256Hex (File.ReadAllBytes(Path.Combine(source, planPath)))
-    [ match compileWithSplit sources (parseFile (Path.Combine(source, planPath))) planPath planSha with
+    // A historical Rehearsal 010 proposal: judged with the selector semantics it records (Legacy, v4.1.5).
+    let semantics = recordedSemantics committed
+    let compile = compileWith semantics
+    let compileWithSplit = compileWithSplitWith semantics
+    [ if semantics <> Legacy then yield sprintf "milestone-aligned split: the committed proposal selects %A selectors, not Legacy" semantics
+      match compileWithSplit sources (parseFile (Path.Combine(source, planPath))) planPath planSha with
       | Error ps -> yield sprintf "milestone-aligned split: refused: %A" (List.truncate 3 ps)
       | Ok m ->
           if content m <> content (compile sources) then yield "milestone-aligned split: requirements, obligations, priorities or mandatory flags differ from the approved scope"
@@ -1023,6 +1039,99 @@ let cf07Deferral (source: string) : string list =
       let verdict = Ledger.sliceVerdictJson (Ledger.deferredAssertions s deferredCase) deferredCase []
       if strs "deferredToRelease" verdict <> [ "J1-03" ] then yield "cf07: the slice verdict does not record the deferred assertion" ]
 
+/// `covers` judges every form of the frozen selector grammar (Model.matches) the execution DAG uses: T18 `prefix:PF-`,
+/// T20 `prefix:EXT-DATA-`, T23 `doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md`, T25 `origin:external`. Each form
+/// has a requirement it must cover and one it must not, both directly and through a compiled scope.
+let selectorGrammar () : string list =
+    let wdl = selectorSubject "WDL-013" "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md" "baseline"
+    let pf = selectorSubject "PF-001" "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md" "baseline"
+    let ext = selectorSubject "HISTORICAL-CASE-CATALOG§catalog-policy" "docs/HISTORICAL-CASE-CATALOG.md" "external"
+    let task (selector: string) = JObj [ "id", JStr "T"; "covers", jstrs [ selector ] ]
+    let cases =
+        [ "all", wdl, true
+          "id:WDL-013", wdl, true
+          "id:WDL-013", pf, false
+          "id:WDL-01", wdl, false
+          "prefix:PF-", pf, true
+          "prefix:PF-", wdl, false
+          "prefix:F-", pf, false
+          "regex:^WDL-0\\d+$", wdl, true
+          "regex:^WDL-0\\d+$", pf, false
+          "doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md", wdl, true
+          "doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md", pf, false
+          "doc:WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md", wdl, false
+          "origin:external", ext, true
+          "origin:external", wdl, false
+          "origin:baseline", wdl, true
+          "origin:baseline", ext, false
+          "WDL-013", wdl, true
+          "WDL-013", pf, false
+          "WDL", wdl, false ]
+    let direct =
+        [ for selector, r, expected in cases do
+              if covers (task selector) r <> expected then
+                  yield sprintf "selector grammar: '%s' %s %s" selector (if expected then "does not cover" else "covers") r.Id ]
+    // Through compile: plan requirements carry their document, gate-level ones take it from the baseline.
+    let planReq id doc = JObj [ "requirement", JStr id; "priority", JStr "P0"; "title", JStr id; "document", JStr doc; "dependencies", JObj [ "requirements", JArr []; "contracts", JArr [] ]; "obligations", JArr [ JObj [ "sourceObligation", JStr(id + "-O1") ] ] ]
+    let dagTask id (covers: string list) = JObj [ "id", JStr id; "title", JStr id; "owner", JStr "domain"; "covers", jstrs covers; "dependsOn", JArr [] ]
+    let s =
+        { sources with
+            Plan = JObj [ "requirements", JArr [ planReq "PF-001" "docs/PF.md"; planReq "EXT-DATA-001" "docs/EXT.md"; planReq "WDL-001" "docs/WDL.md"; planReq "R1.1" "docs/REQUIREMENTS.md"; planReq "Z-001" "docs/Z.md" ] ]
+            ExecutionPlan = JObj [ "suites", JArr [] ]
+            Dag =
+              JObj
+                  [ "tasks",
+                    JArr
+                        [ dagTask "T17" []
+                          dagTask "T18" [ "prefix:PF-" ]
+                          dagTask "T20" [ "prefix:EXT-DATA-" ]
+                          dagTask "T23" [ "doc:docs/WDL.md" ]
+                          dagTask "T25" [ "origin:external" ]
+                          dagTask "T26" [ "id:R1.1" ] ] ]
+            Baseline = JObj [ "requirements", JArr [ JObj [ "id", JStr "WDL-013"; "document", JStr "docs/WDL.md" ]; JObj [ "id", JStr "PF-099"; "document", JStr "docs/PF.md" ]; JObj [ "id", JStr "U-001"; "document", JStr "docs/U.md" ] ] ] }
+    let m = compile s
+    let itemsOf id = arr "requirements" m |> List.tryFind (fun r -> str "id" r = id) |> Option.map (strs "workItems") |> Option.defaultValue []
+    let gateOf wi = arr "workItems" m |> List.tryFind (fun w -> str "id" w = wi) |> Option.map (strs "gateRequirements") |> Option.defaultValue []
+    let compiled =
+        [ for id, expected in [ "PF-001", [ "T18" ]; "EXT-DATA-001", [ "T20" ]; "WDL-001", [ "T23" ]; "R1.1", [ "T26" ]; "Z-001", [ "WI-GEN-RECORDS" ] ] do
+              if itemsOf id <> expected then yield sprintf "selector grammar: compiled %s maps to %A, expected %A" id (itemsOf id) expected
+          for wi, expected in [ "T23", [ "WDL-013" ]; "T18", [ "PF-099" ]; "T20", []; "T25", []; "T26", [] ] do
+              if gateOf wi <> expected then yield sprintf "selector grammar: compiled %s has gate requirements %A, expected %A" wi (gateOf wi) expected
+          for gone in [ "WI-GEN-PF"; "WI-GEN-EXT-DATA"; "WI-GEN-WDL" ] do
+              if arr "workItems" m |> List.exists (fun w -> str "id" w = gone) then yield sprintf "selector grammar: %s is generated although a DAG task's selector covers its requirements" gone ]
+    direct @ compiled
+
+/// The full grammar (V2) is the default; Legacy is selected only by a recorded package version up to v4.1.5. Compiling
+/// the Rehearsal 010 sources without Legacy gives a different scope than the approved one, which preflight refuses,
+/// while `scope preflight` (selecting from the manifest) still passes the committed record.
+let selectorSemantics (source: string) : string list =
+    let versions =
+        [ "4.1.5", Legacy; "4.1.4", Legacy; "4.0.0", Legacy; "4.1", Legacy; "4.1.6", V2; "4.1.10", V2; "4.2", V2; "5", V2; "", V2; "4.1.x", V2; "v4.1.5", V2 ]
+    let pf = selectorSubject "PF-001" "docs/PF.md" "baseline"
+    let task (selector: string) = JObj [ "id", JStr "T"; "covers", jstrs [ selector ] ]
+    let legacyCases = [ "PF-001", true; "regex:^PF-0\\d+$", true; "PF", false; "prefix:PF-", false; "id:PF-001", false; "doc:docs/PF.md", false; "origin:baseline", false; "all", false ]
+    let fixedDigest = "6a0e23b0db2aa15cde7d2dff235e7cd09b133d0d3260beaa61a7195f8d70604c"
+    let s = ScopeCommands.sourcesOf source (scopePackage source)
+    let committed = parseFile (manifestPath source)
+    let byDefault = compile s
+    let itemIds (m: Json) = arr "workItems" m |> List.map (str "id") |> Set.ofList
+    [ for v, expected in versions do
+          if semanticsForPackageVersion v <> expected then yield sprintf "selector semantics: package version '%s' selects %A, expected %A" v (semanticsForPackageVersion v) expected
+      for selector, expected in legacyCases do
+          if coversWith Legacy (task selector) pf <> expected then yield sprintf "selector semantics: Legacy '%s' %s PF-001" selector (if expected then "does not cover" else "covers")
+      if recordedSemantics (JObj []) <> V2 then yield "selector semantics: a manifest recording no package version selects Legacy"
+      if semanticsOfSources s <> Legacy then yield "selector semantics: the v4.1.5 sources do not select Legacy for scope compile"
+      // The default is the fixed grammar: the Rehearsal 010 sources compile to a different, non-approved scope.
+      if str "scopeSha256" byDefault <> fixedDigest then yield sprintf "selector semantics: the default compile of the Rehearsal 010 sources gives %s, expected %s" (str "scopeSha256" byDefault) fixedDigest
+      if str "scopeSha256" byDefault = str "scopeSha256" committed then yield "selector semantics: the default compile reproduces the approved Legacy scope"
+      if (preflight byDefault committed).IsEmpty then yield "selector semantics: the approved Legacy scope passes preflight against the default compile"
+      for gone in [ "WI-GEN-PF"; "WI-GEN-UI"; "WI-GEN-EXT-DATA" ] do
+          if (itemIds byDefault).Contains gone then yield sprintf "selector semantics: the default compile still generates %s" gone
+          if not ((itemIds committed).Contains gone) then yield sprintf "selector semantics: the approved Legacy scope has no %s" gone
+      // The command layer selects from the manifest's record: the approved scope passes `scope preflight`.
+      let code = ScopeCommands.scopeCommand [ "preflight"; "--source"; source; "--package"; scopePackage source; "--manifest"; manifestPath source ]
+      if code <> 0 then yield sprintf "selector semantics: scope preflight of the approved Rehearsal 010 manifest exited %d" code ]
+
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source)
+    guard "adversarial" adversarial @ guard "selector grammar" selectorGrammar @ guard "selector semantics" (fun () -> selectorSemantics source) @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source)
