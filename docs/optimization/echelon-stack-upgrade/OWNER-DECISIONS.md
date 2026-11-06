@@ -38,6 +38,8 @@ Today, `analysis/forma-layout-contract.json` and `analysis/forma-0.12.0-inventor
 
 ## ODR-ESU-03: the generated CI installs the pinned SDK (Conditor HF-029)
 
+> **Applied, option A.** The owner instructed this in the session on 2026-11-06. It is applied in `docs/rehearsal-010-readiness/STARTUP-INSTRUCTIONS.md` §2 step 3: the bootstrap commit replaces `dotnet-version: "10.0.x"` with `global-json-file: global.json`. It is not written into any `approvals.causa.json` (agents never write approval records); `owner-freeze.fsx` is the owner's tool if a formal record is wanted.
+
 Conditor 0.10.20 still scaffolds `setup-dotnet dotnet-version: "10.0.x"`. The v4.1.5 bootstrap writes `global.json` 10.0.402 with `rollForward: disable`. R8 and R9 both lost CI runs to this.
 
 | Option | Effect |
@@ -47,6 +49,13 @@ Conditor 0.10.20 still scaffolds `setup-dotnet dotnet-version: "10.0.x"`. The v4
 | C | The v41 bootstrap rewrites the workflows. This is a compiler change, which changes the compiler tree digest that frozen packages record |
 
 ## ODR-ESU-04: adopt the version-drift preflight
+
+> **Applied, option A.** The owner instructed this in the session on 2026-11-06. It is applied in two places:
+>
+> - `preflight-tooling.yml`, job `fsharp-tooling`, runs `stack-drift.fsx test` against registry commits `5752402` and `7a2c27a`.
+> - STARTUP §2 step 3 requires `stack-drift.fsx check` to report READY before the bootstrap is pushed (so before the scope checkpoint), and commits the report as `evidence/t0/stack-drift.json`. Until ODR-ESU-01 is decided, the check uses the echelon-current 1.37.0 lock in this folder, the set the toolchain lock installs.
+>
+> In a dry run on the real Conditor 0.10.20 + v4.1.5 tree (`evidence/DP-10-t0-dry-run-after-esu03.json`), the check was NOT READY before the ODR-ESU-03 fix and READY after it, with 49 PASS.
 
 `tools/stack-drift/stack-drift.fsx` is added on this branch. It is not wired into any gate.
 
