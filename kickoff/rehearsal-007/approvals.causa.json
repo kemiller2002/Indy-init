@@ -1196,6 +1196,103 @@
           ]
         }
       ]
+    },
+    {
+      "id": "APR-COMP-OWNER-1",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "ODR-COMP-P01",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P02",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P03",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P04",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P05",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P06",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P07",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P08",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P09",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P10",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P11",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P12",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P13",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/v416-competition-decisions/TEST-DEPLOY-KEY.md",
+              "sha256": "5c9a94fe638f612c267d599ff826b7792d423582448ac593228f992d006652f6"
+            }
+          ],
+          "amendsRequirements": [
+            "EXT-DATA-004-O1",
+            "EXT-DATA-004-O3",
+            "EXT-DATA-002-O1",
+            "PF-015-O4",
+            "DF-CON-2026-A002 (bootstrap criterion)",
+            "DF-CON-2026-A002 (persistence authentication criterion)"
+          ],
+          "addsRequirements": [
+            "EXT-DATA-004-O5"
+          ]
+        },
+        {
+          "decision_id": "ODR-COMP-P14",
+          "action": "decide",
+          "option": "A"
+        }
+      ]
     }
   ]
 }
