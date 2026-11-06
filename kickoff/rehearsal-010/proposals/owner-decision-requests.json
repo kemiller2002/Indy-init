@@ -607,15 +607,15 @@
       "id": "ODR-R10-34",
       "kind": "decision",
       "title": "Competition gate: bound or remove the second browser install (L1)",
-      "question": "tools/r9/verification-gate.yml (governed; pinned in kickoff/rehearsal-010/observer-pins.json) installs browsers twice on ubuntu-latest. Its browser step (line 170) is bounded to 10 minutes, but the J1-J3 journeys run a second `npx playwright install --with-deps chromium webkit` inside the suites step (line 274), bounded only by the verify job's 40 minutes (line 49). On a stalled apt mirror (seen three times on 2026-11-05) that install can consume the whole gate budget before the gate fails. What should the gate do?",
+      "question": "tools/r9/verification-gate.yml (governed: tools/r9/governance.json names it, r9.fsx govern copies it and check-governance requires it byte-equal) installs browsers twice on ubuntu-latest. Its browser step (line 170) is bounded to 10 minutes, but the step \"Governed journeys J1-J3 and the design contract\" runs a second `npx playwright install --with-deps chromium webkit` (line 274) with no step limit, bounded only by the verify job's 40 minutes (line 49). On a stalled apt mirror, as Indy-init's own CI jobs saw three times on 2026-11-05, that install can consume the whole gate budget before the gate fails. What should the gate do?",
       "options": [
         "A: accept the exposure; record it in docs/ci-playwright-mitigation/FINAL-REPORT.md; no workflow change",
-        "B: move the journeys' npm install and browser install into their own step with timeout-minutes: 10 (dropping it instead only if verification/journeys pins the same Playwright version as the browser step); workflow edit through r9.fsx govern, observer-pins re-pin, proven on a rehearsal repository before T0",
-        "C: run the verify job in the digest-pinned Playwright image used by Indy-init's adversarial jobs (#150), removing both apt-based installs; workflow edit through r9.fsx govern, observer-pins re-pin, validated on a rehearsal repository before T0"
+        "B: move the journeys' npm install and browser install into their own step with timeout-minutes: 10 (dropping it instead only if verification/journeys and the candidate's root lock resolve the same Playwright version); a governed workflow edit through r9.fsx govern, proven on a rehearsal repository before T0",
+        "C: run the verify job in the digest-pinned Playwright image used by Indy-init's adversarial jobs (#150), removing both apt-based browser installs (a small apt step for tools such as git, jq and curl remains, and the gate's other tools must be provided); a governed workflow edit through r9.fsx govern, validated on a rehearsal repository before T0"
       ],
-      "recommendation": "B: it bounds the stall the same way #150 bounded Indy-init's runner installs, with the smallest change to a governed file. C removes the apt dependency entirely but changes the gate's whole runtime this close to Nov 7.",
+      "recommendation": "B: it bounds the stall the same way #150 bounded Indy-init's runner installs, with the smallest change to a governed file. C removes the browser installs' apt dependency but changes the gate's whole runtime this close to Nov 7.",
       "rationale": "The gate decides every competition merge; an unbounded install turns a mirror stall into a 40-minute red gate instead of a 10-minute named failure.",
-      "impact": "A: none. B and C: the governed gate changes, so check-governance, the observer pins and launch-preflight's observer checks must all agree on the new file; an agent applies the chosen option in a reviewed PR.",
+      "impact": "A: none. B and C: the governed gate changes under tools/, so launch-preflight LP-09 needs a fresh Preflight tooling run of the new tree before launch; an agent applies the chosen option in a reviewed PR.",
       "launchable": [
         "A",
         "B",
