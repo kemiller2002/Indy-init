@@ -31,7 +31,7 @@
   - approved (ODR-V414-03);
   - tagged;
   - added to the frozen guard.
-- [x] 5a. v4.1.5 (superseded v4.1.4 for Rehearsal 010), done on 2026-11-06:
+- [ ] 5a. v4.1.5 (superseded v4.1.4 for Rehearsal 010), done on 2026-11-06:
   - decided (APR-V415-OWNER-1, -2) and approved (APR-V415-OWNER-3);
   - tagged `indy-init-requirements-v4.1.5` on b2b3022;
   - added to the frozen guard (#153);
