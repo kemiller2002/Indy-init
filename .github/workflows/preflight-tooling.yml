@@ -1,4 +1,9 @@
 name: Preflight tooling
+# Playwright browsers (docs/ci-playwright-mitigation/FINAL-REPORT.md): the adversarial jobs run in Microsoft's
+# mcr.microsoft.com/playwright:v1.63.0-noble image, which carries Chromium, WebKit and their OS libraries, so they install
+# no browser (on 2026-11-05 `playwright install --with-deps` on the runner used the whole 45-minute budget three times
+# before any case ran). The other browser steps install on the runner with a step time limit: a stall fails that step,
+# named, rather than consuming the job; there is no in-script kill or retry (killing apt mid-install is not safe).
 # Directive workstream C: a PR commit ran this workflow twice (push and pull_request events, same commit, every job),
 # doubling runner load while three sessions had PRs open. Push now runs only on main; PRs run on pull_request (the
 # merge result), and a newer commit on the same PR cancels the older run (its checks are on the old commit, so the new
@@ -97,6 +102,8 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
+      - name: CTP-001 readiness check holds its cases and its EXP-INDY-002 replay (docs/execution/contract-triggered-parallel)
+        run: dotnet fsi tools/execution/ctp-check.fsx -- test --indy-init .
       - name: Build the F# requirements compiler and its tests
         run: dotnet build tools/requirements-compiler/tests -c Release
       - name: Check out the five Rehearsal 7 evidence files the v4 lesson analysis quotes (evidence only, never a build input)
@@ -267,6 +274,10 @@ jobs:
           dotnet build "$RUNNER_TEMP/layered415/Causa.slnx" -c Release
           dotnet build "$RUNNER_TEMP/layered415/App.slnx" -c Release
       - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
+        # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget. No retry, so a
+        # cancelled apt leaves no lock behind for a second attempt (the problem 8d58246 removed); nothing is skipped. Trade-off: on a very
+        # slow mirror this can turn a slow green run red. This step (install plus the layout run) took 803 s on run 42138265759, so 25.
+        timeout-minutes: 25
         run: |
           mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
           tar -xzf "$RUNNER_TEMP/forma.tgz" -C "$RUNNER_TEMP/forma"
@@ -381,6 +392,10 @@ jobs:
         with:
           global-json-file: global.json
       - name: Fixture trees (with and without the webkit project)
+        # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget. No retry, so a
+        # cancelled apt leaves no lock behind for a second attempt (the problem 8d58246 removed); nothing is skipped. Trade-off: on a very
+        # slow mirror (slowest measured success 664 s) this can turn a slow green run red; 15 minutes leaves that margin.
+        timeout-minutes: 15
         run: |
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx"
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx-nowebkit" --without-webkit true
@@ -411,12 +426,28 @@ jobs:
   # every shard succeeded, and proves the shards' union is the whole case list before its own steps run.
   r10-adversarial-cases:
     runs-on: ubuntu-latest
+    # Browsers and their OS libraries come preinstalled in Playwright's image (the tag must equal @playwright/test).
+    # Installing them per run with `playwright install --with-deps` pulled ~100 apt packages from the runner mirror and,
+    # on a slow mirror, used the whole 45-minute budget before any case ran (PR #140, runs 42115761982 and 42122833553).
+    container:
+      # Pinned by digest (the index digest docker pulled in run 42134469740), so the image cannot change under the tag.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+    defaults:
+      run:
+        shell: bash -e {0}   # what these steps ran with on the runner; a container defaults to sh
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         shard: [0, 1, 2]
     steps:
+      - name: Tools the image does not carry (git, jq, curl, ICU for .NET)
+        timeout-minutes: 6
+        run: |
+          # Bounded and labelled: an unreachable apt mirror fails here, by name, before any case runs (never as a pass).
+          timeout -k 15 300 sh -c 'apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null' \
+            || { echo "::error::phase=container-tools: apt could not install git, jq, curl and ICU within 5 minutes; no case ran"; exit 1; }
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
@@ -434,7 +465,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
-          npx playwright install --with-deps chromium webkit
+          # Chromium and WebKit are already in the container image (no per-run download or apt install).
           npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
           mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
@@ -453,8 +484,24 @@ jobs:
     needs: r10-adversarial-cases
     if: always()
     runs-on: ubuntu-latest
+    # Browsers and their OS libraries come preinstalled in Playwright's image (the tag must equal @playwright/test).
+    # Installing them per run with `playwright install --with-deps` pulled ~100 apt packages from the runner mirror and,
+    # on a slow mirror, used the whole 45-minute budget before any case ran (PR #140, runs 42115761982 and 42122833553).
+    container:
+      # Pinned by digest (the index digest docker pulled in run 42134469740), so the image cannot change under the tag.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+    defaults:
+      run:
+        shell: bash -e {0}   # what these steps ran with on the runner; a container defaults to sh
     timeout-minutes: 45
     steps:
+      - name: Tools the image does not carry (git, jq, curl, ICU for .NET)
+        timeout-minutes: 6
+        run: |
+          # Bounded and labelled: an unreachable apt mirror fails here, by name, before any case runs (never as a pass).
+          timeout -k 15 300 sh -c 'apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null' \
+            || { echo "::error::phase=container-tools: apt could not install git, jq, curl and ICU within 5 minutes; no case ran"; exit 1; }
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Every adversarial shard succeeded
         run: |
           test "${{ needs.r10-adversarial-cases.result }}" = success || { echo "::error::adversarial shards: ${{ needs.r10-adversarial-cases.result }}"; exit 1; }
@@ -492,7 +539,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
-          npx playwright install --with-deps chromium webkit
+          # Chromium and WebKit are already in the container image (no per-run download or apt install).
           npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
           mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
@@ -542,12 +589,14 @@ jobs:
             diff <(jq -S . "$RUNNER_TEMP/slices.$v.json") <(jq -S . $P/slice-execution-manifest.$v.json) || { echo "::error::$P/slice-execution-manifest.$v.json is stale or edited"; exit 1; }
             diff <(jq -S . "$RUNNER_TEMP/inventory.$v.json") <(jq -S . $P/praxis-work-inventory.$v.json) || { echo "::error::$P/praxis-work-inventory.$v.json is stale or edited"; exit 1; }
           done
+      - name: Gather the evidence under one folder (the artifact keeps the same three top-level folders)
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/r10-evidence"
+          for d in adv-evidence replay-evidence launch-evidence; do [ -d "$RUNNER_TEMP/$d" ] && cp -r "$RUNNER_TEMP/$d" "$RUNNER_TEMP/r10-evidence/"; done; true
       - name: Publish
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: r10-adversarial
-          path: |
-            ${{ runner.temp }}/adv-evidence
-            ${{ runner.temp }}/replay-evidence
-            ${{ runner.temp }}/launch-evidence
+          path: ${{ runner.temp }}/r10-evidence

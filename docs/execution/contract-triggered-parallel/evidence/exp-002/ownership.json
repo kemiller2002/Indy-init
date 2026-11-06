@@ -1,0 +1,5 @@
+{"source":"EXP-INDY-002 PLAN.md 'Execution model', transcribed literally (commit 5151cdf); files PLAN assigns to no one are left unowned",
+ "owners":{
+ "coordinator":["src/Exp002.Contracts/Contracts.fs","tools/contract-check.fsx","tools/lifecycle.fsx"],
+ "domain":["src/Exp002.Engine/**","tests/Exp002.Tests/**"],
+ "ui":["src/Exp002.Ui/**","src/Exp002.Wasm/**","web/**","build.fsx","serve.fsx","tools/ui-binding-check.fsx","tests/Exp002.Ui.Tests/**"]}}

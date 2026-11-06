@@ -1,0 +1,28 @@
+UNVERIFIED limen              release manifest in echelon-registry                       expected releases/limen/0.9.1.release.json 54f088e76880308b2db1f7d447ad946d95d1a7f384893f0da2ae63937f6a1655; actual no registry checkout supplied
+           -> pass --registry <echelon-registry checkout at the lock's registryCommit>
+UNVERIFIED limen-fsharp       release manifest in echelon-registry                       expected releases/limen-fsharp/0.9.0.release.json d8aec120fdaff6bb2a9dcd6e4d79b8a92d69f8cc0227de1c6b7166c6c3b8ce3a; actual no registry checkout supplied
+           -> pass --registry <echelon-registry checkout at the lock's registryCommit>
+UNVERIFIED forma              release manifest in echelon-registry                       expected releases/forma/0.13.0.release.json cc096c903785434ac4f664e709819a2599765c16b66ebd9825db87930b0fc2d5; actual no registry checkout supplied
+           -> pass --registry <echelon-registry checkout at the lock's registryCommit>
+UNVERIFIED folio              release manifest in echelon-registry                       expected releases/folio/0.4.1.release.json d453d980ce7f81e3c5bd227e34bd8d287417ea79ca09aa97ae9fdc56a28c6880; actual no registry checkout supplied
+           -> pass --registry <echelon-registry checkout at the lock's registryCommit>
+UNVERIFIED praxis             release manifest in echelon-registry                       expected releases/praxis/3.25.0.release.json b42b9cf7cf2b3a436f7419c03fccc32d123abe0594839889fe8b6372cfb46a41; actual no registry checkout supplied
+           -> pass --registry <echelon-registry checkout at the lock's registryCommit>
+UNVERIFIED dokimos            release manifest in echelon-registry                       expected releases/dokimos/0.11.1.release.json c5bf0df99823aaf1f3d2fc0f11f56cc92f266952df4733e32f18719a56f9b285; actual no registry checkout supplied
+           -> pass --registry <echelon-registry checkout at the lock's registryCommit>
+UNVERIFIED ordo               release manifest in echelon-registry                       expected releases/ordo/1.20.0.release.json ac58cf8b42542ad3ad3cb3d5e9e95abaf660e3dcef5b84f85a6b52b7255563c0; actual no registry checkout supplied
+           -> pass --registry <echelon-registry checkout at the lock's registryCommit>
+UNVERIFIED percepta-semantic  release manifest in echelon-registry                       expected releases/percepta-semantic/0.4.0.release.json 07e4e640816e480b456ad3ce6e3562cc7aae8717a75db5683a2addcac02b1ee8; actual no registry checkout supplied
+           -> pass --registry <echelon-registry checkout at the lock's registryCommit>
+UNVERIFIED percepta           release manifest in echelon-registry                       expected releases/percepta/0.1.0.release.json 07b6291c63ff25e6b669edb8c845e48ba76831b6a6133efa4ad3a390439b1b2b; actual no registry checkout supplied
+           -> pass --registry <echelon-registry checkout at the lock's registryCommit>
+UNVERIFIED aegis              release manifest in echelon-registry                       expected releases/aegis/1.0.0.release.json 4530cfa3396c1e57d3e1a6500c661cd2d520236e852d1d9e88aa44c385d0bd6b; actual no registry checkout supplied
+           -> pass --registry <echelon-registry checkout at the lock's registryCommit>
+PASS       dotnet-sdk         global.json                                                expected 10.0.402; actual 10.0.402
+PASS       dotnet-sdk         installed SDK (dotnet --version)                           expected 10.0.402; actual 10.0.402
+PASS       praxis             installed praxis                                           expected 3.25.0; actual 3.25.0
+PASS       dokimos            installed dokimos                                          expected 0.11.1; actual 0.11.1
+PASS       ordo               installed ordo                                             expected 1.20.0; actual 1.20.0
+PASS       percepta-semantic  installed percepta                                         expected 0.4.0; actual 0.4.0
+PASS       percepta           installed percepta-repo                                    expected 0.1.0; actual 0.1.0
+stack-drift: PASS 7, DRIFT 0, BLOCKED 0, UNVERIFIED 10; NOT READY (a required system is not PASS)

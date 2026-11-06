@@ -82,6 +82,22 @@
         "proposals/r10-contract-first-ui/v415-fold/07-IF41-VIEW.folded.fs"
       ],
       "evidence": "v4.1.5 session report (19:45 UTC) on the fold; PR #134"
+    },
+    {
+      "id": "DTD-R10-007",
+      "class": "dev-workflow-update",
+      "decision": "Adopt CTP-001 section 1 (docs/execution/contract-triggered-parallel/ADOPTION-DECISIONS.md) for preparation work and rehearsals on Indy-init: the contract lifecycle with immutable versions and change requests, contract completeness per CONTRACT-SCHEMA.json, single-writer ownership with an independent verifier, event-driven integration with an independent browser test at every integration, real-provider evidence for durable persistence, push once per candidate, and never merging past a red check. tools/execution/ctp-check.fsx is advisory. This does not make CTP-001 the competition execution method, a required gate, or change any frozen package; those remain the owner's decisions listed in section 2 of that file.",
+      "rationale": "The owner's directive covers updating preparation scripts, development workflows and non-security governance procedures. CTP-001 was independently reviewed in three rounds (final PASS) and merged as PR #145.",
+      "actingAgent": {
+        "kind": "agent",
+        "session": "session_01G1iECgS2MYoyqvc2eXNdhV",
+        "role": "lead/integration"
+      },
+      "decidedAt": "2026-11-05T23:45:00Z",
+      "paths": [
+        "docs/execution/contract-triggered-parallel/ADOPTION-DECISIONS.md"
+      ],
+      "evidence": "PR #145 (merge 24f8530)"
     }
   ]
 }

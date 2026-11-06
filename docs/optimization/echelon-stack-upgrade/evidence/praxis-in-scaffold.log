@@ -1,0 +1,19 @@
+$ praxis verify --strict
+verification passed: @echelon-foundry/repository-operating-system@3.25.0
+exit=0
+$ praxis status
+{
+  "repository": "scaffold",
+  "protocolVersion": "1.0.0",
+  "validation": "failed",
+  "findingCount": 202,
+  "workItems": [
+    {
+      "id": "ROS-INSTALL-3-25-0",
+      "type": "mechanical",
+      "state": "complete",
+      "semanticState": "complete",
+      "allowedActions": [],
+      "telemetryExecutionIds": []
+    }
+  ],

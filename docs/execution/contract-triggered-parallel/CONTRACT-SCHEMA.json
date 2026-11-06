@@ -1,0 +1,481 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "indy-init.ctp-registry/1",
+  "title": "CTP-001 contract registry",
+  "description": "The format of a CTP-001 contract registry, lifecycle row and integration record. tools/execution/ctp-check.fsx enforces it (registry, lifecycle and integration modes). It is documented here as JSON Schema for readers; the checker does not depend on a schema library.",
+  "type": "object",
+  "required": [
+    "schema",
+    "contracts"
+  ],
+  "properties": {
+    "schema": {
+      "const": "indy-init.ctp-registry/1"
+    },
+    "catalog": {
+      "type": "string",
+      "description": "the frozen requirement catalog the IDs come from"
+    },
+    "fsharpContract": {
+      "type": "string",
+      "description": "path of the F# contract file(s) the hash covers"
+    },
+    "contracts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/contract"
+      }
+    }
+  },
+  "$defs": {
+    "contract": {
+      "type": "object",
+      "required": [
+        "id",
+        "requirements",
+        "kind",
+        "group",
+        "persistence",
+        "tests"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9]*-[0-9]+$",
+          "description": "stable field/contract ID, never derived from an F# name (CV-23)"
+        },
+        "requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "kind": {
+          "enum": [
+            "field",
+            "action",
+            "display",
+            "validation-rule",
+            "workflow-outcome"
+          ]
+        },
+        "group": {
+          "type": "string",
+          "description": "release group CG-*"
+        },
+        "screen": {
+          "type": "string"
+        },
+        "component": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string",
+          "description": "accessible name (required for field and display)"
+        },
+        "command": {
+          "type": "string"
+        },
+        "fsharp": {
+          "type": "object",
+          "properties": {
+            "record": {
+              "type": "string"
+            },
+            "property": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "input": {
+              "type": "string"
+            },
+            "output": {
+              "type": "string"
+            },
+            "function": {
+              "type": "string"
+            }
+          },
+          "description": "field: record, property, type. command action: input, output. display/validation-rule: type."
+        },
+        "controls": {
+          "type": "array",
+          "description": "one entry per UI action this contract exposes, each with its own accessible name (EXP-002 CR-1); names are distinct within a contract (case-insensitive)",
+          "items": {
+            "type": "object",
+            "required": [
+              "uiAction",
+              "accessibleName"
+            ],
+            "properties": {
+              "uiAction": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "accessibleName": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "fields": {
+          "type": "array",
+          "description": "nested inputs; each needs a label, component and F# type (EXP-002 CR-2)",
+          "items": {
+            "type": "object",
+            "required": [
+              "record",
+              "property",
+              "type",
+              "label",
+              "component"
+            ],
+            "properties": {
+              "record": {
+                "type": "string"
+              },
+              "property": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "component": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "options": {
+          "type": "array",
+          "description": "display labels for every value a 'one of …' validation rule names (EXP-002 CR-2)",
+          "items": {
+            "type": "object",
+            "required": [
+              "value",
+              "label"
+            ],
+            "properties": {
+              "value": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "validation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "rule",
+              "error"
+            ],
+            "properties": {
+              "rule": {
+                "type": "string"
+              },
+              "error": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "transitions": {
+          "type": "array",
+          "description": "structured state transitions; each names what the target state carries and its tests (EXP-002 CR-3, D-3)",
+          "items": {
+            "type": "object",
+            "required": [
+              "from",
+              "event",
+              "to",
+              "carries",
+              "tests"
+            ],
+            "properties": {
+              "from": {
+                "type": "string"
+              },
+              "event": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "carries": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "what the target state holds; [\"nothing\"] when it holds nothing (EXP-002 CR-3)"
+              },
+              "tests": {
+                "type": "array",
+                "description": "at least one UT-/UI- id and one AT- id",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "persistence": {
+          "enum": [
+            "none",
+            "local",
+            "durable-github"
+          ]
+        },
+        "realProviderEvidence": {
+          "type": "boolean",
+          "description": "required true when persistence is durable-github"
+        },
+        "tests": {
+          "type": "object",
+          "properties": {
+            "unit": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "ui": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "acceptance": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "independent acceptance obligations (required for field, action, workflow-outcome)"
+            }
+          }
+        }
+      }
+    },
+    "lifecycleRow": {
+      "type": "object",
+      "required": [
+        "t",
+        "group",
+        "version",
+        "status",
+        "hash",
+        "actor"
+      ],
+      "properties": {
+        "t": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "group": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "enum": [
+            "DEFINED",
+            "VALIDATED",
+            "RELEASED",
+            "IMPLEMENTING",
+            "STAGED",
+            "INTEGRATION_READY",
+            "VERIFIED",
+            "BLOCKED"
+          ]
+        },
+        "hash": {
+          "type": "string",
+          "description": "SHA-256 over the F# contract and the group's registry entries"
+        },
+        "actor": {
+          "enum": [
+            "coordinator",
+            "integration",
+            "domain",
+            "persistence",
+            "ui",
+            "ui-2",
+            "ui-3",
+            "verification",
+            "reviewer"
+          ],
+          "description": "DEFINED/VALIDATED/RELEASED: coordinator or integration; IMPLEMENTING/STAGED/BLOCKED: domain, persistence, ui, ui-2, ui-3; INTEGRATION_READY/VERIFIED: integration. verification/reviewer write tests, not lifecycle states."
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "changeRequest": {
+          "type": "string",
+          "pattern": "^CR-[0-9]+$",
+          "description": "required on DEFINED for version > 1"
+        },
+        "evidence": {
+          "type": "object",
+          "description": "required on VERIFIED",
+          "properties": {
+            "candidateSha": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{7,40}$"
+            },
+            "ciRun": {
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            },
+            "acceptanceRun": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "note": {
+          "type": "string"
+        },
+        "sides": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "domain",
+              "ui"
+            ]
+          },
+          "description": "on DEFINED: which sides implement the group (default both)"
+        }
+      },
+      "description": "hash is required except on BLOCKED annotations; t never decreases within a group"
+    },
+    "integrationRecord": {
+      "type": "object",
+      "required": [
+        "integrations"
+      ],
+      "properties": {
+        "integrations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "groups",
+              "acceptance",
+              "persistence"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "group",
+                    "version",
+                    "hash"
+                  ]
+                },
+                "minItems": 1
+              },
+              "acceptance": {
+                "type": "object",
+                "required": [
+                  "runRef",
+                  "author",
+                  "implementers",
+                  "passed",
+                  "total"
+                ],
+                "properties": {
+                  "runRef": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "author": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "implementers": {
+                    "type": "array",
+                    "minItems": 1
+                  },
+                  "passed": {
+                    "type": "integer"
+                  },
+                  "total": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "description": "passed must equal total; the author (case-insensitive) is not an implementer"
+              },
+              "defects": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "class",
+                    "owner"
+                  ]
+                }
+              },
+              "persistence": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "enum": [
+                      "none",
+                      "local",
+                      "durable-github"
+                    ]
+                  },
+                  "realProvider": {
+                    "type": "object",
+                    "properties": {
+                      "runRef": {
+                        "type": "string"
+                      },
+                      "readBack": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              }
+            }
+          },
+          "minItems": 1
+        }
+      }
+    }
+  }
+}

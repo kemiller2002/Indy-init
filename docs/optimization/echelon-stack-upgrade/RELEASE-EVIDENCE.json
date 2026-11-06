@@ -1,0 +1,434 @@
+{
+ "schema": "indy-init.echelon-release-evidence/1",
+ "description": "Authoritative release and artifact references for the proposed Echelon stack (echelon-current 1.37.0 plus Conditor 0.10.20 and .NET SDK 10.0.402). Every digest marked observed was computed in this session from a file downloaded from the stated distribution. Dates come from the stated source; where only a git tag commit date was reachable, it is labelled so.",
+ "observedAt": "2026-11-05",
+ "registry": {
+  "repository": "kemiller2002/echelon-registry",
+  "commit": "575240233d1fc32b57cfa827ea1031b68609fc58",
+  "set": "sets/echelon-current/1.37.0.json",
+  "setSha256": "bc7d163d7ff4bda0eeafe741b3bc0aedf93427526184fe347862ac69f9abe22f",
+  "status": "approved"
+ },
+ "systems": [
+  {
+   "system": "limen",
+   "version": "0.9.1",
+   "classification": "runtime",
+   "required": true,
+   "repository": "kemiller2002/limen",
+   "tag": "v0.9.1",
+   "commit": "743cdb9be8971c0a3a250906a6e2e112170dfae0",
+   "releaseStage": "stable",
+   "distributionClass": "web-package",
+   "distributions": [
+    {
+     "mechanism": "npm",
+     "package": "@echelon-foundry/limen",
+     "url": "https://registry.npmjs.org/@echelon-foundry/limen/-/limen-0.9.1.tgz"
+    }
+   ],
+   "releaseManifest": {
+    "path": "releases/limen/0.9.1.release.json",
+    "sha256": "54f088e76880308b2db1f7d447ad946d95d1a7f384893f0da2ae63937f6a1655",
+    "registryCommit": "575240233d1fc32b57cfa827ea1031b68609fc58"
+   },
+   "published": "2026-10-28T12:36:44Z",
+   "publishedSource": "npm publish time",
+   "latestStable": "v0.9.1 (highest tag; npm latest 0.9.1)",
+   "artifacts": [
+    {
+     "name": "echelon-foundry-limen-0.9.1.tgz",
+     "sha256": "a7dd300577a145ff56bfa2d8ebae21e864c00b1409e701ebb3704cc367d4ddc8",
+     "observed": "downloaded 2026-11-05 and hashed: a7dd300577a145ff56bfa2d8ebae21e864c00b1409e701ebb3704cc367d4ddc8"
+    }
+   ]
+  },
+  {
+   "system": "limen-fsharp",
+   "version": "0.9.0",
+   "classification": "runtime",
+   "required": true,
+   "repository": "kemiller2002/limen",
+   "tag": "v0.9.0",
+   "commit": "96eb75fb5c5aeea41f59e7476d76e143dc35a759",
+   "releaseStage": "stable",
+   "distributionClass": "nuget-library",
+   "distributions": [
+    {
+     "mechanism": "github-release",
+     "url": "https://github.com/kemiller2002/limen/releases/tag/v0.9.0"
+    }
+   ],
+   "releaseManifest": {
+    "path": "releases/limen-fsharp/0.9.0.release.json",
+    "sha256": "d8aec120fdaff6bb2a9dcd6e4d79b8a92d69f8cc0227de1c6b7166c6c3b8ce3a",
+    "registryCommit": "575240233d1fc32b57cfa827ea1031b68609fc58"
+   },
+   "published": "2026-10-08T21:03:05Z",
+   "publishedSource": "tag commit date (git)",
+   "latestStable": "v0.9.0 (newest limen-fsharp release manifest in the registry; v0.9.1 is the npm package only)",
+   "artifacts": [
+    {
+     "name": "EchelonFoundry.Limen.Contract.0.9.0.nupkg",
+     "sha256": "1db1ec2c19f45331b31fc0d13a876259e12efa4de7509f6ee4939567984c2817",
+     "observed": "downloaded 2026-11-05 and hashed: 1db1ec2c19f45331b31fc0d13a876259e12efa4de7509f6ee4939567984c2817"
+    }
+   ]
+  },
+  {
+   "system": "forma",
+   "version": "0.13.0",
+   "classification": "runtime",
+   "required": true,
+   "repository": "kemiller2002/forma",
+   "tag": "v0.13.0",
+   "commit": "2fcd10739189a0eef03f74ea306b3761d3dffbe0",
+   "releaseStage": "stable",
+   "distributionClass": "web-package",
+   "distributions": [
+    {
+     "mechanism": "github-release",
+     "package": "@echelon-foundry/design-system",
+     "url": "https://github.com/kemiller2002/forma/releases/tag/v0.13.0"
+    }
+   ],
+   "releaseManifest": {
+    "path": "releases/forma/0.13.0.release.json",
+    "sha256": "cc096c903785434ac4f664e709819a2599765c16b66ebd9825db87930b0fc2d5",
+    "registryCommit": "575240233d1fc32b57cfa827ea1031b68609fc58"
+   },
+   "published": "2026-10-30T10:57:03Z",
+   "publishedSource": "npm publish time",
+   "latestStable": "v0.13.0 (highest tag; npm latest 0.13.0; main carries an unreleased 0.13.1 candidate)",
+   "artifacts": [
+    {
+     "name": "echelon-foundry-design-system-0.13.0.tgz",
+     "sha256": "2f9ceeb6ea99a54f6cf4ffa03e3a69fd609dd60a89ddbd99680811cca2d43725",
+     "observed": "downloaded 2026-11-05 and hashed: 2f9ceeb6ea99a54f6cf4ffa03e3a69fd609dd60a89ddbd99680811cca2d43725"
+    }
+   ]
+  },
+  {
+   "system": "folio",
+   "version": "0.4.1",
+   "classification": "runtime",
+   "required": true,
+   "repository": "kemiller2002/folio",
+   "tag": "v0.4.1",
+   "commit": "a94cea73dd4b4c5409fb0d4399ba65f7dbc51f5e",
+   "releaseStage": "stable",
+   "distributionClass": "web-package",
+   "distributions": [
+    {
+     "mechanism": "github-release",
+     "package": "@echelon-foundry/print-components",
+     "url": "https://github.com/kemiller2002/folio/releases/tag/v0.4.1"
+    }
+   ],
+   "releaseManifest": {
+    "path": "releases/folio/0.4.1.release.json",
+    "sha256": "d453d980ce7f81e3c5bd227e34bd8d287417ea79ca09aa97ae9fdc56a28c6880",
+    "registryCommit": "575240233d1fc32b57cfa827ea1031b68609fc58"
+   },
+   "published": "2026-10-13T20:51:00Z",
+   "publishedSource": "tag commit date (git)",
+   "latestStable": "v0.4.1 (highest tag)",
+   "artifacts": [
+    {
+     "name": "echelon-foundry-print-components-0.4.1.tgz",
+     "sha256": "57c6a0eccad41e6acef7c0b91a6e072276b0ebaddda27fbb3b36abd956aeea1b",
+     "observed": "downloaded 2026-11-05 and hashed: 57c6a0eccad41e6acef7c0b91a6e072276b0ebaddda27fbb3b36abd956aeea1b"
+    }
+   ]
+  },
+  {
+   "system": "praxis",
+   "version": "3.25.0",
+   "classification": "development-tool",
+   "required": true,
+   "repository": "kemiller2002/praxis",
+   "tag": "v3.25.0",
+   "commit": "12bf9951253fc15e6973c2d3f5b88076f4556245",
+   "releaseStage": "stable",
+   "distributionClass": "self-contained-native-cli",
+   "distributions": [
+    {
+     "mechanism": "github-release",
+     "url": "https://github.com/kemiller2002/praxis/releases/tag/v3.25.0"
+    }
+   ],
+   "releaseManifest": {
+    "path": "releases/praxis/3.25.0.release.json",
+    "sha256": "b42b9cf7cf2b3a436f7419c03fccc32d123abe0594839889fe8b6372cfb46a41",
+    "registryCommit": "575240233d1fc32b57cfa827ea1031b68609fc58"
+   },
+   "published": "2026-11-03T19:22:41Z",
+   "publishedSource": "tag commit date (git)",
+   "latestStable": "v3.25.0 (git ls-remote: highest tag)",
+   "artifacts": [
+    {
+     "name": "praxis-linux-x64.tar.gz",
+     "platform": "linux-x64",
+     "sha256": "98e2ecaccac3f0502d755569bf2dddef852947b43a7989c570fcfff25f82d0c8",
+     "observed": "installed by Conditor 0.10.20 workstation apply; cached archive hashed equal"
+    }
+   ],
+   "installedReports": "praxis 3.25.0"
+  },
+  {
+   "system": "dokimos",
+   "version": "0.11.1",
+   "classification": "verification-tool",
+   "required": true,
+   "repository": "kemiller2002/dokimos",
+   "tag": "dokimos-v0.11.1",
+   "commit": "fecbe0c51dda4d87a78e43a034c38c00e6045c7b",
+   "releaseStage": "stable",
+   "distributionClass": "self-contained-native-cli",
+   "distributions": [
+    {
+     "mechanism": "github-release",
+     "package": null,
+     "url": "https://github.com/kemiller2002/dokimos/releases/tag/dokimos-v0.11.1"
+    }
+   ],
+   "releaseManifest": {
+    "path": "releases/dokimos/0.11.1.release.json",
+    "sha256": "c5bf0df99823aaf1f3d2fc0f11f56cc92f266952df4733e32f18719a56f9b285",
+    "registryCommit": "575240233d1fc32b57cfa827ea1031b68609fc58"
+   },
+   "published": "2026-11-04T21:53:54Z",
+   "publishedSource": "GitHub release published_at",
+   "latestStable": "dokimos-v0.11.1 (GitHub releases/latest)",
+   "artifacts": [
+    {
+     "name": "EchelonFoundry.Dokimos.Cli.0.11.1.nupkg",
+     "sha256": "bbc9ce6d70347923807a4e5a51ff738ba2e6be81905ab036975be8eab6becb71",
+     "observed": "downloaded 2026-11-05 and hashed: bbc9ce6d70347923807a4e5a51ff738ba2e6be81905ab036975be8eab6becb71"
+    },
+    {
+     "name": "dokimos-linux-x64.tar.gz",
+     "platform": "linux-x64",
+     "sha256": "31578ce40622823c323cd2d9699aebd08c98503c59122d61b4bc98e6f06dc337",
+     "observed": "installed by Conditor 0.10.20 workstation apply; cached archive hashed equal"
+    }
+   ],
+   "installedReports": "ReleaseVersion 0.11.1, SourceCommit fecbe0c51dda4d87a78e43a034c38c00e6045c7b"
+  },
+  {
+   "system": "ordo",
+   "version": "1.20.0",
+   "classification": "development-tool",
+   "required": true,
+   "repository": "kemiller2002/ordo",
+   "tag": "v1.20.0",
+   "commit": "05933dfa442a5d8a998bc09c1941588f9bdf12a6",
+   "releaseStage": "stable",
+   "distributionClass": "self-contained-native-cli",
+   "distributions": [
+    {
+     "mechanism": "github-release",
+     "url": "https://github.com/kemiller2002/ordo/releases/tag/v1.20.0"
+    }
+   ],
+   "releaseManifest": {
+    "path": "releases/ordo/1.20.0.release.json",
+    "sha256": "ac58cf8b42542ad3ad3cb3d5e9e95abaf660e3dcef5b84f85a6b52b7255563c0",
+    "registryCommit": "575240233d1fc32b57cfa827ea1031b68609fc58"
+   },
+   "published": "2026-11-02T13:51:37Z",
+   "publishedSource": "GitHub release published_at",
+   "latestStable": "v1.20.0 (GitHub releases/latest)",
+   "artifacts": [
+    {
+     "name": "ordo-construction.nupkg",
+     "sha256": "bb17b2da3d006a9bd4e3275a8b1660102090a758891d4babc6ffbab8d64a805f",
+     "observed": "downloaded 2026-11-05 and hashed: bb17b2da3d006a9bd4e3275a8b1660102090a758891d4babc6ffbab8d64a805f"
+    },
+    {
+     "name": "ordo-linux-x64.tar.gz",
+     "platform": "linux-x64",
+     "sha256": "c5851a5bead4145d6bb5bb56bfab67927c9db06c84960136f677bc94fc84e3cf",
+     "observed": "installed by Conditor 0.10.20 workstation apply; cached archive hashed equal"
+    }
+   ],
+   "installedReports": "1.20.0"
+  },
+  {
+   "system": "percepta-semantic",
+   "version": "0.4.0",
+   "classification": "verification-tool",
+   "required": true,
+   "repository": "kemiller2002/percepta",
+   "tag": "percepta-semantic-v0.4.0",
+   "commit": "4a53688238f205fdde474cc340378a89ddea0c09",
+   "releaseStage": "stable",
+   "distributionClass": "self-contained-native-cli",
+   "distributions": [
+    {
+     "mechanism": "github-release",
+     "package": null,
+     "url": "https://github.com/kemiller2002/percepta/releases/tag/percepta-semantic-v0.4.0"
+    }
+   ],
+   "releaseManifest": {
+    "path": "releases/percepta-semantic/0.4.0.release.json",
+    "sha256": "07e4e640816e480b456ad3ce6e3562cc7aae8717a75db5683a2addcac02b1ee8",
+    "registryCommit": "575240233d1fc32b57cfa827ea1031b68609fc58"
+   },
+   "published": "2026-11-02T20:35:42Z",
+   "publishedSource": "tag commit date (git)",
+   "latestStable": "percepta-semantic-v0.4.0 (highest tag)",
+   "artifacts": [
+    {
+     "name": "percepta-semantic-0.4.0-linux-x64.tar.gz",
+     "platform": "linux-x64",
+     "sha256": "6c498b170818bbeeb0eae22da236007440d806c645e9e7a0acc1c0e0bcb67a34",
+     "observed": "installed by Conditor 0.10.20 workstation apply; cached archive hashed equal"
+    }
+   ],
+   "installedReports": "percepta 0.4.0+4a53688238f205fdde474cc340378a89ddea0c09"
+  },
+  {
+   "system": "percepta",
+   "version": "0.1.0",
+   "classification": "verification-tool",
+   "required": true,
+   "repository": "kemiller2002/percepta",
+   "tag": "percepta-repo-v0.1.0",
+   "commit": "3027983f20b91d6856a27c1cf8ee2582108ef6be",
+   "releaseStage": "stable",
+   "distributionClass": "self-contained-native-cli",
+   "distributions": [
+    {
+     "mechanism": "github-release",
+     "package": null,
+     "url": "https://github.com/kemiller2002/percepta/releases/tag/percepta-repo-v0.1.0"
+    }
+   ],
+   "releaseManifest": {
+    "path": "releases/percepta/0.1.0.release.json",
+    "sha256": "07b6291c63ff25e6b669edb8c845e48ba76831b6a6133efa4ad3a390439b1b2b",
+    "registryCommit": "575240233d1fc32b57cfa827ea1031b68609fc58"
+   },
+   "published": "2026-09-28T01:38:36Z",
+   "publishedSource": "tag commit date (git)",
+   "latestStable": "percepta-repo-v0.1.0 (only percepta-repo tag)",
+   "artifacts": [
+    {
+     "name": "percepta-repo-linux-x64",
+     "platform": "linux-x64",
+     "sha256": "e46113aa08c9d2a97dfb1f75ca65c986946e1601c5f2c5cdcc9e8c25841d6039",
+     "observed": "installed by Conditor 0.10.20 workstation apply; cached archive hashed equal"
+    }
+   ],
+   "installedReports": "0.1.0"
+  },
+  {
+   "system": "aegis",
+   "version": "1.0.0",
+   "classification": "runtime",
+   "required": true,
+   "repository": "kemiller2002/aegis",
+   "tag": "nuget:EchelonFoundry.Aegis.Core@1.0.0",
+   "commit": "56935c889b4f5cbf0b8046d3c2078f205cdb20c7",
+   "releaseStage": "stable",
+   "distributionClass": "nuget-library",
+   "distributions": [
+    {
+     "mechanism": "nuget",
+     "package": "EchelonFoundry.Aegis.Core",
+     "url": "https://api.nuget.org/v3-flatcontainer/echelonfoundry.aegis.core/1.0.0/echelonfoundry.aegis.core.1.0.0.nupkg"
+    }
+   ],
+   "releaseManifest": {
+    "path": "releases/aegis/1.0.0.release.json",
+    "sha256": "4530cfa3396c1e57d3e1a6500c661cd2d520236e852d1d9e88aa44c385d0bd6b",
+    "registryCommit": "575240233d1fc32b57cfa827ea1031b68609fc58"
+   },
+   "published": "2026-09-17T23:20:26Z",
+   "publishedSource": "NuGet published",
+   "latestStable": "1.0.0 (only NuGet version)",
+   "artifacts": [
+    {
+     "name": "EchelonFoundry.Aegis.Core.1.0.0.nupkg",
+     "sha256": "24255d245463f1ce819ce98f10bc5f6a062f8b3342d0bf4eee00fef9a45a835d",
+     "observed": "downloaded 2026-11-05 and hashed: 24255d245463f1ce819ce98f10bc5f6a062f8b3342d0bf4eee00fef9a45a835d"
+    }
+   ]
+  },
+  {
+   "system": "dotnet-sdk",
+   "version": "10.0.402",
+   "authority": "global.json (rollForward disable)",
+   "install": "https://dot.net/v1/dotnet-install.sh --version 10.0.402",
+   "observed": "dotnet --version = 10.0.402 after install; Forma 0.13.0 TokenValidator, requirements-compiler, Causa.slnx, App.slnx and the preview WASM site all built on it"
+  },
+  {
+   "system": "conditor",
+   "version": "0.10.20",
+   "tag": "v0.10.20",
+   "commit": "a4c53cee6f72966ed737362be5daa5d8ddea12d8",
+   "repository": "kemiller2002/conditor",
+   "published": "2026-11-03T21:19:20Z",
+   "publishedSource": "GitHub release published_at",
+   "releaseUrl": "https://github.com/kemiller2002/conditor/releases/tag/v0.10.20",
+   "latestStable": "v0.10.20 (GitHub releases/latest; main = 0.10.20 + qualification of 1.37.0, no release requested)",
+   "artifacts": [
+    {
+     "name": "conditor-linux-x64",
+     "sha256": "75849672f326b3f58dfe9e8de3a3a274ef4137a39d4e76bbe62889042ff326bd",
+     "observed": "downloaded by r9.fsx install-conditor and hashed: equal to kickoff/rehearsal-010/toolchain.lock.proposed.json"
+    }
+   ],
+   "releaseStage": "stable"
+  }
+ ],
+ "formaComparison": {
+  "0.12.0": {
+   "tag": "v0.12.0",
+   "commit": "38ba6701e6e6adf1d87f33868b86321d14453f0e",
+   "npmPublished": "2026-10-29T15:38:27Z",
+   "tarballSha256": "b824568d528562658ded3d53ecd06504e907f7d42129facd86a8f298d1cb7aae",
+   "githubAndNpmIdentical": true
+  },
+  "0.13.0": {
+   "tag": "v0.13.0",
+   "commit": "2fcd10739189a0eef03f74ea306b3761d3dffbe0",
+   "npmPublished": "2026-10-30T10:57:03Z",
+   "tarballSha256": "2f9ceeb6ea99a54f6cf4ffa03e3a69fd609dd60a89ddbd99680811cca2d43725",
+   "githubAndNpmIdentical": true
+  },
+  "newerStable": "none: npm dist-tag latest = 0.13.0; forma main holds an unreleased 0.13.1 candidate (marketing containment, FMO-019 requirement identity)"
+ },
+ "notInSet": [
+  {
+   "system": "vigila",
+   "evidence": "no tags (git ls-remote)"
+  },
+  {
+   "system": "iter",
+   "evidence": "no tags"
+  },
+  {
+   "system": "vitium",
+   "evidence": "no tags; not in registry/systems-v2.json"
+  },
+  {
+   "system": "tutors",
+   "evidence": "add_repo: repository not found or not accessible; not in the registry"
+  },
+  {
+   "system": "fides",
+   "latest": "v0.2.0 (in set, optional)"
+  },
+  {
+   "system": "arca",
+   "latest": "v0.7.0 (in set, optional)"
+  },
+  {
+   "system": "strata",
+   "latest": "v0.1.1 (in set, optional; installed by the workstation profile, archive digest equal)"
+  }
+ ]
+}
