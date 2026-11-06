@@ -20,7 +20,7 @@
   "validation": "FAIL",
   "files": {
     "AGENT-RULES.md": "77969639bfabfe6f0baa7b7ffa52f7d5d71a0ddff0c2c734b6c12fb197b6f610",
-    "AMENDMENT-4.1.6.md": "e0a21d975e4601542871c95aa13e6ab8f196a9050c07cf24b99ba9d1e7f5dd60",
+    "AMENDMENT-4.1.6.md": "f2dcbef78529f4f3f6831f26e7211a634b83fda8fe958e958a3bb77044066276",
     "FREEZE.md": "d991d3c20f08995613ab688065587130713b692ebc61a7b919831c3d1ca5137d",
     "README.md": "34a829a898d0b12c0ecc1deeb7660d6e0fccfada7274fba8ab6869ff4a28cc08",
     "STARTING-STATE.md": "3a8259a4f41e3b6736228f5265f91bcb8a033648ae087512fafa718f82420aea",
@@ -59,7 +59,7 @@
     "layout-tests/run.mjs": "b5e323797dfbe818caafcb8036ba9a0ff39a1b7ba8455217afc36ed5f47e473b",
     "optimization-report.md": "74b71ecee023f9070ff807b6b1dde2982b6fd1b7da03694deafe12d9c48a2d83",
     "preservation-report.json": "7cc7a8c05c92a33325dfcab11b5d57709ebae13e04e88a88da36fac5b910b6d8",
-    "proposals/owner-decision-requests.json": "f9a972592ac823ec3003d4469529b50003d06783e4e4a2c513da0b1bc8f50295",
+    "proposals/owner-decision-requests.json": "aada9b6899c7273fbbbf58afd6da8efe07bb12dbf4dd4fb5d51983e112f5d41c",
     "schedule.json": "79c2a92a41b1196e935dac2f90e907f5d560c2913e00246fe6c42e9b9c99d847",
     "state-machine-contracts.json": "d58d21f9c11b23238402727c39ce6045a960dbf248fe0f58bf3a30a2bc4a8bc2",
     "validation-report.json": "f378e17808e50ea4631d50a9592cc1270f0c837ce692620c2dc585a78f59ee75",

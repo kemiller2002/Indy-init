@@ -1013,7 +1013,7 @@
     "B: adopt the fix and recompile Rehearsal 010's approved scope too (its digest changes; the split plans are re-derived)",
     "C: keep the current mapping (bare ids and regex: only); the WI-GEN-* items keep absorbing the prefix:/doc:/origin: covers"
    ],
-   "recommendation": "A (SS-1, SS-2, SS-3): tomorrow's scope compile must map each requirement to the DAG task that covers it, and the competition scope is re-approved on its own digest anyway (ODR-R10-01); Rehearsal 010's record stays as it was. This is the coordinator's recommendation; the owner has NOT accepted it yet (unlike section A of the sheet). This request records only the decision; #176 is reviewed on its own.",
+   "recommendation": "A (SS-1, SS-2, SS-3): tomorrow's scope compile must map each requirement to the DAG task that covers it, and the competition scope is approved on its own digest; Rehearsal 010's record stays as history. The owner answered \"accept c\" (section C of DECISIONS-FOR-TONIGHT.md: SS-1, SS-2, SS-3) on 2026-11-06 in session; that answer is not a record. This request is how it is recorded. It records only the decision; #176 is reviewed on its own and merged with the scope recompile, its tests updated to the new approved digest.",
    "rationale": "It changes which work items the approved scope assigns, an owner-controlled re-scope (ScopeTests requires the committed scope manifest to equal the compile output).",
    "impact": "With A, the competition scope has 31 work items and no split plan; with B, Rehearsal 010's approved scope record changes; with C, the mis-mapping stays.",
    "approvalRecord": {
