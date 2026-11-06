@@ -267,6 +267,8 @@ case "authorize-refuses-requirements-without-obligations" [ 4 ] [ "4 links: T12 
 case "authorize-refuses-obligations-without-requirements" [ 4 ] [ "4 links: T13 names no requirement" ] [] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
 case "authorize-refuses-an-emptied-non-coordination-item" [ 4 ] [ "4 links: WI-CONTENT-2 names no requirement"; "4 links: WI-CONTENT-2 names no verification obligation" ] [ "4 links: T10" ] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
 planWith ""
+// authorize-implementation authorizes only a committed state: commit the Praxis items the F1 cases added.
+commitAll app "praxis: the F1 cases' work items; the work plan as before" |> ignore
 r9case "authorize-passes-and-writes-the-checkpoint" [ 0 ] [ "checkpoint"; "1 work item(s)" ] (authorize [] @ [ "--scope-sha256"; "scope-approved" ]) app |> ignore
 let checkpointSha = commitAll app "initialization checkpoint"
 r9case "authorize-refuses-a-second-checkpoint" [ 4 ] [ "is immutable" ] (authorize []) app |> ignore
