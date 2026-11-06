@@ -3,7 +3,8 @@
 //   dotnet fsi tools/r9/r9.fsx -- install-conditor --lock LOCK --dir DIR [--platform RID]
 //   dotnet fsi tools/r9/r9.fsx -- workstation --lock LOCK --conditor EXE --home DIR [--platform RID] [--target-id ID] [--require-registration true]
 //   dotnet fsi tools/r9/r9.fsx -- govern --indy-init SRC --target REPO [--lock kickoff/rehearsal-0NN/toolchain.lock.json]
-//   dotnet fsi tools/r9/r9.fsx -- check-governance --indy-init SRC --target REPO [--base-scope FILE]
+//   dotnet fsi tools/r9/r9.fsx -- check-governance --indy-init SRC --target REPO [--base-scope FILE] [--trusted-operator ID [--approvals F]]
+//        A later change of the governance record is accepted only with the owner's re-govern approval (reGovernCauses).
 //   dotnet fsi tools/r9/r9.fsx -- gate --obligations F --root REPO --results F --dokimos EXE --out DIR
 //        (--mode release | --mode development --scope-file F) [--expect-candidate SHA]
 //        [--work-item ID --scope REQ,...] [--matrix F]
@@ -221,7 +222,12 @@ let govern () =
     let target = Path.GetFullPath(req "--target")
     let g = governanceOf src
     let rosPath = Path.Combine(target, "ros.json")
+    // A re-govern (a record already exists) keeps the T0 record's lock and its items completed before governance:
+    // it adopts a corrected template, nothing else (check-governance accepts it only with the owner's approval).
+    let existingRecord = Path.Combine(target, ".echelon", "r9-governance.json") |> fun f -> if File.Exists f then Some(readJson f) else None
     if not (File.Exists rosPath) then Unusable $"{rosPath} does not exist; run conditor init first"
+    elif existingRecord |> Option.exists (fun r -> str r "toolchainLock" <> "" && str r "toolchainLock" <> lockPath) then
+        Unusable $"""the repository is governed with {str existingRecord.Value "toolchainLock"}; a re-govern keeps the rehearsal's lock (--lock {str existingRecord.Value "toolchainLock"})"""
     else
         let ros = readJson rosPath
         ros["workProtocol"]["qualityEvidence"] <- g["qualityEvidence"].DeepClone()
@@ -234,9 +240,11 @@ let govern () =
         if not (File.Exists scope) then File.WriteAllText(scope, "{\n  \"schema\": \"indy-init.r9-verification-scope/1\",\n  \"requirements\": []\n}\n")
         let current = Path.Combine(target, ".ros", "context", "current.json")
         let preexisting =
-            if File.Exists current then
+            match existingRecord with
+            | Some r -> arr r "completedBeforeGovernance" |> List.map (fun n -> n.DeepClone())
+            | None when File.Exists current ->
                 arr (readJson current) "workItems" |> List.filter (fun w -> str w "state" = "complete") |> List.map (fun w -> JsonValue.Create(str w "id") :> JsonNode)
-            else []
+            | None -> []
         let _, srcCommit = git src [ "rev-parse"; "HEAD" ]
         let record =
             JsonObject(
@@ -264,6 +272,54 @@ let passedMatrices (target: string) (vdir: string) =
         |> Seq.map (fun v -> "sha256:" + str v "matrixSha256", v)
         |> Map.ofSeq
 
+/// Rehearsal 010 (Fix 5): a running rehearsal could never adopt a corrected governance template, because any second
+/// commit touching .echelon/r9-governance.json was refused. A later version of the record is accepted only when the
+/// owner approved it: the pinned approvals (--approvals, read from the governing Indy-init checkout; default
+/// kickoff/rehearsal-007/approvals.causa.json) hold a record by the trusted operator (--trusted-operator) with a change
+/// {action: "re-govern", indyInitCommit: X} whose tools/r9 tree is the one that version's indyInitCommit governs with
+/// (X itself, or a later commit that changes nothing under tools/r9, such as the one adding the approval). The approved
+/// commits and every version's commit must be fetched into the governing checkout (the gate workflow does). A re-govern
+/// adopts a template only: the rehearsal's lock and the items completed before governance stay as written at T0.
+/// Without --trusted-operator no later version is accepted (the T0 rule).
+let reGovernCauses (src: string) (target: string) : string list =
+    let recordRel = ".echelon/r9-governance.json"
+    let _, log = git target [ "log"; "--format=%H"; "--"; recordRel ]
+    let commits = log.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray |> List.rev
+    match commits with
+    | [] | [ _ ] -> []
+    | first :: later ->
+        match opt "--trusted-operator" with
+        | None -> [ $".echelon/r9-governance.json was changed after T0 ({commits.Length} commits touch it): the governance record is written once, by r9.fsx govern, and changed only by an owner-approved re-govern (--approvals, --trusted-operator)" ]
+        | Some operator ->
+            let at (c: string) =
+                let code, text = git target [ "show"; $"{c}:{recordRel}" ]
+                if code = 0 then (try Some(JsonNode.Parse text) with _ -> None) else None
+            let approvalsPath = opt "--approvals" |> Option.defaultValue "kickoff/rehearsal-007/approvals.causa.json"
+            let approvalsFile = if Path.IsPathRooted approvalsPath then approvalsPath else Path.Combine(src, approvalsPath)
+            let approved =
+                if not (File.Exists approvalsFile) then []
+                else
+                    arr (readJson approvalsFile) "approvals"
+                    |> List.filter (fun a -> let au = a["authority"] in not (isNull au) && str au "kind" = "operator" && str au "id" = operator)
+                    |> List.collect (fun a -> arr a "changes" |> List.filter (fun c -> str c "action" = "re-govern") |> List.map (fun c -> str a "id", str c "indyInitCommit"))
+            let tree (commit: string) =
+                let code, out = git src [ "rev-parse"; "--verify"; "--quiet"; $"{commit}:tools/r9" ]
+                if code = 0 && isSha commit then Some(out.Trim()) else None
+            let t0 = at first
+            let same (key: string) (r: JsonNode) = (match t0 with Some t -> canonical t[key] | None -> "") = canonical r[key]
+            later
+            |> List.collect (fun c ->
+                let short = c.Substring(0, min 12 c.Length)
+                match at c with
+                | None -> [ $"re-govern {short}: .echelon/r9-governance.json is missing or unreadable there" ]
+                | Some r ->
+                    let y = str r "indyInitCommit"
+                    let matching = approved |> List.filter (fun (_, x) -> isSha x && (x = y || (tree x).IsSome && tree x = tree y))
+                    check (not matching.IsEmpty)
+                        $"""re-govern {short}: Indy-init {y} is not approved: no re-govern record by {operator} in {approvalsPath} names it or a commit with its tools/r9 ({(if approved.IsEmpty then "none recorded" else String.Join(", ", approved |> List.map (fun (id, x) -> $"{id} -> {x}")))}; an approved commit and {y} must be fetched)"""
+                    @ check (same "toolchainLock" r) $"re-govern {short}: the record changes the rehearsal's lock; a re-govern adopts a corrected template only"
+                    @ check (same "completedBeforeGovernance" r) $"re-govern {short}: the record changes the items completed before governance; they stay as written at T0")
+
 let checkGovernance () =
     let src = Path.GetFullPath(req "--indy-init")
     let target = Path.GetFullPath(req "--target")
@@ -277,10 +333,9 @@ let checkGovernance () =
         @ check (File.Exists workflow && sha256File workflow = sha256File (Path.Combine(src, str g "workflow")))
             ".github/workflows/verification-gate.yml is missing or differs from Indy-init tools/r9/verification-gate.yml"
         @ check (File.Exists recordPath) ".echelon/r9-governance.json is missing: the repository was not governed at T0"
-        // The record pins the governing Indy-init commit and the rehearsal's lock; it is written once at T0.
-        @ (let _, log = git target [ "log"; "--format=%H"; "--"; ".echelon/r9-governance.json" ]
-           let commits = log.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length
-           check (commits <= 1) $".echelon/r9-governance.json was changed after T0 ({commits} commits touch it): the governance record is written once, by r9.fsx govern")
+        // The record pins the governing Indy-init commit and the rehearsal's lock; it is written once at T0, and
+        // changed later only by an owner-approved re-govern (reGovernCauses).
+        @ reGovernCauses src target
     let record = if File.Exists recordPath then readJson recordPath else null
     let before = arr record "completedBeforeGovernance" |> List.map (fun n -> n.GetValue<string>()) |> Set.ofList
     let current = Path.Combine(target, ".ros", "context", "current.json")

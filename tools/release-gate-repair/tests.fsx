@@ -472,6 +472,53 @@ git evil [ "add"; "-A" ] |> ignore
 git evil [ "commit"; "-qm"; "merge side (with implementation)" ] |> ignore
 r9case "check-sequencing-inspects-what-a-merge-adds" [ 4 ] [ "merge side (with implementation)" ] [ "check-sequencing"; "--target"; evil ] evil |> ignore
 
+
+// ---- re-govern (Rehearsal 010, Fix 5): a later governance record only with the owner's approval -------------------
+
+// A synthetic Indy-init (tools/r9 and the approvals file) at three commits: the T0 template W, a corrected template X
+// and Y, which only adds the owner's re-govern approval of X; and a governed repository moved from W to Y.
+let govSrc = Path.Combine(work, "gov-src")
+let govApprovals = Path.Combine(govSrc, "kickoff", "rehearsal-007", "approvals.causa.json")
+let gateYml = Path.Combine(govSrc, "tools", "r9", "verification-gate.yml")
+Directory.CreateDirectory(Path.Combine(govSrc, "tools", "r9")) |> ignore
+git govSrc [ "init"; "-q"; "-b"; "main" ] |> ignore
+for f in Directory.GetFiles(Path.Combine(src, "tools", "r9")) do File.Copy(f, Path.Combine(govSrc, "tools", "r9", Path.GetFileName f), true)
+let approvalsWith (records: string) = write govApprovals ("{\"schema\":\"causa.requirements-approvals/1\",\"approvals\":[" + records + "]}\n")
+approvalsWith ""
+let govW = commitAll govSrc "T0 template"
+File.AppendAllText(gateYml, "# corrected template\n")
+let govX = commitAll govSrc "corrected template"
+let regovern (id: string) (operator: string) (commit: string) = $"{{\"id\":\"{id}\",\"authority\":{{\"kind\":\"operator\",\"id\":\"{operator}\"}},\"changes\":[{{\"action\":\"re-govern\",\"indyInitCommit\":\"{commit}\"}}]}}"
+approvalsWith (regovern "APR-TEST-REGOVERN" "kemiller2002" govX)
+let govY = commitAll govSrc "owner approves the re-govern of the corrected template"
+let gov = Path.Combine(work, "gov-target")
+Directory.CreateDirectory gov |> ignore
+git gov [ "init"; "-q"; "-b"; "main" ] |> ignore
+write (Path.Combine(gov, "ros.json")) "{\"workProtocol\":{\"qualityEvidence\":{}}}\n"
+let lock10 = [ "--lock"; "kickoff/rehearsal-010/toolchain.lock.json" ]
+git govSrc [ "checkout"; "-q"; govW ] |> ignore
+r9case "govern-at-t0" [ 0 ] [ "govern: PASS" ] ([ "govern"; "--indy-init"; govSrc; "--target"; gov ] @ lock10) gov |> ignore
+commitAll gov "T0: governance" |> ignore
+r9case "check-governance-t0-record" [ 0 ] [ "check-governance: PASS" ] [ "check-governance"; "--indy-init"; govSrc; "--target"; gov; "--trusted-operator"; "kemiller2002" ] gov |> ignore
+git govSrc [ "checkout"; "-q"; govY ] |> ignore
+r9case "re-govern-keeps-the-lock" [ 2 ] [ "a re-govern keeps the rehearsal's lock" ] [ "govern"; "--indy-init"; govSrc; "--target"; gov; "--lock"; "kickoff/rehearsal-009/toolchain.lock.json" ] gov |> ignore
+r9case "re-govern-writes-the-corrected-template" [ 0 ] [ "govern: PASS" ] ([ "govern"; "--indy-init"; govSrc; "--target"; gov ] @ lock10) gov |> ignore
+let regoverned = commitAll gov "re-govern: the corrected template"
+r9case "re-govern-refused-without-the-approval-check" [ 4 ] [ "was changed after T0 (2 commits touch it)" ] [ "check-governance"; "--indy-init"; govSrc; "--target"; gov ] gov |> ignore
+r9case "re-govern-accepted-with-the-owner-approval" [ 0 ] [ "check-governance: PASS" ] [ "check-governance"; "--indy-init"; govSrc; "--target"; gov; "--trusted-operator"; "kemiller2002" ] gov |> ignore
+r9case "re-govern-refused-for-another-operator" [ 4 ] [ $"Indy-init {govY} is not approved" ] [ "check-governance"; "--indy-init"; govSrc; "--target"; gov; "--trusted-operator"; "someone-else" ] gov |> ignore
+// A forged record: the approved commit, but it whitelists an item as completed before governance.
+let recordFile = Path.Combine(gov, ".echelon", "r9-governance.json")
+write recordFile ((File.ReadAllText recordFile).Replace("\"completedBeforeGovernance\": []", "\"completedBeforeGovernance\": [ \"WI-FORGED\" ]"))
+commitAll gov "forged: an item completed before governance" |> ignore
+r9case "re-govern-refused-when-it-changes-completed-items" [ 4 ] [ "changes the items completed before governance" ] [ "check-governance"; "--indy-init"; govSrc; "--target"; gov; "--trusted-operator"; "kemiller2002" ] gov |> ignore
+git gov [ "reset"; "-q"; "--hard"; regoverned ] |> ignore
+// A template the owner did not approve (tools/r9 differs from every approved commit's).
+File.AppendAllText(gateYml, "# unapproved template\n")
+let govZ = commitAll govSrc "unapproved template"
+r9case "re-govern-to-an-unapproved-template" [ 0 ] [ "govern: PASS" ] ([ "govern"; "--indy-init"; govSrc; "--target"; gov ] @ lock10) gov |> ignore
+commitAll gov "re-govern: an unapproved template" |> ignore
+r9case "re-govern-refused-for-an-unapproved-template" [ 4 ] [ $"Indy-init {govZ} is not approved" ] [ "check-governance"; "--indy-init"; govSrc; "--target"; gov; "--trusted-operator"; "kemiller2002" ] gov |> ignore
 // ---- verdict ------------------------------------------------------------------------------------------------------
 
 let failed = cases |> List.filter (snd >> not) |> List.map fst
