@@ -1017,6 +1017,42 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-CR-OWNER-2",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "OD-CR-01",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/contract-readiness/causa-precompetition/DOMAIN-CONTRACT.json",
+              "sha256": "8f4deaec62c8053361f261ce4140316f730b1ddda5e6cca981971e7d828599b9"
+            },
+            {
+              "path": "docs/contract-readiness/causa-precompetition/COMMAND-EVENT-REGISTRY.json",
+              "sha256": "5b9e29359387fa88d317a7752bae9a8facb6a5ad043efd0c06cd3ba032cd7de9"
+            }
+          ]
+        },
+        {
+          "decision_id": "OD-CR-08",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/contract-readiness/causa-precompetition/PACKAGE-MANIFEST.json",
+              "sha256": "6ce7ae1ccc033f264e40485b90729f32d35ec4879ac3b01141a35869f7234483"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
