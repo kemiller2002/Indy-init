@@ -11,7 +11,7 @@
 | main | 307ce17 (#148). Its own Preflight run 42133849069: the `r10-adversarial` aggregate has been stuck in "Playwright, Chromium and WebKit" for more than 35 minutes, the failure this report removes. |
 | Runner | `ubuntu-latest` = Ubuntu 26.04 (runner image ubuntu26/20261101.186), x64. `--with-deps` pulls around 100 apt packages from `azure.archive.ubuntu.com`. |
 | Playwright | `@playwright/test@1.63.0` and `playwright@1.63.0`, in every job |
-| Container image | `mcr.microsoft.com/playwright:v1.63.0-noble` (Ubuntu 24.04). Pulled digest `sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27` (run 42134469740). |
+| Container image | `mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30…` (Ubuntu 24.04; published by Microsoft on mcr.microsoft.com), **pinned by digest** in the workflow. Digest as pulled `sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27` (run 42134469740). |
 | Jobs that install browsers (main) | <ul><li>`fsharp-tooling`, the Forma layout assertions on Chromium and WebKit: **no time limit** (job default 360 min).</li><li>`suite-commands`, the fixture trees: job limit 20 min.</li><li>`r10-adversarial-cases` (3 shards) and `r10-adversarial`: 45 min each.</li><li>`live-provider-preflight`, owner-dispatched: job limit 30 min.</li></ul> |
 | Chromium and WebKit required | all of the above (journeys J1–J3, the layout contract, and the suite runners `--project=chromium` / `webkit`) |
 
@@ -43,7 +43,7 @@ There is no warm-versus-cold distinction for the container: every run pulls the 
 | External mirror | Azure, then archive | mcr.microsoft.com, plus a small apt step | Azure (fallback) | mcr for adversarial |
 | Chromium and WebKit run | yes | **yes, measured** | not reached | yes |
 | F#, .NET and harness compatible | yes | **yes, measured**: setup-dotnet, dotnet fsi and git in the container | — | yes |
-| Reproducibility | mirror-dependent | **pinned image tag** (digest recorded) | key-pinned, but OS libraries still from apt | B |
+| Reproducibility | mirror-dependent | **image pinned by digest** | key-pinned, but OS libraries still from apt | B |
 | Failure recovery | kill and retry, **unverified, and unsafe for dpkg** | fails at image pull or tools step, named | the fallback failed | step limits, fail early, named |
 | Maintenance | low | low (the tag must equal Playwright's version) | medium (cache key, OS pin, probe) | low |
 | Hidden test omissions | none | none: same cases, union check, 0 not run | none | none |

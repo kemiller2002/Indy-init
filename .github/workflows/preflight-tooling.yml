@@ -472,7 +472,8 @@ jobs:
     # Installing them per run with `playwright install --with-deps` pulled ~100 apt packages from the runner mirror and,
     # on a slow mirror, used the whole 45-minute budget before any case ran (PR #140, runs 42115761982 and 42122833553).
     container:
-      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      # Pinned by digest (the index digest docker pulled in run 42134469740), so the image cannot change under the tag.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
     defaults:
       run:
         shell: bash -e {0}   # what these steps ran with on the runner; a container defaults to sh
@@ -529,7 +530,8 @@ jobs:
     # Installing them per run with `playwright install --with-deps` pulled ~100 apt packages from the runner mirror and,
     # on a slow mirror, used the whole 45-minute budget before any case ran (PR #140, runs 42115761982 and 42122833553).
     container:
-      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      # Pinned by digest (the index digest docker pulled in run 42134469740), so the image cannot change under the tag.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
     defaults:
       run:
         shell: bash -e {0}   # what these steps ran with on the runner; a container defaults to sh
