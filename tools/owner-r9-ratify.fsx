@@ -67,7 +67,13 @@ type Run = { Code: int; Out: string; Err: string }
 let run (dir: string) (program: string) (args: string list) : Run =
     let info = ProcessStartInfo(program, WorkingDirectory = dir, RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false)
     args |> List.iter info.ArgumentList.Add
-    use p = Process.Start info
+    use p =
+        try Process.Start info
+        with :? ComponentModel.Win32Exception ->
+            let hint =
+                if program = "git" || program = "gh" then $"install {program} and sign in as yourself"
+                else "install Praxis 3.25.0 beside your other versions:\n  curl -fsSL https://raw.githubusercontent.com/kemiller2002/praxis/main/scripts/install-native.sh | sh -s -- --version 3.25.0 --install-base ~/.echelon --no-activate\nthen pass --praxis ~/.echelon/tools/praxis/3.25.0/praxis"
+            stop $"cannot start '{program}' (not found on PATH); {hint}"
     let out = p.StandardOutput.ReadToEndAsync()
     let err = p.StandardError.ReadToEnd()
     p.WaitForExit()
