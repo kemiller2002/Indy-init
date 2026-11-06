@@ -11,7 +11,8 @@ const kind = async (page, value) => {
 // with nothing selected, so the journey chooses a value; the label may be the wire value or its words.
 const choose = async (page, groupName, label) => {
   const group = page.getByRole('group', { name: groupName }).or(page.getByRole('radiogroup', { name: groupName })).first();
-  await group.getByLabel(label).check();
+  // By role and accessible name: the name is trimmed, so a label's leading space (Forma radio markup) still matches.
+  await group.getByRole('radio', { name: label }).check();
 };
 const pick = async (page, pattern, label) => {
   const select = page.getByRole('combobox', { name: pattern }).first();
