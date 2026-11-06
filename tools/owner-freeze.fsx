@@ -1,4 +1,4 @@
-// owner-freeze.fsx: the owner's steps to freeze Indy-init's compiled requirements packages v4, v4.1, v4.1.1, v4.1.2 and v4.1.4
+// owner-freeze.fsx: the owner's steps to freeze Indy-init's compiled requirements packages v4, v4.1, v4.1.1, v4.1.2, v4.1.4 and v4.1.5
 // (the FREEZE.md of each package under requirements-compiled/).
 //
 // Every decision is yours. The script shows each owner decision request as the package states it and records
@@ -28,9 +28,14 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.4 --repo Indy-init  # ODR-V414-01, -02; then the agent compiles v4.1.4
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.4 --repo Indy-init # ODR-V414-03, after the compiled package is reviewed
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.4 --repo Indy-init --commit <merge commit of the ODR-V414-03 pull request>
-//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide rehearsal-010 --repo Indy-init  # ODR-RG-03, -05 and ODR-R10-01..18
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.5 --repo Indy-init  # ODR-V415-01, -03, -04 and -IF-VIEW; then the agent compiles v4.1.5
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.5 --repo Indy-init # ODR-V415-02, after the compiled package is reviewed
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.5 --repo Indy-init --commit <merge commit of the ODR-V415-02 pull request>
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide rehearsal-010 --repo Indy-init  # ODR-RG-03, -05 and ODR-R10-01..33
 //        (kickoff/rehearsal-010/proposals/owner-decision-requests.json). A request that pins a file records the sha256
-//        of that file at origin/main, shown before you answer; ODR-R10-01 is asked only once v4.1.4 is tagged.
+//        of that file at origin/main, shown before you answer; ODR-R10-01 is asked only once v4.1.5 is tagged. A recorded
+//        decision whose pinned file has changed since is asked again, with what changed (as ODR-R10-01 and -19 were for
+//        the v4.1.5 re-pin, recorded in APR-R10-OWNER-4).
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- ratify rehearsal-010 --repo Indy-init  # applies ODR-R10-02 (A): the
 //        successor catalog becomes the ratified catalog, only if it is the file you approved and keeps every
 //        ratified requirement unchanged
