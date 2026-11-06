@@ -114,7 +114,29 @@ Ordered by consequence.
 - **Run the real-provider durability evidence** (CR-LIVE-01, J3-05, INV-037) against GitHub.
 - **Not to be implemented until the owner decides:** the 14 blocked bindings and 7 proposed commands. If OD-CR-01 A is recorded before kickoff, causa-storage 1.1.0 has to be released and v4.1.6 compiled and frozen first. That is owner-paced, and two or more agent-hours of compile and review work is an estimate. If OD-CR-01 B is recorded, the affected journeys become declared expected failures.
 
-## 6. Process
+## 6. Recording the decisions (owner only)
+
+1. **Merge this pull request.** `owner-freeze.fsx` reads requests and pinned files only from `origin/main`. Merging adds candidate documents and tooling. It is not a freeze.
+2. **Record OD-CR-01..08.** From the directory that holds your clone, preview first:
+
+   ```bash
+   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide contract-readiness --repo Indy-init --dry-run
+   ```
+
+   Then record:
+
+   ```bash
+   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide contract-readiness --repo Indy-init
+   ```
+
+   - Each request shows its question, evidence, options and recommendation. OD-CR-01 and OD-CR-08 also show the sha256 of the files they pin.
+   - Answer with a letter, or `skip` to leave a request pending.
+   - The script commits `APR-CR-OWNER-n` to `kickoff/rehearsal-007/approvals.causa.json` as you and opens a pull request for you to merge.
+   - Agents cannot record: the script refuses when an agent runs it.
+3. **Record ODR-V415-02.** After #143 merges, run `owner-freeze.fsx -- approve v4.1.5`.
+4. **Agent follow-up.** `contract-readiness generate` reads the recorded answers: a recorded decision stops blocking the gate. The bindings and commands it unblocks still have to be applied, for example releasing causa-storage 1.1.0 and compiling v4.1.6 under OD-CR-01 A, before the verdict can reach PASS.
+
+## 7. Process
 
 - Work is on branch `claude/loving-turing-ixvzqx` in Indy-init. Nothing is merged.
 - No frozen package, approval record, application code, experiment code, verification asset or causa-data file was changed.

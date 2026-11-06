@@ -1,7 +1,7 @@
 {
   "schema": "causa.contract-readiness.package-manifest/1",
   "contractPackage": "causa-precompetition 1.0.0-candidate",
-  "packageChecksum": "879619b9f79880c941d19a7d25c48e55749e596afae7ad9ce23261eaec848828",
+  "packageChecksum": "1df907cec2cf62e7cf0105a07612dbad5023d213651d1369432d8b3ddd9a8b2c",
   "checksumRule": "sha256 of the lines '<sha256>  <path>\\n' for every package file (except this manifest) and every validator source file, in this order",
   "dependencies": {
     "causaDataRepository": "https://github.com/kemiller2002/causa-data",
@@ -35,7 +35,7 @@
     },
     {
       "path": "CONTRACT-READINESS.json",
-      "sha256": "f6bb1d8c9af664de11d4a2e366c8eda50b2edaaa6bfddbdfdbfff979ffebf70a"
+      "sha256": "c5871ca147f90ec7d473fd969b801ef66ea8496d66277a542cb60fccd1eea2a6"
     },
     {
       "path": "DOMAIN-CONTRACT.json",
@@ -47,7 +47,7 @@
     },
     {
       "path": "FINAL-REPORT.md",
-      "sha256": "fe47948d24e91a79e72b0a93b15311060cd86db4230fe15fc8c8fc334746c1b8"
+      "sha256": "d32b562f7a5f387bc2a7ac92c0c4a6977d229e100230b6942e2c69964599ea52"
     },
     {
       "path": "HISTORICAL-COMPATIBILITY.md",
@@ -59,7 +59,7 @@
     },
     {
       "path": "OWNER-DECISIONS.proposed.json",
-      "sha256": "cfb2cefb45fa8c2b7dd96894a2e5a186da1f6c86c41c25e2accd4e8a2774ffe9"
+      "sha256": "abe8915955f4acfaa6475aed0ab8b49c7ae1a4c710b60a8c7f0ef3691aa68ff6"
     },
     {
       "path": "PERSISTENCE-CONTRACT.md",
@@ -84,6 +84,10 @@
     {
       "path": "evidence/clean-checkout-9e42aba.txt",
       "sha256": "c55ccdafd0ac472c0c4fa79564a8a2dfaba30f76a536ee9d229b63344df9a9e2"
+    },
+    {
+      "path": "proposals/owner-decision-requests.json",
+      "sha256": "f6aa565a5b9a4bc81c4cac5e0314772d81ca874504a551d241f769979cef9fd7"
     }
   ],
   "validator": [
@@ -129,11 +133,11 @@
     },
     {
       "path": "tools/contract-readiness/src/Package.fs",
-      "sha256": "06149f016c29ef9362ae18dce23d82ad64bf0d202d7127463594b207a34a4c18"
+      "sha256": "51e4ca473838f8d34b3e0cda109e8a290621c2eea8187720c8679cf6dd73b97d"
     },
     {
       "path": "tools/contract-readiness/src/Program.fs",
-      "sha256": "846611b7f2a0019f356ab108e3ee58a7b83f16aef31dc31fce1e908be8284106"
+      "sha256": "5bda90a7f764256120847ef18935e7b31fa6438eddac7f854c45ac4fa93e65f9"
     },
     {
       "path": "tools/contract-readiness/src/Schema.fs",

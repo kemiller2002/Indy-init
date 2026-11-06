@@ -14,9 +14,14 @@
       "title": "Approve package v4.1.5 (existing request, not created here)",
       "blocking": true,
       "status": "open (pending; FREEZE step 2 is PR #143, step 3 records it)",
-      "affects": ["every defined-v4.1.5 binding and command"],
+      "affects": [
+        "every defined-v4.1.5 binding and command"
+      ],
       "conflictingEvidence": "v4.1.5 is a CANDIDATE: no tag indy-init-requirements-v4.1.5; kickoff/rehearsal-007/approvals.causa.json holds ODR-V415-01/-03/-04/-IF-VIEW but not ODR-V415-02.",
-      "alternatives": ["A: approve and tag v4.1.5 (FREEZE.md steps 3-4)", "B: fall back to v4.1.4 per ODR-V415-04"],
+      "alternatives": [
+        "A: approve and tag v4.1.5 (FREEZE.md steps 3-4)",
+        "B: fall back to v4.1.4 per ODR-V415-04"
+      ],
       "recommendation": "A. This package's historical replay shows v4.1.5 represents 1,363/1,363 catalog events losslessly; v4.1.4 represents 0 (envelope provenance) and lacks a case for 487.",
       "compatibilityImpact": "None on data. B leaves 487 historical events without a case.",
       "deferralConsequence": "The competition starts on an unfrozen contract or on v4.1.4 with declared expected failures."
@@ -26,7 +31,19 @@
       "title": "Adopt the causa-storage 1.1.0 additive extension and a v4.1.6 successor that carries it",
       "blocking": true,
       "status": "open",
-      "affects": ["INV-023", "INV-025", "INV-027", "INV-029", "INV-030 update", "INV-031 consistent-with/inconclusive", "INV-032", "INV-033", "INV-034", "INV-035", "INV-037"],
+      "affects": [
+        "INV-023",
+        "INV-025",
+        "INV-027",
+        "INV-029",
+        "INV-030 update",
+        "INV-031 consistent-with/inconclusive",
+        "INV-032",
+        "INV-033",
+        "INV-034",
+        "INV-035",
+        "INV-037"
+      ],
       "conflictingEvidence": "ODR-R10-26 A (recorded) commissions causa-data storage v1.1 for these fields; causa-data at e8259df has only contract/v1.0.0. v4.1.5 has the ConclusionRecorded event but no RecordConclusion command. Without both, 14 of 45 UI bindings have no defined write path (CONTRACT-READINESS.json).",
       "alternatives": [
         "A: release causa-storage 1.1.0 exactly as DOMAIN-CONTRACT.json proposedStorageExtension (6 new events, 2 new relationship kinds; no v1.0.0 change) and compile v4.1.6 = v4.1.5 + those CoreEvent cases + 7 CoreCommand cases (ReviseInvestigationDetails, ReviseObservation, ReviseHypothesis, ReviseEvidence, ReviseEvidenceRelationship, WithdrawEvidenceRelationship, RecordConclusion)",
@@ -35,91 +52,160 @@
       ],
       "recommendation": "A. Every proposed event is additive (§13.1): v1.0.0 histories read unchanged (CR-HIST-* stays green) and a v1.0.0 reader refuses the new data. B is the fallback if the freeze cycle cannot finish before kickoff.",
       "compatibilityImpact": "Additive minor version; no migration; historical cases gain nothing (OD-HC-06 B: nothing is fabricated).",
-      "deferralConsequence": "The competition builds against v4.1.5: journeys J1-03, J2-01, J2-03, J2-04, J2-05, J2-06, J2-07, J2-09 cannot round-trip the affected fields, and agents must not invent storage for them."
+      "deferralConsequence": "The competition builds against v4.1.5: journeys J1-03, J2-01, J2-03, J2-04, J2-05, J2-06, J2-07, J2-09 cannot round-trip the affected fields, and agents must not invent storage for them.",
+      "question": "Release causa-storage 1.1.0 with exactly the additive content of DOMAIN-CONTRACT.json proposedStorageExtension (6 new events: InvestigationDetailsRevised, ObservationRevised, HypothesisRevised, EvidenceRevised, EvidenceRelationshipRevised, EvidenceRelationshipWithdrawn; relationship kinds consistentWith and inconclusive), and compile a v4.1.6 successor of v4.1.5 with the matching CoreEvent cases and 7 CoreCommand cases including RecordConclusion?",
+      "pins": [
+        {
+          "path": "docs/contract-readiness/causa-precompetition/DOMAIN-CONTRACT.json"
+        },
+        {
+          "path": "docs/contract-readiness/causa-precompetition/COMMAND-EVENT-REGISTRY.json"
+        }
+      ]
     },
     {
       "decisionId": "OD-CR-02",
       "title": "Evidence category on write",
       "blocking": true,
       "status": "open",
-      "affects": ["INV-012", "CMD-EVD-ADD"],
+      "affects": [
+        "INV-012",
+        "CMD-EVD-ADD"
+      ],
       "conflictingEvidence": "EvidenceAdmitted.category is a required closed enum (directObservation, measurement, log, document, experimentResult, testimony, externalReference); CAT-CAUSA-INVESTIGATION has no field for it, so AdmitEvidence has no input path.",
-      "alternatives": ["A: add a required catalog field INV-045 'Evidence category' (select over the seven wire values)", "B: a fixed category for UI-entered evidence (which one is a business rule only the owner can set)", "C: make category nullable in causa-storage 1.1.0 for new evidence"],
       "recommendation": "A. It invents no meaning and the wire already defines the closed set.",
       "compatibilityImpact": "A and B: none. C: a new event shape.",
-      "deferralConsequence": "No evidence can be admitted from the UI without an agent choosing a category."
+      "deferralConsequence": "No evidence can be admitted from the UI without an agent choosing a category.",
+      "question": "UI-entered evidence must carry a category (EvidenceAdmitted.category, required closed enum), but no catalog field supplies one. How is it supplied?",
+      "alternatives": [
+        "A: add a required catalog field INV-045 'Evidence category' (select over the seven wire values)",
+        "B: UI-entered evidence is always stored with category document",
+        "C: causa-storage 1.1.0 makes category nullable for new evidence"
+      ]
     },
     {
       "decisionId": "OD-CR-03",
       "title": "Evidence source reference: optional in the catalog, required on the wire",
       "blocking": true,
       "status": "open",
-      "affects": ["INV-028", "CMD-EVD-ADD"],
+      "affects": [
+        "INV-028",
+        "CMD-EVD-ADD"
+      ],
       "conflictingEvidence": "INV-028 required:false; EvidenceAdmitted.source is required non-blank text (R3.2 provenance). FIELD-MAPPING.md: 'Provenance: where it came from'.",
-      "alternatives": ["A: make INV-028 required (catalog amendment)", "B: causa-storage 1.1.0 nullable source for UI-admitted evidence", "C: the UI writes a fixed placeholder (fabricates provenance; not recommended)"],
+      "alternatives": [
+        "A: make INV-028 required (catalog amendment)",
+        "B: causa-storage 1.1.0 nullable source for UI-admitted evidence",
+        "C: the UI writes a fixed placeholder (fabricates provenance; not recommended)"
+      ],
       "recommendation": "A. R3.2 already requires provenance for evidence.",
       "compatibilityImpact": "A: none. B: new shape.",
-      "deferralConsequence": "Evidence without a source is refused by the codec (CAUSA.SCHEMA_VIOLATION)."
+      "deferralConsequence": "Evidence without a source is refused by the codec (CAUSA.SCHEMA_VIOLATION).",
+      "question": "The evidence source reference is optional in INV-028 but required non-blank on the wire (EvidenceAdmitted.source, R3.2 provenance). Which gives way?"
     },
     {
       "decisionId": "OD-CR-04",
       "title": "Conclusion strength on write",
       "blocking": true,
       "status": "open",
-      "affects": ["INV-032", "INV-033", "CMD-CONCL-RECORD"],
+      "affects": [
+        "INV-032",
+        "INV-033",
+        "CMD-CONCL-RECORD"
+      ],
       "conflictingEvidence": "ConclusionRecorded.strength is a required enum (plausibleExplanation, leadingExplanation, supportedCause, confirmedCause, acceptedWithResidualUncertainty); INV-032/033 give only a statement. INVESTIGATION-SEMANTICS.md: 'conclusion strength and residual uncertainty are visible together'.",
-      "alternatives": ["A: add a required catalog field INV-046 'Conclusion strength' (radio group over the five values)", "B: a fixed strength for UI conclusions (owner picks which)"],
       "recommendation": "A.",
       "compatibilityImpact": "None.",
-      "deferralConsequence": "No conclusion can be recorded without an agent choosing a strength."
+      "deferralConsequence": "No conclusion can be recorded without an agent choosing a strength.",
+      "question": "A UI-recorded conclusion must carry a strength (ConclusionRecorded.strength, required enum), but INV-032/033 give only a statement. How is it supplied?",
+      "alternatives": [
+        "A: add a required catalog field INV-046 'Conclusion strength' (radio group over the five wire values)",
+        "B: UI-recorded conclusions are always stored with strength plausibleExplanation"
+      ]
     },
     {
       "decisionId": "OD-CR-05",
       "title": "INV-011 'Hypothesis explanation' maps to HypothesisRecorded.mechanism",
       "blocking": true,
       "status": "open",
-      "affects": ["INV-011", "CMD-HYP-ADD", "CMD-HYP-EDIT"],
+      "affects": [
+        "INV-011",
+        "CMD-HYP-ADD",
+        "CMD-HYP-EDIT"
+      ],
       "conflictingEvidence": "S04 'what it explains' vs the wire's mechanism ('Proposed mechanism, if stated', FIELD-MAPPING.md). No other wire field can hold it.",
-      "alternatives": ["A: confirm the mapping explanation = mechanism", "B: a separate explanation field in causa-storage 1.1.0"],
+      "alternatives": [
+        "A: confirm the mapping explanation = mechanism",
+        "B: a separate explanation field in causa-storage 1.1.0"
+      ],
       "recommendation": "A. mechanism is nullable, matching CF-03 A (optional on record).",
       "compatibilityImpact": "A: none. B: new field.",
-      "deferralConsequence": "Agents must guess what the field means."
+      "deferralConsequence": "Agents must guess what the field means.",
+      "question": "Does INV-011 'Hypothesis explanation' map to the stored field HypothesisRecorded.mechanism ('proposed mechanism, if stated')?"
     },
     {
       "decisionId": "OD-CR-06",
       "title": "INV-035 for evidence: which parts are editable with the same id",
       "blocking": true,
       "status": "open",
-      "affects": ["INV-035", "CMD-EVD-EDIT"],
+      "affects": [
+        "INV-035",
+        "CMD-EVD-EDIT"
+      ],
       "conflictingEvidence": "INV-035 says an edited evidence item keeps its identifier; causa-storage v1.0.0 corrects evidence only by EvidenceSuperseded to a new id; R3 and CONTRACT §5.5 keep admitted content immutable.",
-      "alternatives": ["A: label, source and URL are revisable with the same id (EvidenceRevised); content changes only by supersession (new id, relationships stay on the old item until reassessed)", "B: content also revisable in place with the same id"],
+      "alternatives": [
+        "A: label, source and URL are revisable with the same id (EvidenceRevised); content changes only by supersession (new id, relationships stay on the old item until reassessed)",
+        "B: content also revisable in place with the same id"
+      ],
       "recommendation": "A. It keeps evidence (the admitted original) distinct from its description and from interpretations.",
       "compatibilityImpact": "A: as proposed. B: breaks the immutability of admitted content.",
-      "deferralConsequence": "J2-06/J2-09 evidence edits have no defined meaning."
+      "deferralConsequence": "J2-06/J2-09 evidence edits have no defined meaning.",
+      "question": "INV-035 says an edited evidence item keeps its identifier; storage keeps admitted content immutable and corrects it by supersession to a new id. What may an evidence edit change while keeping the id?"
     },
     {
       "decisionId": "OD-CR-08",
       "title": "Adopt this contract package and its validator as owner-controlled verification assets",
       "blocking": true,
       "status": "open",
-      "affects": ["COMPETITION-CONSUMPTION.md", "tools/contract-readiness", "every registry in this package"],
+      "affects": [
+        "COMPETITION-CONSUMPTION.md",
+        "tools/contract-readiness",
+        "every registry in this package"
+      ],
       "conflictingEvidence": "OD-INDY-22 forbids a rehearsal to copy code from earlier work; OD-HC-05 B chose route R2 (freeze checks as owner-controlled verification assets that the rehearsal runs from the governed checkout). This package is agent-authored and not frozen, and no Conditor, Praxis, Dokimos or Ordo step runs it today.",
-      "alternatives": ["A: freeze the package (tag) as a governed verification asset, run from SRC like verification/ (route R2), and add `contract-readiness check --require-pass` to the T0 preflight", "B: reference only; competition agents read it but nothing enforces it", "C: fold the registries into the v4.1.6 successor package"],
+      "alternatives": [
+        "A: freeze the package (tag) as a governed verification asset, run from SRC like verification/ (route R2), and add `contract-readiness check --require-pass` to the T0 preflight",
+        "B: reference only; competition agents read it but nothing enforces it",
+        "C: fold the registries into the v4.1.6 successor package"
+      ],
       "recommendation": "A, with C for the parts OD-CR-01 compiles into v4.1.6.",
       "compatibilityImpact": "None on data or contracts.",
-      "deferralConsequence": "Competition agents may consume it, but it has no governed status and its gate is advisory."
+      "deferralConsequence": "Competition agents may consume it, but it has no governed status and its gate is advisory.",
+      "question": "Should this contract package (docs/contract-readiness/causa-precompetition, at the PACKAGE-MANIFEST.json pinned below) and its validator tools/contract-readiness become owner-controlled verification assets that a rehearsal runs from the governed checkout?",
+      "pins": [
+        {
+          "path": "docs/contract-readiness/causa-precompetition/PACKAGE-MANIFEST.json"
+        }
+      ]
     },
     {
       "decisionId": "OD-CR-07",
       "title": "Actor identity for UI writes",
       "blocking": true,
       "status": "open",
-      "affects": ["F.Envelope.actor", "every write command"],
+      "affects": [
+        "F.Envelope.actor",
+        "every write command"
+      ],
       "conflictingEvidence": "actorId must be stable, non-secret and non-personal (CONTRACT §5.3); ActorContext = {ActorId: string} does not say where it comes from (DATA-REPOSITORY-CONTRACT.md S7). Rehearsal workspaces used 'live-test-operator'.",
-      "alternatives": ["A: a fixed configured id per deployment, kind human (for example 'causa-operator')", "B: an opaque id derived from the GitHub account id (personal data; not recommended)"],
       "recommendation": "A.",
       "compatibilityImpact": "None.",
-      "deferralConsequence": "Each agent picks its own actor id; histories differ between runs."
+      "deferralConsequence": "Each agent picks its own actor id; histories differ between runs.",
+      "question": "Every stored event carries an actorId that must be stable, non-secret and non-personal (CONTRACT §5.3); no contract says where the UI gets it. Where does it come from?",
+      "alternatives": [
+        "A: a fixed configured id per deployment, kind human: causa-operator",
+        "B: an opaque id derived from the GitHub account id (personal data; not recommended)"
+      ]
     }
   ]
 }

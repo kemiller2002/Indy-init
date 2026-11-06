@@ -217,7 +217,22 @@ module Package =
                       Meaning = Json.strOpt "meaning" f }))
         types, fields
 
-    let load (dir: string) : ContractPackage =
+    /// Every decision the owner has recorded in the approvals file: decision_id -> (approval id, option or action).
+    let recordedDecisions (approvalsPath: string) : Map<string, string * string> =
+        if not (File.Exists approvalsPath) then Map.empty
+        else
+            Json.arrOf "approvals" (Json.parseFile approvalsPath)
+            |> List.collect (fun a ->
+                let id = Json.strOpt "id" a |> Option.defaultValue "?"
+                Json.arrOf "changes" a
+                |> List.choose (fun c ->
+                    Json.strOpt "decision_id" c
+                    |> Option.map (fun d -> d, (id, Json.strOpt "option" c |> Option.defaultValue (Json.strOpt "action" c |> Option.defaultValue "")))))
+            |> List.fold (fun m (d, v) -> Map.add d v m) Map.empty
+
+    /// A decision's status comes from the owner's approvals file, never from this package: a request is open until the
+    /// owner records it (RDP-003).
+    let load (dir: string) (recorded: Map<string, string * string>) : ContractPackage =
         let read name = Json.parseFile (Path.Combine(dir, name))
         let cer = read "COMMAND-EVENT-REGISTRY.json"
         let st = read "STATE-TRANSITIONS.json"
@@ -264,7 +279,10 @@ module Package =
                 { DecisionId = Json.fieldStr "decisionId" d
                   Title = Json.fieldStr "title" d
                   Blocking = Json.boolOf "blocking" d
-                  Status = Json.fieldStr "status" d
+                  Status =
+                    match recorded.TryFind(Json.fieldStr "decisionId" d) with
+                    | Some(approval, option) -> sprintf "recorded %s (%s)" option approval
+                    | None -> Json.fieldStr "status" d
                   Affects = strList "affects" d }) }
 
     let variantOfEvent (variants: EventVariant list) (eventType: string) (payload: TV) : EventVariant option =
