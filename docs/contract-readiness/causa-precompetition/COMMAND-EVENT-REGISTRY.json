@@ -93,7 +93,7 @@
         {"fieldId": "F.Payload.InvestigationStarted.title", "source": "ui:INV-002; blank title falls back to the problem statement (FIELD-MAPPING.md InvestigationStarted.title)"},
         {"fieldId": "F.Payload.InvestigationStarted.observationId", "source": "derived: new UUID for the initial observation"},
         {"fieldId": "F.Envelope.occurredAt", "source": "session: RequestContext.Now truncated to milliseconds at the command boundary (CONTRACT §2.9)"},
-        {"fieldId": "F.Envelope.actor", "source": "session: ActorContext (OD-CR-07)"},
+        {"fieldId": "F.Envelope.actor", "source": "session: the fixed configured actor {actorId: causa-operator, kind: human} (OD-CR-07 A, APR-CR-OWNER-1)"},
         {"fieldId": "F.Envelope.correlationId", "source": "derived: CommandEnvelope.CommandId, fresh per command (CONTRACT §5.4)"}
       ],
       "preconditions": ["connected with write permission (IF41-WIRE Connect)", "target is a working copy: Writable.ofAddress accepts WorkspaceAddress.workingCopy only (v4.1.5 W1)", "no investigation with this id exists in the working copy"],
@@ -212,7 +212,7 @@
       "inputs": [
         {"fieldId": "F.Payload.HypothesisRecorded.hypothesisId", "source": "derived: new UUID"},
         {"fieldId": "F.Payload.HypothesisRecorded.statement", "source": "ui:INV-026"},
-        {"fieldId": "F.Payload.HypothesisRecorded.mechanism", "source": "ui:INV-011 (optional on record, CF-03 A; mapping OD-CR-05)"}
+        {"fieldId": "F.Payload.HypothesisRecorded.mechanism", "source": "ui:INV-011 (explanation = mechanism, OD-CR-05 A; optional on record, CF-03 A)"}
       ],
       "preconditions": ["investigation exists in a working copy"],
       "validationErrors": [{"code": "INV-026", "rule": "non-blank, maxLength 10000"}, {"code": "INV-011", "rule": "maxLength 10000; non-blank when given"}],
@@ -222,7 +222,7 @@
       "authorization": "Writable working copy; agent actors may not record hypotheses (CONTRACT §5.3, D-004).",
       "persistenceEffect": "SaveInput.Edit.",
       "tests": ["T-IMPL-CMD-HYP-ADD-01"],
-      "blockedBy": ["OD-CR-05"],
+      "blockedBy": [],
       "sources": ["INV-009", "INV-011", "INV-026", "CF-03 A"]
     },
     {
@@ -235,7 +235,7 @@
       "inputs": [
         {"fieldId": "F.Payload.HypothesisRevised.hypothesisId", "source": "selection"},
         {"fieldId": "F.Payload.HypothesisRevised.statement", "source": "ui:INV-026"},
-        {"fieldId": "F.Payload.HypothesisRevised.mechanism", "source": "ui:INV-011 (required when edited in detail, CF-03 A)"}
+        {"fieldId": "F.Payload.HypothesisRevised.mechanism", "source": "ui:INV-011 (= mechanism, OD-CR-05 A; required when edited in detail, CF-03 A)"}
       ],
       "preconditions": ["hypothesis exists"],
       "validationErrors": [{"code": "INV-026", "rule": "non-blank, maxLength 10000"}, {"code": "INV-011", "rule": "non-blank, maxLength 10000"}],
@@ -245,7 +245,7 @@
       "authorization": "Writable working copy.",
       "persistenceEffect": "SaveInput.Edit; needs causa-storage 1.1.0.",
       "tests": ["T-IMPL-CMD-HYP-EDIT-01 id kept, earlier text in history (INV-035)"],
-      "blockedBy": ["OD-CR-01", "OD-CR-05"],
+      "blockedBy": ["OD-CR-01"],
       "sources": ["INV-035", "S04"]
     },
     {
@@ -289,7 +289,7 @@
         {"fieldId": "F.Payload.EvidenceRevised.source", "source": "ui:INV-028"},
         {"fieldId": "F.Payload.EvidenceRevised.sourceUrl", "source": "ui:INV-029"}
       ],
-      "preconditions": ["evidence exists and is not superseded"],
+      "preconditions": ["evidence exists and is not superseded", "only label, source and URL change; the admitted content changes only by EvidenceSuperseded to a new id (OD-CR-06 A)"],
       "validationErrors": [{"code": "INV-027", "rule": "non-blank, maxLength 200"}, {"code": "INV-029", "rule": "SafeUrl"}],
       "transitions": [],
       "resultEvents": ["EvidenceRevised"],
@@ -297,7 +297,7 @@
       "authorization": "Writable working copy.",
       "persistenceEffect": "SaveInput.Edit; needs causa-storage 1.1.0.",
       "tests": ["T-IMPL-CMD-EVD-EDIT-01 id kept; content unchanged; earlier label in history"],
-      "blockedBy": ["OD-CR-01", "OD-CR-06"],
+      "blockedBy": ["OD-CR-01"],
       "sources": ["INV-035", "R3"]
     },
     {

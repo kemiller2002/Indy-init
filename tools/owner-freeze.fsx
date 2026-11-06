@@ -503,7 +503,7 @@ let decide repo dryRun (p: Package) =
             // A Rehearsal 010 decision whose pinned file has changed since it was recorded is asked again; the
             // later record supersedes it (the lock and launch-preflight read the latest).
             let stale =
-                done' && p.Name = "rehearsal-010"
+                done' && (p.Name = "rehearsal-010" || p.Name = "contract-readiness")
                 && (recorded |> List.filter (fun c -> str c "decision_id" = str r "id") |> List.tryLast
                     |> Option.exists (fun c -> staleRecord repo c))
             if stale then

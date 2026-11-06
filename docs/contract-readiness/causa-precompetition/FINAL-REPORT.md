@@ -136,7 +136,33 @@ Ordered by consequence.
 3. **Record ODR-V415-02.** After #143 merges, run `owner-freeze.fsx -- approve v4.1.5`.
 4. **Agent follow-up.** `contract-readiness generate` reads the recorded answers: a recorded decision stops blocking the gate. The bindings and commands it unblocks still have to be applied, for example releasing causa-storage 1.1.0 and compiling v4.1.6 under OD-CR-01 A, before the verdict can reach PASS.
 
-## 7. Process
+## 7. Applying the recorded decisions (2026-11-06)
+
+The owner recorded **APR-CR-OWNER-1**, which chose A for every decision OD-CR-01..08, and **APR-V415-OWNER-3**, which approves v4.1.5 (now tagged `indy-init-requirements-v4.1.5`). The gate reads both.
+
+**Applied in this package:**
+
+| Decision | What changed |
+|---|---|
+| OD-CR-05 A | INV-011 maps to `HypothesisRecorded.mechanism`. UB-011 is covered, and CMD-HYP-ADD is no longer blocked. |
+| OD-CR-06 A | An evidence edit keeps the id for the label, source and URL only. The content changes only by `EvidenceSuperseded`. This is written into CMD-EVD-EDIT and UB-035. |
+| OD-CR-07 A | Every UI write uses the actor `{actorId: causa-operator, kind: human}`. This is written into CMD-INV-CREATE and the Provenance entity. |
+
+**Still to apply.** These need more than a package edit:
+
+- **OD-CR-02 A, -03 A, -04 A: catalog amendment.** The amendment adds a required INV-045 "Evidence category" and a required INV-046 "Conclusion strength", and makes INV-028 required. The ratified catalog's sha256 is pinned by:
+  - `docs/rehearsal-010-readiness/scope-manifest.json`;
+  - `kickoff/rehearsal-010/catalog-verification-contract.json`;
+  - SCREEN-MANIFEST and the two successor scope manifests.
+
+  So the amendment has to go through a catalog successor, ratification and a scope recompile that the owner re-approves. Until then, UB-012 and UB-028 stay blocked. UB-032 and UB-033 also stay blocked.
+- **OD-CR-01 A: storage release and successor package.**
+  - **causa-storage 1.1.0** is a `contract/1.1.0/` tree in causa-data. causa-data's fixtures and its gate are produced by the reference engine pinned in `engine.lock.json` (`indy-init-rehearsal-001` `55f49f6`), and that engine has none of the six new commands. The release needs the causa-data owner, or a decision to publish 1.1.0 as schemas only, without engine-generated fixtures. This session has read-only access to causa-data.
+  - **v4.1.6** is compiled with `requirements-compiler v41` from v4.1.5, plus 6 `CoreEvent` cases and 7 `CoreCommand` cases. It needs X01–X21, an independent review, `approve` and `tag`. v4.1.5 took about five hours from candidate to its freeze record (estimate from its commit history).
+
+**Re-confirmation.** OD-CR-01 and OD-CR-08 pinned exact content. Applying the decisions above changed `DOMAIN-CONTRACT.json`, `COMMAND-EVENT-REGISTRY.json`, `UI-FIELD-MAP.json` and validator sources, so the gate reports both decisions as stale. After this change merges, the owner confirms them again with `owner-freeze.fsx -- decide contract-readiness`. The script now asks again only about a record whose pinned file has changed.
+
+## 8. Process
 
 - Work is on branch `claude/loving-turing-ixvzqx` in Indy-init. Nothing is merged.
 - No frozen package, approval record, application code, experiment code, verification asset or causa-data file was changed.

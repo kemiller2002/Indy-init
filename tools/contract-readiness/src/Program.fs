@@ -56,7 +56,49 @@ let private generatedNames = [ "FIELD-REGISTRY.json"; "HISTORICAL-DATA-INVENTORY
 let run (mode: string) (dataRoot: string) (indyRoot: string) (requirePass: bool) =
     let pkgDir = Path.Combine(indyRoot, "docs", "contract-readiness", "causa-precompetition")
     let approvalsPath = Path.Combine(indyRoot, "kickoff", "rehearsal-007", "approvals.causa.json")
-    let pkg = Package.load pkgDir (Package.recordedDecisions approvalsPath)
+    let recorded = Package.recordedDecisions approvalsPath
+    // A recorded decision stays in force only while every file it pinned is unchanged (owner-freeze re-asks it otherwise).
+    // A pinned PACKAGE-MANIFEST.json is generated, so it is compared by content: the pinned version is found in git
+    // history, and every authored package file and validator source it lists must still have its pinned sha256.
+    let generatedFiles = Set.ofList [ "FIELD-REGISTRY.json"; "HISTORICAL-DATA-INVENTORY.json"; "VERIFICATION-MATRIX.json"; "CONTRACT-READINESS.json"; "proposals/owner-decision-requests.json" ]
+    let gitText (args: string list) =
+        try
+            let psi = Diagnostics.ProcessStartInfo("git", ["-C"; indyRoot] @ args, RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false)
+            use p = Diagnostics.Process.Start psi
+            let out = p.StandardOutput.ReadToEnd()
+            p.WaitForExit()
+            if p.ExitCode = 0 then Some out else None
+        with _ -> None
+    let changedSince (path: string) (sha: string) : string list option =
+        let rel = path
+        let full = Path.Combine(indyRoot, rel)
+        if rel.EndsWith "/PACKAGE-MANIFEST.json" then
+            let pinned =
+                gitText [ "log"; "--format=%H"; "--"; rel ]
+                |> Option.map (fun s -> s.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray)
+                |> Option.defaultValue []
+                |> List.tryPick (fun c -> gitText [ "show"; c + ":" + rel ] |> Option.filter (fun t -> Json.sha256Text t = sha))
+            pinned
+            |> Option.map (fun text ->
+                let m = Json.parse text
+                let dir = Path.GetDirectoryName rel
+                (Json.arrOf "files" m |> List.filter (fun f -> not (generatedFiles.Contains(Json.fieldStr "path" f))) |> List.map (fun f -> Path.Combine(dir, Json.fieldStr "path" f), Json.fieldStr "sha256" f))
+                @ (Json.arrOf "validator" m |> List.map (fun f -> Json.fieldStr "path" f, Json.fieldStr "sha256" f))
+                |> List.filter (fun (p, s) -> not (File.Exists(Path.Combine(indyRoot, p))) || Json.sha256File (Path.Combine(indyRoot, p)) <> s)
+                |> List.map fst)
+        elif File.Exists full then Some(if Json.sha256File full = sha then [] else [ rel ])
+        else Some [ rel ]
+    let statusOf (id: string) =
+        recorded.TryFind id
+        |> Option.map (fun (approval, option, pins) ->
+            let changes = pins |> List.map (fun (p, s) -> p, changedSince p s)
+            match changes |> List.tryFind (snd >> Option.isNone) with
+            | Some(p, _) -> sprintf "open (recorded %s in %s, but the pinned version of %s is not in this checkout's history: unverifiable)" option approval p
+            | None ->
+                match changes |> List.collect (snd >> Option.defaultValue []) with
+                | [] -> sprintf "recorded %s (%s)" option approval
+                | changed -> sprintf "open (stale: recorded %s in %s, but pinned content changed since: %s; the owner confirms it again with owner-freeze decide contract-readiness)" option approval (String.Join(", ", changed |> List.map Path.GetFileName |> List.distinct)))
+    let pkg = Package.load pkgDir statusOf
     // The owner-freeze request file (`owner-freeze.fsx decide contract-readiness`), generated from
     // OWNER-DECISIONS.proposed.json so the two never disagree. ODR-V415-02 is recorded by `approve v4.1.5` instead.
     let requestsText =
