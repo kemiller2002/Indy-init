@@ -138,7 +138,9 @@ let fixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixture -> string
     write (Path.Combine(f.Runs, "path-4242")) ".github/workflows/live-provider-preflight.yml\n"
     write (Path.Combine(f.Runs, "path-777")) ".github/workflows/preflight-tooling.yml\n"
     write (Path.Combine(f.Runs, "run-777.json")) $"{{\"workflowName\":\"Preflight tooling\",\"headBranch\":\"main\",\"event\":\"push\",\"conclusion\":\"success\",\"headSha\":\"{h1}\"}}\n"
-    write (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "cases.tsv")) "case\ttitle\tverdict\nC01\tzero tests\tVALIDATED\nC02\tgate\tVALIDATED\n"
+    // The layout CI publishes: one table per adversarial shard, each holding only its own cases.
+    write (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-0", "cases.tsv")) "case\ttitle\tverdict\nC01\tzero tests\tVALIDATED\n"
+    write (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv")) "case\ttitle\tverdict\nC02\tgate\tVALIDATED\n"
     let stub =
         [ @"#!/bin/sh"
           @"# gh stand-in (fixture). api: GitHub's verdict on a commit (valid, committer = git's committer name, unless marked"
@@ -309,8 +311,9 @@ let cases =
       case "adversarial-run-of-another-workflow-file" "LP-09" (fun f -> write (Path.Combine(f.Runs, "path-777")) ".github/workflows/lookalike.yml\n")
       case "adversarial-run-on-a-branch" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "run-777.json")) "\"headBranch\":\"main\"" "\"headBranch\":\"agent-branch\"")
       case "adversarial-run-failed" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "run-777.json")) "\"conclusion\":\"success\"" "\"conclusion\":\"failure\"")
-      case "adversarial-case-not-validated" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "cases.tsv")) "C02\tgate\tVALIDATED" "C02\tgate\tFAILED")
-      case "adversarial-case-missing" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "cases.tsv")) "C02\tgate\tVALIDATED\n" "")
+      case "adversarial-case-not-validated" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv")) "C02\tgate\tVALIDATED" "C02\tgate\tFAILED")
+      case "adversarial-case-missing" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv")) "C02\tgate\tVALIDATED\n" "")
+      case "adversarial-shard-table-missing" "LP-09" (fun f -> File.Delete(Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv")))
       case "adversarial-run-of-older-tools" "LP-09" (fun f -> write (Path.Combine(f.Indy, "tools/r10/new-tool.fsx")) "// new\n"; commitPush f "tools")
       // LP-10: the competition repository, as published
       case "clock-already-started" "LP-10" (fun f ->

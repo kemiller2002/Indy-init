@@ -385,11 +385,13 @@ let lp09 =
     let defined =
         let f = path "tools/r10/adversarial.fsx"
         if File.Exists f then Regex.Matches(File.ReadAllText f, "\\{ Id = \"(C[0-9]+)\"") |> Seq.map (fun m -> m.Groups[1].Value) |> Set.ofSeq else Set.empty
-    let judged (meta: JsonNode) (tsv: string) =
+    /// Every cases.tsv the run published: one per adversarial shard (adv-evidence/adversarial-shard-N/cases.tsv), or a
+    /// single one from an unsharded run. The run validates a case only if some shard's table says so.
+    let judged (meta: JsonNode) (tsvs: string list) =
         let headSha = str meta "headSha"
         let ancestor = headSha <> "" && fst (git src [ "merge-base"; "--is-ancestor"; headSha; "HEAD" ]) = 0
         let unchanged = ancestor && fst (git src [ "diff"; "--quiet"; headSha; "HEAD"; "--"; "tools"; "verification"; ".github/workflows/preflight-tooling.yml" ]) = 0
-        let rows = File.ReadAllLines tsv |> Array.skip 1 |> Array.filter (fun l -> l.Trim() <> "") |> List.ofArray
+        let rows = tsvs |> List.collect (fun tsv -> File.ReadAllLines tsv |> Array.skip 1 |> Array.filter (fun l -> l.Trim() <> "") |> List.ofArray)
         let validated = rows |> List.filter (fun l -> l.EndsWith "VALIDATED") |> List.map (fun l -> l.Split('\t').[0]) |> Set.ofList
         let missing = Set.difference defined validated
         fail (str meta "workflowName" = "Preflight tooling") $"""run is workflow "{str meta "workflowName"}", not "Preflight tooling" """
@@ -409,11 +411,11 @@ let lp09 =
             if wfPath <> ".github/workflows/preflight-tooling.yml" then [ $"run {id} is of workflow file {wfPath}, not .github/workflows/preflight-tooling.yml" ] else
             let dir = tempDir "adversarial"
             let dcode, dout = run src gh [ "run"; "download"; id; "--repo"; indyInitRepo; "--name"; "r10-adversarial"; "--dir"; dir ]
-            let tsv = if Directory.Exists dir then Directory.EnumerateFiles(dir, "cases.tsv", SearchOption.AllDirectories) |> Seq.tryHead else None
+            let tsvs = if Directory.Exists dir then Directory.EnumerateFiles(dir, "cases.tsv", SearchOption.AllDirectories) |> Seq.sort |> List.ofSeq else []
             let result =
-                match dcode, tsv with
-                | 0, Some t -> judged (JsonNode.Parse metaText) t
-                | 0, None -> [ $"run {id} has no r10-adversarial cases.tsv" ]
+                match dcode, tsvs with
+                | 0, [] -> [ $"run {id} has no r10-adversarial cases.tsv" ]
+                | 0, ts -> judged (JsonNode.Parse metaText) ts
                 | _ -> [ $"gh run download {id} failed: {dout}" ]
             (try Directory.Delete(dir, true) with _ -> ())
             result)
