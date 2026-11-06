@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.r9-toolchain-lock/1",
- "description": "Proposed toolchain, requirements package and governed contracts for Rehearsal 010: Rehearsal 009's Conditor and process-evidence pins, the successor package v4.1.4 (corrected suite runners), and the governed catalog, design and deadline contracts of the adversarial-audit remediation. The resolved set is echelon-current 1.37.0, which carries Dokimos 0.11.1 (url-input). Change this file only through the owner decision process.",
+ "description": "Proposed toolchain, requirements package and governed contracts for Rehearsal 010: Rehearsal 009's Conditor and process-evidence pins, the successor package v4.1.5, approved and tagged (it carries v4.1.4's corrected suite runners), and the governed catalog, design and deadline contracts of the adversarial-audit remediation. The resolved set is echelon-current 1.37.0, which carries Dokimos 0.11.1 (url-input). Change this file only through the owner decision process.",
  "conditor": {
   "version": "0.10.20",
   "tag": "v0.10.20",
@@ -77,14 +77,14 @@
   "approval": "echelon-current 1.37.0 approved by the owner (sets/echelon-current/1.37.0.json, OD-INDY-8; echelon-registry#109 merged as 5752402) after Conditor qualified it (conditor#131)"
  },
  "requirementsPackage": {
-  "path": "requirements-compiled/v4.1.4",
+  "path": "requirements-compiled/v4.1.5",
   "base": "requirements-compiled/v4",
-  "packageVersion": "4.1.4",
-  "tag": "indy-init-requirements-v4.1.4",
-  "tagCommit": "208ec9f187578c0e9c8b871361e302e58ffb84ba",
-  "manifestSha256": "24c68f7a72e38f79c79b1385267806bd0c2eded9f0243a87596f5d3bb68f58df",
-  "verificationPlanSha256": "8254ed03b991dd3d3a56a4e0bf5897c2484bbbf11e67e2f15e80309c1482b973",
-  "approval": "APR-V414-OWNER-1 (ODR-V414-01, -02), APR-V414-OWNER-2 (ODR-V414-03)"
+  "packageVersion": "4.1.5",
+  "tag": "indy-init-requirements-v4.1.5",
+  "tagCommit": "b2b30223f05fd665a8af6c3a87dd134ba6851bec",
+  "manifestSha256": "3c54fffa3eeafb3717e15ed172726c527851a3db1fe696ecf183f7b6b02b9977",
+  "verificationPlanSha256": "2f1c1339e849d12cc6c82ae0a6795ffd565526688425fff9e9f78c5be753ff86",
+  "approval": "APR-V415-OWNER-1 (ODR-V415-01, -03, -04), APR-V415-OWNER-2 (ODR-V415-IF-VIEW), APR-V415-OWNER-3 (ODR-V415-02)"
  },
  "workstationTargetId": "indy-init-r9-workstation",
  "processEvidence": {
@@ -96,11 +96,11 @@
   "proposedSha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d",
   "rulesStatus": "PINNED: the owner recorded ODR-R10-14 = A with this file's digest (APR-R10-OWNER-1)"
  },
- "status": "PROPOSED: not an owner pin. Recorded: v4.1.4 (APR-V414-OWNER-1, -2; tag indy-init-requirements-v4.1.4), the Rehearsal 010 decisions and the ratified catalog (APR-R10-OWNER-1), echelon-current 1.37.0 with Dokimos 0.11.1 (echelon-registry#109). Still the owner's: ODR-R10-03 again (the catalog contract now names the ratified catalog) and ODR-R10-01 for this scopeSha256, then the live-provider run, then renaming this file to toolchain.lock.json in the owner's own commit (ODR-RG-04). Until then Rehearsal 010 has no approved lock.",
+ "status": "PROPOSED: not an owner pin. Recorded: v4.1.5 (APR-V415-OWNER-1..3; tag indy-init-requirements-v4.1.5), the Rehearsal 010 decisions and the ratified catalog (APR-R10-OWNER-1), echelon-current 1.37.0 with Dokimos 0.11.1 (echelon-registry#109). Still the owner's: ODR-R10-03 again (the catalog contract now names the ratified catalog) and ODR-R10-01 for this scopeSha256, then the live-provider run, then renaming this file to toolchain.lock.json in the owner's own commit (ODR-RG-04). Until then Rehearsal 010 has no approved lock.",
  "scope": {
   "manifest": "docs/rehearsal-010-readiness/scope-manifest.json",
-  "scopeSha256": "59bfef5a62a3ab43ef19c08b5915ffaf3d408bd55d8add874c5f1071e7cd087c",
-  "approval": "ODR-R10-01 (pending: the owner approves this scopeSha256 with owner-freeze.fsx decide rehearsal-010; v4.1.4 is tagged and the catalog ratified, APR-R10-OWNER-1 ODR-R10-02)",
+  "scopeSha256": "26e6ff3cde467ca97ba9c2eda869947a367854a63dbd221db3987790d949f71f",
+  "approval": "ODR-R10-01 (pending re-record: the approved scope moved from v4.1.4 to the tagged v4.1.5 with unchanged content; the owner re-approves this scopeSha256 with owner-freeze.fsx decide rehearsal-010)",
   "rule": "scope preflight and the Praxis coverage check must pass and the scope checkpoint must be committed before any application code (STARTUP-INSTRUCTIONS.md)"
  },
  "catalogVerification": {
