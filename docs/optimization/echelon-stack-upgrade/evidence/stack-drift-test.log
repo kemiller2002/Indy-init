@@ -1,0 +1,31 @@
+PASS pinnedVersion: exact, v-prefixed and release-asset URL pin
+PASS pinnedVersion: ^, ~, x-range, * and latest float (negative control)
+PASS versionFromOutput: praxis, ordo, percepta and dokimos JSON
+PASS versionFromOutput: no version is None (UNVERIFIED, not PASS)
+PASS matching tools and SDK are PASS
+PASS no registry checkout makes every registry component UNVERIFIED, so not ready
+PASS negative control: installed praxis 3.24.0 against 3.25.0 is DRIFT and not ready
+PASS negative control: a missing required tool is BLOCKED
+PASS negative control: an executable without a version is UNVERIFIED
+PASS an optional system's drift is reported but does not block
+PASS negative control: SDK 10.0.403 installed against 10.0.402 is DRIFT
+PASS negative control: no dotnet is BLOCKED
+PASS negative control: global.json that rolls forward is DRIFT
+PASS negative control: Forma 0.12.0 declared against 0.13.0 is DRIFT
+PASS negative control: a floating Forma range is DRIFT even when it would resolve to 0.13.0
+PASS negative control: an installed node_modules version that differs is DRIFT
+PASS negative control: an Echelon npm package outside the lock is BLOCKED
+PASS Limen F# packages map to limen-fsharp; Arca outside the lock is BLOCKED
+PASS negative control: a workflow downloading Forma 0.12.0 is DRIFT
+PASS negative control: setup-dotnet 10.0.x with global.json rollForward disable is DRIFT (HF-029); global-json-file is PASS
+PASS negative control: a Conditor manifest naming Forma 0.12.0 is DRIFT
+PASS negative control: an artifact whose digest differs is BLOCKED
+PASS negative control: an unobtainable artifact is UNVERIFIED
+PASS package mapping falls back to a lock's distributions and artifact names (the frozen v4 lock has no package fields)
+PASS artifactUrl: a file distribution (npm) is used as is; a release page falls back to the tag's asset
+PASS negative control: a lock version that is not the set's version is DRIFT
+PASS negative controls: toolchain lock on 1.36.0 and Conditor 0.10.18, and a Conditor binary of another digest, are DRIFT
+PASS negative control: a toolchain-lock tool outside the dependency lock is BLOCKED
+PASS negative controls (lock): a prerelease, a digest the set does not record and a forbidden framework are problems
+PASS lock: reproduces the frozen v4 lock from the v4 source (deep JSON equality, no problems)
+stack-drift test: 30/30 passed

@@ -1,0 +1,36 @@
+PASS       echelon-current    release set                                                expected 1.37.0 bc7d163d7ff4bda0eeafe741b3bc0aedf93427526184fe347862ac69f9abe22f; actual match
+PASS       limen              release manifest                                           expected 0.9.1 54f088e76880308b2db1f7d447ad946d95d1a7f384893f0da2ae63937f6a1655; actual match
+PASS       limen-fsharp       release manifest                                           expected 0.9.0 d8aec120fdaff6bb2a9dcd6e4d79b8a92d69f8cc0227de1c6b7166c6c3b8ce3a; actual match
+PASS       forma              release manifest                                           expected 0.13.0 cc096c903785434ac4f664e709819a2599765c16b66ebd9825db87930b0fc2d5; actual match
+PASS       folio              release manifest                                           expected 0.4.1 d453d980ce7f81e3c5bd227e34bd8d287417ea79ca09aa97ae9fdc56a28c6880; actual match
+PASS       praxis             release manifest                                           expected 3.25.0 b42b9cf7cf2b3a436f7419c03fccc32d123abe0594839889fe8b6372cfb46a41; actual match
+PASS       dokimos            release manifest                                           expected 0.11.1 c5bf0df99823aaf1f3d2fc0f11f56cc92f266952df4733e32f18719a56f9b285; actual match
+PASS       ordo               release manifest                                           expected 1.20.0 ac58cf8b42542ad3ad3cb3d5e9e95abaf660e3dcef5b84f85a6b52b7255563c0; actual match
+PASS       percepta-semantic  release manifest                                           expected 0.4.0 07e4e640816e480b456ad3ce6e3562cc7aae8717a75db5683a2addcac02b1ee8; actual match
+PASS       percepta           release manifest                                           expected 0.1.0 07b6291c63ff25e6b669edb8c845e48ba76831b6a6133efa4ad3a390439b1b2b; actual match
+PASS       aegis              release manifest                                           expected 1.0.0 4530cfa3396c1e57d3e1a6500c661cd2d520236e852d1d9e88aa44c385d0bd6b; actual match
+DRIFT      dotnet-sdk         global.json                                                expected 10.0.402; actual 10.0.403
+           -> pin global.json to the locked SDK
+BLOCKED    dotnet-sdk         installed SDK (dotnet --version)                           expected 10.0.402; actual exit 155: 10.0.402 [$HOME/.dotnet/sdk]
+           -> install .NET SDK 10.0.402 (dotnet-install.sh --version 10.0.402)
+PASS       praxis             installed praxis                                           expected 3.25.0; actual 3.25.0
+PASS       dokimos            installed dokimos                                          expected 0.11.1; actual 0.11.1
+PASS       ordo               installed ordo                                             expected 1.20.0; actual 1.20.0
+PASS       percepta-semantic  installed percepta                                         expected 0.4.0; actual 0.4.0
+PASS       percepta           installed percepta-repo                                    expected 0.1.0; actual 0.1.0
+DRIFT      forma              declared in neg: package.json                              expected 0.13.0; actual 0.99.0
+           -> pin forma to 0.13.0, the locked version
+DRIFT      limen              declared in neg: package.json                              expected 0.9.1; actual floating specifier '^0.9.1'
+           -> pin exactly 0.9.1
+PASS       folio              declared in neg: package.json                              expected 0.4.1; actual 0.4.1
+PASS       praxis             component in neg: conditor.json                            expected 3.25.0; actual 3.25.0
+PASS       ordo               component in neg: conditor.json                            expected 1.20.0; actual 1.20.0
+PASS       percepta           component in neg: conditor.json                            expected 0.1.0; actual 0.1.0
+PASS       aegis              component in neg: conditor.json                            expected 1.0.0; actual 1.0.0
+PASS       limen              component in neg: conditor.json                            expected 0.9.1; actual 0.9.1
+PASS       forma              component in neg: conditor.json                            expected 0.13.0; actual 0.13.0
+PASS       folio              component in neg: conditor.json                            expected 0.4.1; actual 0.4.1
+PASS       aegis              EchelonFoundry.Aegis.Core in neg: src/engine/App.Engine.fsproj expected 1.0.0; actual 1.0.0
+PASS       dotnet-sdk         setup-dotnet in neg: .github/workflows/build-and-test.yml:29 expected global-json-file; actual global-json-file
+PASS       dotnet-sdk         setup-dotnet in neg: .github/workflows/candidate-acceptance.yml:66 expected global-json-file; actual global-json-file
+stack-drift: PASS 27, DRIFT 3, BLOCKED 1, UNVERIFIED 0; NOT READY (a required system is not PASS)
