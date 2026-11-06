@@ -325,7 +325,7 @@ jobs:
         run: dotnet build tools/requirements-compiler/src -c Release
       - name: Candidate package v4.1.4 is reproduced byte for byte and X01-X21 pass
         run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --check
-      - name: Percepta's specification preflight finds nothing blocking in v4.1.5, the package Rehearsal 010 is pinned to (FREEZE.md step 2)
+      - name: Percepta's specification preflight finds nothing blocking in v4.1.5, the package Rehearsal 010 is pinned to (v4.1.5 FREEZE.md)
         run: |
           percepta spec-preflight --machines requirements-compiled/v4.1.5/state-machine-contracts.json --invariants requirements-compiled/v4/invariants.json \
             --interfaces requirements-compiled/v4.1.5/analysis/interface-specifications.json --out "$RUNNER_TEMP/spec-preflight-v415.json"

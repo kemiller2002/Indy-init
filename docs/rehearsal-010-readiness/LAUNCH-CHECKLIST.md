@@ -31,7 +31,12 @@
   - approved (ODR-V414-03);
   - tagged;
   - added to the frozen guard.
-- [ ] 5a. v4.1.5 (superseded v4.1.4 for Rehearsal 010): decided (APR-V415-OWNER-1, -2), approved (APR-V415-OWNER-3), tagged `indy-init-requirements-v4.1.5` on b2b3022, added to the frozen guard (#153), and the lock and scopes re-pinned (#155). Then ODR-R10-01 and ODR-R10-19 are re-recorded against the new scope digests.
+- [x] 5a. v4.1.5 (superseded v4.1.4 for Rehearsal 010), done on 2026-11-06:
+  - decided (APR-V415-OWNER-1, -2) and approved (APR-V415-OWNER-3);
+  - tagged `indy-init-requirements-v4.1.5` on b2b3022;
+  - added to the frozen guard (#153);
+  - the lock and scopes re-pinned (#155), and ODR-R10-01 and ODR-R10-19 re-asked (#156).
+- [ ] 5b. Re-record ODR-R10-01 and ODR-R10-19 for the v4.1.5 scope digests (`owner-freeze.fsx decide rehearsal-010`).
 - [ ] 6. Dokimos 0.11.1:
   - merged, tagged and published;
   - artifacts verified;

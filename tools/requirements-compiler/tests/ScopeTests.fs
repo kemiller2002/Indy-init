@@ -256,10 +256,9 @@ let recovery () : string list =
 
 let private manifestPath (source: string) = Path.Combine(source, "docs", "rehearsal-010-readiness", "scope-manifest.json")
 
-/// The package the Rehearsal 010 scope is compiled from: the requirements package the lock pins (v4.1.5 since the
-/// owner approved and tagged it), so the scope checks follow the lock rather than a second hard-coded copy.
-/// The package the Rehearsal 010 lock pins. A lock without requirementsPackage.path is an error, not a default:
-/// a silent fallback would compile the scope from a package the lock does not name.
+/// The package the Rehearsal 010 scope is compiled from: the requirements package the lock pins, so the scope checks
+/// follow the lock rather than a second hard-coded copy. A lock without requirementsPackage.path is an error, not a
+/// default: a silent fallback would compile the scope from a package the lock does not name.
 let private scopePackage (source: string) =
     let lock = Path.Combine(source, "kickoff", "rehearsal-010", "toolchain.lock.proposed.json")
     parseFile lock

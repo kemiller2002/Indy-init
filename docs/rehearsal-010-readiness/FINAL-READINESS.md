@@ -1,5 +1,7 @@
 # Rehearsal 010 final readiness
 
+> **Superseded in part (2026-11-06).** Rehearsal 010 is now pinned to the frozen v4.1.5 (tag `indy-init-requirements-v4.1.5` on b2b3022; APR-V415-OWNER-1..3). The scope is `26e6ff3c…` (#155), and ODR-R10-01 and ODR-R10-19 are re-asked for it (#156). The v4.1.4 package and scope rows below are kept as they were recorded.
+
 ## Decision: READY FOR OWNER ACTION
 
 Engineering is complete and verified:
