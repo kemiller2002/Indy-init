@@ -1,0 +1,69 @@
+{
+ "round": 7,
+ "package": "requirements-compiled/v4.1.5",
+ "commit": "2dfc12fed360243cd10190b213d1c815d5b86299",
+ "verdict": "PASS",
+ "reviewer": "Independent general-purpose review agents spawned by the lead/integration session (session_01G1iECgS2MYoyqvc2eXNdhV), separate from the package author (workstream D, session_01G1iECgvwA92qPWSR19ZXxX). Recorded here by the package author from the lead's reports.",
+ "scope": "FREEZE step 2 (PR #143): confirmation of L1-L3",
+ "summary": "L1-L3 confirmed fixed. L2: a record by another authority (mallory) committed under the owner identity is ignored and a change naming it refused; an agent-authored approvals commit is refused by v415ApprovalsHistory alone; an owner-identity rewrite of APR-V415-OWNER-2 is refused as append-only; a shallow clone fails closed. L1: the controls read the requests at <record>^ and a HEAD-reading regression fails the offline suite. L3: a change relabelled to another decision is refused. Clean head: offline suite all passed; v415OwnerRecords, its controls and v414OwnerRecords return []. Observation (not a defect): on a tampered tree the re-pin fixture control also fires.",
+ "previousRounds": [
+  {
+   "round": 1,
+   "scope": "v4.1.5 core (PR #135)",
+   "commit": "f91bd7b",
+   "verdict": "FAIL",
+   "summary": "H1: a catalog could reach a writable save session (an asserted WorkspaceAddress role; a run id equal to a catalog workspace). H2: the pending415 CI guard accepted other blanked approvals. M1: the departure from ODR-R10-32 A (one combined package) was not disclosed in the requests. M2: the A4 falsification-scope weakening was not stated. L1, L2, Info: wording."
+  },
+  {
+   "round": 2,
+   "scope": "v4.1.5 core (PR #135)",
+   "commit": "730e2d6",
+   "verdict": "PASS",
+   "summary": "H1, H2, M1, M2, L1, L2 confirmed fixed by probes (forged addresses refused with FS1093; the guard refuses tampers; approve requires ODR-V415-01/-03/-04; the A4 weakening stated). New: N1 (carried owner-approved state-machine content unenforced, Medium), N2 (the run-id regex accepted a trailing newline, Low)."
+  },
+  {
+   "round": 3,
+   "scope": "v4.1.5 core (PR #135)",
+   "commit": "51adf76",
+   "verdict": "PASS",
+   "summary": "N1 and N2 confirmed fixed (six tampers refused; pins recomputed; 'r10\\n' -> None). 921f66f ports the N1 check to F# like for like (author-reported with tamper output, not re-reviewed)."
+  },
+  {
+   "round": 4,
+   "scope": "IF41-VIEW fold (PR #137)",
+   "commit": "8415935",
+   "verdict": "PASS",
+   "summary": "ODR-V415-01/-03/-04 byte-identical; approve gated on IF-VIEW; guard 2+7. Findings: F1 (request digest pins unenforced, Medium), F2 (contract comments claimed guarantees the types do not give, Medium), F3 (RequireQualifiedAccess collisions, Low), F4 (unowned files, Low), F5 (project-structure pin, Low, optional)."
+  },
+  {
+   "round": 5,
+   "scope": "IF41-VIEW fold (PR #137)",
+   "commit": "f838f35",
+   "verdict": "PASS",
+   "summary": "F1-F5 confirmed fixed (the Backdoor tamper refused; collisions gone; all 66 sharedFiles owned; the project-structure pin bites). Caveat: the owner's records carry no digests, so the owner-record check must read the requests at the parent of each record's commit; addressed in step 2. 07 is byte-identical to PR #139 (sha256 e1e58486...)."
+  },
+  {
+   "round": 6,
+   "scope": "FREEZE step 2 (PR #143)",
+   "commit": "64d4695",
+   "verdict": "PASS",
+   "summary": "Approval fields exact; requests read at <record>^ (cb512c3, 5926822, both owner commits); tampers refused; a shallow clone fails closed; CI uses fetch-depth 0; --check 21/21 (v4.1.5, v4.1.4), 20/20 (v4.1.2, v4.1.1); contracts typecheck, FS1093; both bootstraps build; offline suite passes. Findings: L1 (controls judged against HEAD's requests), L2 (authority id not required to be the owner; relied on the v4.1.4 history guard), L3 (a change's decision not compared with the pinning decision). Info: transitions also covered by the carried-amendments check."
+  }
+ ],
+ "ownerRecords": {
+  "APR-V415-OWNER-1": {
+   "commit": "cb512c3",
+   "decisions": {
+    "ODR-V415-01": "A",
+    "ODR-V415-03": "A",
+    "ODR-V415-04": "A"
+   }
+  },
+  "APR-V415-OWNER-2": {
+   "commit": "5926822",
+   "decisions": {
+    "ODR-V415-IF-VIEW": "A"
+   }
+  }
+ }
+}

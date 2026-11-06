@@ -743,35 +743,35 @@
    "file": "contracts/00-DOMAIN-STUBS.fs",
    "sha256": "877d18e46bf17fe77eedfcfe8bdc0a85f543773cf7a8a15bec2a3e9b7c4b4e55",
    "decision": "ODR-V415-01",
-   "approval": "",
+   "approval": "APR-V415-OWNER-1",
    "summary": "E1: CoreEvent represents every causa-storage v1.0.0 event (50 cases, every v4.1.4 name kept); EventEnvelope gains Provenance; MarkHypothesisPlausible/Supported and RejectProposal carry what their events need."
   },
   {
    "file": "contracts/02-IF41-STORAGE.fs",
    "sha256": "8a3791ba50e681e6b2c3d90022655f755961a5492d311e3b63545c648f1817fd",
    "decision": "ODR-V415-01",
-   "approval": "",
+   "approval": "APR-V415-OWNER-1",
    "summary": "W1: Workspace, WorkspaceRole, WorkspaceAddress (private; a role is derived by WorkspaceAddress.catalog or .workingCopy, never asserted), InvestigationRef, Writable; PathOf, Verify and VerifiedInvestigation carry the workspace. C1: EncodeNew. E1: VerificationFailure.ReaderStage."
   },
   {
    "file": "contracts/05-IF41-SAVE.fs",
    "sha256": "f758c8bc1dfc2f06ca0f65b3bfabefcf4a7700801b9e13766a320314d57b509e",
    "decision": "ODR-V415-01",
-   "approval": "",
+   "approval": "APR-V415-OWNER-1",
    "summary": "C1: SaveMachine.InitialNew; Initial and InvestigationSession take a Writable address. L1: ListingTarget, ListingStep, Listing, ListingInterpretation, WorkspaceLister. LoadInput.OpenRequested and ScheduleReconcileRead carry an InvestigationRef."
   },
   {
    "file": "contracts/06-IF41-APP.fs",
    "sha256": "ee647592d3ff2749d8ac85ca48b87e19d093b62e62785c434a449afc72a46ed7",
    "decision": "ODR-V415-01",
-   "approval": "",
+   "approval": "APR-V415-OWNER-1",
    "summary": "Loads, Sessions, TimerKey and the machine messages keyed by InvestigationRef; Msg.ListRequested (explicit workspace selection, EXT-DATA-003) and Msg.CreateRequested (explicit creation, EXT-DATA-006); Model.Listings and ListingsInFlight."
   },
   {
    "file": "contracts/07-IF41-VIEW.fs",
    "sha256": "e1e584862b15137d8786feecca03cf7bbf19a5b536bd925ae55876f04c554831",
    "decision": "ODR-V415-IF-VIEW",
-   "approval": "",
+   "approval": "APR-V415-OWNER-2",
    "summary": "CF-09 A (APR-CFUI-OWNER-1), a separate request: the frozen IF41-VIEW types unchanged, followed by namespace Causa.Ui.Contracts (screen view models, capability boundaries Visible/Understood, UiIntent with qualified access, UiBackend, routes as unresolved RouteTarget), types and signatures plus 16 boundary members. Additive; implemented by integration in src/Causa.App/Projections.fs, compiled before Connection.fs; its functions are the producer file src/Causa.App/Ui/Presentation.fs."
   }
  ],
