@@ -48,3 +48,10 @@ them. Each line: id — question — **recommended answer** — why. Reply "acce
 5. Agent: frozen guard, scope recompile, proposed lock.
 6. **Re-record ODR-R10-01 (scope), commit the lock (ODR-RG-04)**, dispatch the live-provider preflight.
 7. Agent: launch-preflight → READY.
+
+## C. Added after "accept all" (scope-selector fix, Indy-init PR #176) — not yet accepted
+| id | Question | Recommended | Why |
+|---|---|---|---|
+| SS-1 | The fixed compiler yields a different R10 scope (scopeSha256 26e6ff3c… → 6a0e23b0…; 37 → 31 items; WDL-013 now gate-covered by T23). Re-approve R10's scope, or approve only the competition scope? | **Competition only:** compile the v4.1.6 competition scope with the fix and approve it on its own digest; leave R10's approved scope as history | R10 is already running; there's no reason to re-approve it |
+| SS-2 | Approved split plans (work-item-split, milestone-aligned) name WI-GEN-UI/PF/EXT-DATA, which no longer exist | **Retire them for the competition**; do not redo them unless the v4.1.6 scope shows a slice too large for a lane | The fix puts those requirements on T18/T20/T22, which is what the splits approximated |
+| SS-3 | PR #176 makes the `real`/`split` offline tests fail until SS-1 lands | **Merge #176 together with the v4.1.6 scope recompile** (same owner step 5), with the tests updated to the new approved digest | So main is never red |

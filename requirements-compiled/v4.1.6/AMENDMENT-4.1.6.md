@@ -20,7 +20,7 @@ v4.1.6 is the successor of the approved package v4.1.5 (APR-V415-OWNER-3, tag `i
 | ODR-V416-S9 | A: `contract/v1.1.0/` |
 | ODR-V416-CAT | A: INV-028 required, INV-045, INV-046 and INV-047 in the successor catalog `docs/rehearsal-010-readiness/proposals/causa-investigation.requirement-catalog.v416.proposed.json` |
 | ODR-V416-WDL013 | A: WDL-013 verified per obligation (O1..O3 verbatim, P1, SU-BROWSER-CHROMIUM, WI-GEN-WDL); supersedes ODR-V4-10 A for WDL-013 only. **Requested only**: the plan entry and binding are added after it is recorded ([WDL-013-OBLIGATIONS.md](../../docs/v416-competition-decisions/WDL-013-OBLIGATIONS.md)). Not verified. |
-| ODR-V416-SCOPE-SELECTORS | A: the scope compiler's `covers` uses the full selector grammar (separate pull request); the competition scope is recompiled with it |
+| ODR-V416-SCOPE-SELECTORS | A (recommended by the coordinator, **not yet accepted by the owner**): adopt PR #176 for the v4.1.6 competition scope only, on its own digest (SS-1); retire the split plans (SS-2); merge #176 with the scope recompile in owner step 5 (SS-3) |
 | ODR-V416-02 | The package approval (RC-2, S-10), after X01-X21, an independent review and causa-storage 1.1.0's ST-01..ST-06 |
 
 ## Contract changes (`analysis/amendment.json` `contractChanges`)
