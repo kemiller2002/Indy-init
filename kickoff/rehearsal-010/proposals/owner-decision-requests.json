@@ -305,7 +305,7 @@
       "id": "ODR-R10-01",
       "kind": "decision",
       "title": "Approve the full Rehearsal 010 scope",
-      "question": "Approve docs/rehearsal-010-readiness/scope-manifest.json, compiled from the frozen v4.1.4 and the ratified catalog, as shown below (requirements, obligations, work items, zero exclusions, scopeSha256), slice integration and full-release acceptance remaining separate gates? Asked only once indy-init-requirements-v4.1.4 is tagged and ODR-R10-02 is applied, because both change the scope digest.",
+      "question": "Approve docs/rehearsal-010-readiness/scope-manifest.json, compiled from the frozen v4.1.5 and the ratified catalog, as shown below (requirements, obligations, work items, zero exclusions, scopeSha256), slice integration and full-release acceptance remaining separate gates? Asked only once indy-init-requirements-v4.1.5 is tagged and ODR-R10-02 is applied, because both change the scope digest. Re-asked for v4.1.5: APR-R10-OWNER-2 approved 59bfef5a, compiled from v4.1.4; the v4.1.5 recompile has the same 205 requirements, 890 obligations and 37 work items, and only the package identity and source commit change (scopeSha256 26e6ff3c...).",
       "options": [
         "A: approve the scope as shown",
         "B: do not approve (the scope is recompiled after changes)"
@@ -313,7 +313,7 @@
       "recommendation": "A, after checking the counts and digest shown against OWNER-APPROVAL-EXECUTION.md.",
       "rationale": "The scope is approved once, by digest; any later change needs a new approval.",
       "impact": "The lock pins this scopeSha256; check-sequencing refuses any other.",
-      "requiresTag": "indy-init-requirements-v4.1.4",
+      "requiresTag": "indy-init-requirements-v4.1.5",
       "requiresCurrentScope": "true",
       "pins": [
         {
@@ -418,11 +418,11 @@
       "id": "ODR-R10-19",
       "kind": "decision",
       "title": "Adopt a successor scope with split work items",
-      "question": "Adopt one successor scope (same 205 requirements and 890 obligations; split work items) instead of the approved 37-item scope 59bfef5a? Only before T0.",
+      "question": "Adopt one successor scope (same 205 requirements and 890 obligations; split work items) instead of the approved 37-item scope? Only before T0. Re-asked for v4.1.5: APR-R10-OWNER-3 chose A on the v4.1.4 compiles (a847f98c / 723c9eb3); the v4.1.5 recompiles keep the same requirements, obligations and work items, and only the package identity and source commit change.",
       "options": [
-        "A: adopt docs/rehearsal-010-optimization/proposals/scope-manifest.successor.json (53 items, a847f98c...)",
-        "B: adopt docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json (57 items, 723c9eb3...)",
-        "C: keep the approved scope 59bfef5a"
+        "A: adopt docs/rehearsal-010-optimization/proposals/scope-manifest.successor.json (53 items, 8baf049b...)",
+        "B: adopt docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json (57 items, abf544d6...)",
+        "C: keep the 37-item scope (ODR-R10-01)"
       ],
       "recommendation": "A or B only together with ODR-R10-22 (they need the speculative queue at realistic CI); otherwise C.",
       "rationale": "Changes what ODR-R10-01 approves; the lock, readiness docs and STARTUP must then name the new digest.",
