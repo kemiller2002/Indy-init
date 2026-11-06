@@ -102,7 +102,7 @@
    "id": "ODR-COMP-P07",
    "kind": "decision",
    "title": "Competition repository pre-created by the owner",
-   "question": "Before T0 the owner pre-creates the competition repository empty, with both App secrets and branch protection requiring a pull request; the bootstrap pushes to it (Conditor 'repo create' refuses an existing repository); STARTUP section 2 step 4 is amended to say so?",
+   "question": "Before T0 the owner pre-creates the competition repository empty, with both App secrets, and, if ODR-COMP-P13 is A, the four deploy secrets CAUSA_BRANCH, DATA_ACCESS_KEY_CAUSA, DATA_SOURCE and REPO_OWNER (TEST-DEPLOY-KEY.md section 7), and branch protection requiring a pull request; the bootstrap pushes to it (Conditor 'repo create' refuses an existing repository); STARTUP section 2 step 4 is amended to say so?",
    "options": [
     "A: pre-create, and amend STARTUP section 2 step 4",
     "B: the session creates it as today"
@@ -192,6 +192,44 @@
    "impact": "With B the competition runs on v4.1.5 and the old scope.",
    "approvalRecord": {
     "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P12\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P13",
+   "kind": "decision",
+   "title": "Test deploy key: amend the credential rule for the deployed test build",
+   "question": "The owner added four Actions secrets (REPO_OWNER, DATA_SOURCE, CAUSA_BRANCH, DATA_ACCESS_KEY_CAUSA) so the deployed app (deploy-pages.yml) reaches the live test data repository by itself. EXT-DATA-004-O1 ('Credentials MUST never be committed, bundled, logged, ...') and DF-CON-2026-A002's bootstrap criterion ('no credential ... is committed, bundled into the client ... A CI check fails the build when one appears') forbid it. Amend them, for the competition build against v4.1.6, with the minimum exception, the amended wording, the added obligation EXT-DATA-004-O5 and its tests, and the changed CI check that docs/v416-competition-decisions/TEST-DEPLOY-KEY.md states (pinned)?",
+   "options": [
+    "A: approve the exception exactly as TEST-DEPLOY-KEY.md states it (sections 2, 4 and 5)",
+    "B: keep the prohibition; the key is entered per session in the Connect form"
+   ],
+   "recommendation": "A: the owner's direction (a test, no secret data, access acceptable; amend rather than avoid bundling). The owner stated this in session; that statement is not a record. This request is how it is recorded.",
+   "rationale": "Changes a P0 security requirement and a Conditor baseline decision; only the owner amends requirements (RDP-003), and frozen packages are never edited.",
+   "impact": "A: an agent applies the amended text, EXT-DATA-004-O5 and its tests to the v4.1.6 candidate after claude/v4.1.6-review-fixes merges (or to its successor), the competing build's integration lane adds the deploy connection and the scan step to its Conditor-generated deploy-pages.yml (reference: indy-init-rehearsal-010 branch setup/test-deploy-key), and the owner adds the four secrets with the App secrets before T0 (with P-7). The key in the public site is readable by anyone until revoked. B: nothing changes; the four secrets stay unused and DATA_ACCESS_KEY_CAUSA should be deleted.",
+   "exception": "Only the one key of the secret DATA_ACCESS_KEY_CAUSA; only for the designated test data repository REPO_OWNER/DATA_SOURCE on branch CAUSA_BRANCH; only in the deployed test build (the build step of .github/workflows/deploy-pages.yml, CAUSA_DEPLOY_CONNECTION=1); only in dist/deploy-connection.json of the deploy artifact. Never committed, never logged, never in events, reports, Praxis state, URLs, error text, localStorage or any browser store. Least privilege: a fine-grained token on that one repository with Contents read and write (Metadata read, added by GitHub) and nothing else, short expiry, revocable. The deployed site is public: anyone can extract the key and read and write that repository until it is revoked; this is the accepted risk.",
+   "amendsRequirements": [
+    "EXT-DATA-004-O1",
+    "EXT-DATA-004-O3",
+    "EXT-DATA-002-O1",
+    "PF-015-O4",
+    "DF-CON-2026-A002 (bootstrap criterion)",
+    "DF-CON-2026-A002 (persistence authentication criterion)"
+   ],
+   "addsRequirements": [
+    "EXT-DATA-004-O5"
+   ],
+   "ciCheck": "The DF-CON-2026-A002 CI check changes from 'fails when a credential appears' to: fails on any credential except exactly the injected DATA_ACCESS_KEY_CAUSA value in the deploy artifact's deploy-connection.json, and on that value anywhere else (source scan EXT-DATA-004-O1 unchanged; build scan in every build; an independent scan step in deploy-pages.yml before upload). Findings name the file, never the value.",
+   "dependsOn": [
+    "claude/v4.1.6-review-fixes (in flight on v4.1.6; P13 is applied after it merges, not on it)",
+    "ODR-COMP-P07 (the owner adds the four secrets when pre-creating the competition repository)"
+   ],
+   "pins": [
+    {
+     "path": "docs/v416-competition-decisions/TEST-DEPLOY-KEY.md"
+    }
+   ],
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P13\", \"action\": \"decide\", \"option\": \"A\", \"pins\": [{\"path\": \"docs/v416-competition-decisions/TEST-DEPLOY-KEY.md\", \"sha256\": \"<at origin/main>\"}]}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
    }
   }
  ]

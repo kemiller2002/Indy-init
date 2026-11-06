@@ -41,9 +41,9 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- ratify v4.1.6-catalog --repo Indy-init  # applies ODR-V416-CAT (A): the
 //        v4.1.6 successor catalog becomes the ratified catalog, only if it is the file you approved, drops nothing and
 //        changes no ratified requirement other than those the request names
-//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide competition --repo Indy-init  # ODR-COMP-P01..P12, section B of the
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide competition --repo Indy-init  # ODR-COMP-P01..P13, sections B and D of the
 //        decisions sheet (docs/v416-competition-decisions/proposals/owner-decision-requests.json); decisions only
-//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide rehearsal-010 --repo Indy-init  # ODR-RG-03, -05 and ODR-R10-01..35
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide rehearsal-010 --repo Indy-init  # ODR-RG-03, -05 and ODR-R10-01..36
 //        (kickoff/rehearsal-010/proposals/owner-decision-requests.json). A request that pins a file records the sha256
 //        of that file at origin/main, shown before you answer; ODR-R10-01 is asked only once v4.1.5 is tagged. A recorded
 //        decision whose pinned file has changed since is asked again, with what changed (as ODR-R10-01 and -19 were for
@@ -128,7 +128,7 @@ let packages =
       // The Causa pre-competition contract-readiness decisions OD-CR-01..08 (docs/contract-readiness/causa-precompetition/
       // OWNER-DECISIONS.proposed.json): decisions only, no package approval and no tag. A pinned file's digest is recorded.
       { Name = "contract-readiness"; Dir = "docs/contract-readiness/causa-precompetition"; ApprovalPrefix = "APR-CR-OWNER"; PackageApprovalId = ""; Tag = "" }
-      // The gate and process decisions for the 7 November competition, ODR-COMP-P01..P12 (section B of
+      // The gate and process decisions for the 7 November competition, ODR-COMP-P01..P13 (sections B and D of
       // docs/v416-competition-decisions/DECISIONS-FOR-TONIGHT.md): decisions only, no package approval and no tag.
       { Name = "competition"; Dir = "docs/v416-competition-decisions"; ApprovalPrefix = "APR-COMP-OWNER"; PackageApprovalId = ""; Tag = "" } ]
 
