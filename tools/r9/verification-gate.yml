@@ -75,13 +75,11 @@ jobs:
           git init -q "$RUNNER_TEMP/indy-init"
           git -C "$RUNNER_TEMP/indy-init" fetch -q --depth 1 https://github.com/kemiller2002/Indy-init "$commit"
           git -C "$RUNNER_TEMP/indy-init" checkout -q FETCH_HEAD
-          # A re-govern (check-governance): every earlier version's Indy-init commit and every commit the owner approved
-          # for a re-govern, so their tools/r9 trees can be compared. A commit that cannot be fetched stays unapproved.
-          { git log --format=%H -- .echelon/r9-governance.json | while read -r c; do git show "$c:.echelon/r9-governance.json" | jq -r .indyInitCommit; done
-            jq -r '.approvals[] | select(.authority.kind == "operator" and .authority.id == "kemiller2002") | .changes[] | select(.action == "re-govern") | .indyInitCommit' \
-              "$RUNNER_TEMP/indy-init/kickoff/rehearsal-007/approvals.causa.json" 2>/dev/null; } | sort -u | grep -E '^[0-9a-f]{40}$' |
-            while read -r c; do git -C "$RUNNER_TEMP/indy-init" fetch -q --depth 1 https://github.com/kemiller2002/Indy-init "$c" || true; done
+          # A re-govern (check-governance) is judged from Indy-init's owner-merged main, cloned separately with its history
+          # (trees, no blobs but the checkout's): its approvals and ancestry, never the governing commit's own files.
+          git clone -q --filter=blob:none --branch main https://github.com/kemiller2002/Indy-init "$RUNNER_TEMP/indy-init-main"
       - name: Governed contracts are the ones the lock pins (catalog, design, deadline policy, journey bindings)
+        id: contracts
         run: |
           src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           r10=$(jq -r 'has("catalogVerification")' "$lock")
@@ -126,8 +124,9 @@ jobs:
             git show "origin/${{ github.base_ref }}:.echelon/verification-scope.json" > "$RUNNER_TEMP/base-scope.json" 2>/dev/null && base_scope="--base-scope $RUNNER_TEMP/base-scope.json"
           fi
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-governance --indy-init "$RUNNER_TEMP/indy-init" --target . $base_scope \
-            --trusted-operator kemiller2002 --approvals kickoff/rehearsal-007/approvals.causa.json
+            --trusted-operator kemiller2002 --trusted-indy-init "$RUNNER_TEMP/indy-init-main" --approvals kickoff/rehearsal-007/approvals.causa.json
       - name: Pinned toolchain (Conditor 0.10.20, then the echelon-current resolved set)
+        id: toolchain
         run: |
           # The lock named at govern time (r9.fsx govern --lock); Rehearsal 009's record names none and reads its own.
           lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
@@ -143,6 +142,7 @@ jobs:
           dokimos verification compile --indy-execution-plan "$src/$pkg/verification-execution-plan.json" \
             --indy-verification-plan "$src/requirements-compiled/v4/verification-plan.json" --out "$RUNNER_TEMP/obligations.json"
       - name: Implementation was authorized before it was committed (Praxis ordering; docs/release-gate-repair)
+        id: sequencing
         run: |
           # A lock that pins a scope manifest (Rehearsal 010 on) also requires the committed scope checkpoint with its
           # scopeSha256 and complete Praxis work-item coverage before implementation.
@@ -151,6 +151,7 @@ jobs:
           scope=""; [ -n "$manifest" ] && scope="--scope-manifest $RUNNER_TEMP/indy-init/$manifest"
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-sequencing --target . $scope --out "$RUNNER_TEMP/sequencing.json"
       - name: Every suite command of the plan can execute (suite-preflight)
+        id: suitepreflight
         run: |
           npm ci
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- suite-preflight --obligations "$RUNNER_TEMP/obligations.json" --root . \
@@ -325,10 +326,12 @@ jobs:
             --root . --candidate "$CAUSA_CANDIDATE" --rendered "$RUNNER_TEMP/journeys/design-rendered-chromium.json,$RUNNER_TEMP/journeys/design-rendered-webkit.json" --out "$RUNNER_TEMP/journeys/design-contract.json"
           exit 0
       - name: Verification gate (executable, record and mixed obligations)
-        # Always produce the verdict once the candidate, the governed checkout, governance and the plan are established:
-        # a journey overrun or a failed suite step never skips it. It fails closed on missing evidence, and the job fails
-        # anyway if an earlier step failed.
-        if: always() && steps.candidate.outcome == 'success' && steps.governed.outcome == 'success' && steps.governance.outcome == 'success' && steps.compile.outcome == 'success'
+        # Always produce the verdict once every precondition holds: the candidate, the governed checkout, the pinned
+        # contracts, governance, the pinned toolchain, the compiled plan, the Praxis ordering and suite-preflight (review F6:
+        # no precondition is weakened). Only what follows them (the suites, the records, the journeys) may have failed or
+        # overrun: the gate then judges what was recorded and fails closed on missing evidence. A failed precondition skips
+        # the gate, which the slice gate refuses (GATE_MISSING); the job fails either way.
+        if: always() && steps.candidate.outcome == 'success' && steps.governed.outcome == 'success' && steps.contracts.outcome == 'success' && steps.governance.outcome == 'success' && steps.toolchain.outcome == 'success' && steps.compile.outcome == 'success' && steps.sequencing.outcome == 'success' && steps.suitepreflight.outcome == 'success'
         env:
           MODE: ${{ inputs.mode || 'development' }}
           WORK_ITEM: ${{ inputs.work_item || steps.slice.outputs.work_item }}
@@ -378,15 +381,18 @@ jobs:
           # The slice's own live obligations (mandatory obligations of its requirements produced by SU-DOTNET-LIVE or
           # SU-BROWSER-LIVE in the approved scope manifest) must all be verified by Dokimos in the governed whole-plan
           # coverage at the merged result. A live slice with no such obligation fails closed. The live suites ran here
-          # against api.github.com with the job's credentials.
+          # against api.github.com with the job's credentials, and both must have executed tests (review F7): a live suite
+          # that did not run, or ran nothing, is never a pass. An obligation is mandatory unless it says mandatory: false.
           livestatus=failed
           live=$(jq -c --slurpfile slice "$RUNNER_TEMP/slice.json" '[.requirements[] | select(.id as $r | $slice[0].requirements | index($r)) | .obligations[]
-            | select((.mandatory // true) and ((.producers // []) | any(. == "SU-DOTNET-LIVE" or . == "SU-BROWSER-LIVE"))) | .id] | unique' \
+            | select((.mandatory != false) and ((.producers // []) | any(. == "SU-DOTNET-LIVE" or . == "SU-BROWSER-LIVE"))) | .id] | unique' \
             "$src/docs/rehearsal-010-readiness/scope-manifest.json")
           unverified=$(jq -cn --argjson l "$live" --argjson v "$(verified "$ev/gate-all-head/coverage.json")" '$l - $v')
-          if [ "$(jq length <<< "$live")" -gt 0 ] && [ "$(jq length <<< "$unverified")" = 0 ]; then livestatus=passed; fi
-          jq -n --arg c "$CANDIDATE" --arg s "$livestatus" --argjson l "$live" --argjson u "$unverified" \
-            '{candidate: $c, baseUrl: "https://api.github.com", status: $s, liveObligations: $l, unverified: $u}' > "$ev/live.json"
+          executed() { jq --arg s "$1" '[.runs[]? | select(.suite == $s) | .executedTests] | add // 0' "$RUNNER_TEMP/results/results.json" 2>/dev/null || echo 0; }
+          ran=$(jq -cn --argjson d "$(executed SU-DOTNET-LIVE)" --argjson b "$(executed SU-BROWSER-LIVE)" '{"SU-DOTNET-LIVE": $d, "SU-BROWSER-LIVE": $b}')
+          if [ "$(jq length <<< "$live")" -gt 0 ] && [ "$(jq length <<< "$unverified")" = 0 ] && jq -e 'all(.[]; . > 0)' <<< "$ran" > /dev/null; then livestatus=passed; fi
+          jq -n --arg c "$CANDIDATE" --arg s "$livestatus" --argjson l "$live" --argjson u "$unverified" --argjson r "$ran" \
+            '{candidate: $c, baseUrl: "https://api.github.com", status: $s, liveObligations: $l, unverified: $u, executedTests: $r}' > "$ev/live.json"
           dotnet "$rc" test-integrity --repo . --base "$base" --head "$CANDIDATE" \
             --base-results "$RUNNER_TEMP/base-results" --head-results "$RUNNER_TEMP/results" --out "$ev/test-integrity.json" || true
           dotnet "$rc" slice-gate --manifest "$src/docs/rehearsal-010-readiness/scope-manifest.json" --events evidence/progress/events.json \
