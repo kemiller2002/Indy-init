@@ -105,10 +105,62 @@ let private subjects (s: Sources) : string -> Model.Requirement =
         |> Map.ofList
     fun id -> selectorSubject id (docs.TryFind id |> Option.defaultValue "") "baseline"
 
+/// How `covers` selectors are judged.
+type SelectorSemantics =
+    /// The compiler before the full grammar: only a bare id or a `regex:` pattern covers anything; every other selector
+    /// form covers nothing. Kept only to verify the historical records it produced (the Rehearsal 010 approved scope,
+    /// scopeSha256 26e6ff3c..., and the split proposals built on its generated work items), byte for byte.
+    | Legacy
+    /// The frozen grammar of the execution DAG and the verification rules, judged by Model.matches. The default.
+    | V2
+
+let private legacyMatches (selector: string) (requirement: Model.Requirement) =
+    if selector.StartsWith("regex:", StringComparison.Ordinal) then Regex.IsMatch(requirement.Id, selector.Substring 6) else selector = requirement.Id
+
+let private selectorMatches =
+    function
+    | Legacy -> legacyMatches
+    | V2 -> Model.matches
+
+/// Does a DAG task cover a requirement under the given selector semantics?
+let coversWith (semantics: SelectorSemantics) (task: Json) (requirement: Model.Requirement) =
+    strs "covers" task |> List.exists (fun selector -> selectorMatches semantics selector requirement)
+
 /// Does a DAG task cover a requirement? Its `covers` selectors use the frozen grammar of the execution DAG and the
 /// verification rules (`all`, `id:`, `prefix:`, `regex:`, `doc:`, `origin:`, a bare id), judged by Model.matches.
-let covers (task: Json) (requirement: Model.Requirement) =
-    strs "covers" task |> List.exists (fun selector -> Model.matches selector requirement)
+let covers : Json -> Model.Requirement -> bool = coversWith V2
+
+/// task -> requirement id -> covered, for the sources' requirements under the given semantics.
+let private coveredBy (semantics: SelectorSemantics) (s: Sources) : Json -> string -> bool =
+    let subject = subjects s
+    fun task id -> coversWith semantics task (subject id)
+
+/// The last package version whose scopes the Legacy compiler produced. Every scope manifest recording this version
+/// or an earlier one (Rehearsal 010 and its split proposals, all v4.1.5) is judged with Legacy selectors; a later
+/// package (the v4.1.6 competition scope onward) is compiled and judged with the full grammar. This follows the
+/// owner's decision that the Rehearsal 010 scope stays a historical record and only the next package's scope is
+/// compiled with the fixed selectors.
+let lastLegacyPackageVersion = [ 4; 1; 5 ]
+
+let private versionParts (version: string) =
+    let parts = version.Split '.' |> Array.map (fun p -> match Int32.TryParse p with | true, n -> Some n | _ -> None)
+    if parts.Length > 0 && Array.forall Option.isSome parts then Some(parts |> Array.choose id |> List.ofArray) else None
+
+/// The selector semantics for a package version: Legacy only for a parseable version up to lastLegacyPackageVersion;
+/// anything else (a later version, a missing or unreadable one) gets the full grammar.
+let semanticsForPackageVersion (version: string) : SelectorSemantics =
+    match versionParts version with
+    | Some parts when parts <= lastLegacyPackageVersion -> Legacy
+    | _ -> V2
+
+/// The semantics of the sources' package (its package-manifest.json `packageVersion`).
+let semanticsOfSources (s: Sources) : SelectorSemantics =
+    strOpt "packageVersion" s.PackageManifest |> Option.defaultValue "" |> semanticsForPackageVersion
+
+/// The semantics a scope manifest was compiled with, read from what it records (`frozen.packageVersion`; preflight
+/// separately refuses a manifest whose frozen block differs from the sources').
+let recordedSemantics (manifest: Json) : SelectorSemantics =
+    field "frozen" manifest |> Option.bind (strOpt "packageVersion") |> Option.defaultValue "" |> semanticsForPackageVersion
 
 /// The requirement family of an id ("UI-001" -> "UI", "EXT-DATA-001" -> "EXT-DATA"): generated work items group
 /// uncovered requirements of one family, so overlapping obligations become one implementation unit, not 660 tasks.
@@ -120,9 +172,8 @@ let private levelOf =
         [ "mapped", "V1"; "exists", "V1"; "visible", "V2"; "accessible", "V2"; "editable", "V3"; "enter", "V3"; "activate", "V3"; "select", "V3"
           "outcome", "V4"; "validation", "V4"; "rejects", "V4"; "save", "V5"; "reload", "V5"; "update", "V5"; "isolation", "V5" ]
 
-let private planRequirements (s: Sources) (dagTasks: Json list) : Requirement list =
+let private planRequirements (covered: Json -> string -> bool) (s: Sources) (dagTasks: Json list) : Requirement list =
     let bound = bindings s.ExecutionPlan
-    let subject = subjects s
     arr "requirements" s.Plan
     |> List.map (fun r ->
         let id = str "requirement" r
@@ -136,7 +187,7 @@ let private planRequirements (s: Sources) (dagTasks: Json list) : Requirement li
                   Kind = (if bs |> List.exists (fun (_, _, exe) -> exe) then Executable else Record)
                   Producers = bs |> List.map (fun (suite, _, _) -> suite) |> List.distinct |> List.sort
                   Tests = bs |> List.map (fun (_, t, _) -> t) |> List.distinct |> List.sort })
-        let tasks = dagTasks |> List.filter (fun t -> covers t (subject id)) |> List.map (str "id")
+        let tasks = dagTasks |> List.filter (fun t -> covered t id) |> List.map (str "id")
         let executable = obligations |> List.exists (fun o -> o.Kind = Executable)
         { Id = id
           Origin = "v4-plan"
@@ -189,7 +240,7 @@ let private catalogRequirements (s: Sources) : Requirement list =
 
 /// The work items: every DAG task that covers a requirement or is a timed task, plus one generated item per
 /// requirement family no task covers and one per catalog screen.
-let private workItems (subject: string -> Model.Requirement) (dagTasks: Json list) (requirements: Requirement list) (gateLevel: string list) : WorkItem list =
+let private workItems (covered: Json -> string -> bool) (dagTasks: Json list) (requirements: Requirement list) (gateLevel: string list) : WorkItem list =
     let reqsOf (wi: string) = requirements |> List.filter (fun r -> List.contains wi r.WorkItems) |> List.map (fun r -> r.Id)
     let fromDag =
         dagTasks
@@ -200,7 +251,7 @@ let private workItems (subject: string -> Model.Requirement) (dagTasks: Json lis
               Owner = strOpt "owner" t |> Option.defaultValue ""
               DependsOn = strs "dependsOn" t
               Requirements = reqsOf (str "id" t)
-              GateRequirements = gateLevel |> List.filter (subject >> covers t) })
+              GateRequirements = gateLevel |> List.filter (covered t) })
     let generated =
         requirements
         |> List.collect (fun r -> r.WorkItems)
@@ -372,9 +423,10 @@ let applySplit (plan: Json) (items: WorkItem list) (requirements: Requirement li
 
 /// The manifest for the given sources, with an optional transformation of the work items (a split plan) and the
 /// fields that record it. Without a transformation it is the approved scope, unchanged.
-let private build (s: Sources) (transform: WorkItem list -> Requirement list -> WorkItem list * Requirement list) (extra: (string * Json) list) : Json =
+let private build (semantics: SelectorSemantics) (s: Sources) (transform: WorkItem list -> Requirement list -> WorkItem list * Requirement list) (extra: (string * Json) list) : Json =
+    let covered = coveredBy semantics s
     let dagTasks = arr "tasks" s.Dag
-    let planReqs0 = planRequirements s dagTasks
+    let planReqs0 = planRequirements covered s dagTasks
     let catalogReqs0 = catalogRequirements s
     let planIds = planReqs0 |> List.map (fun r -> r.Id) |> Set.ofList
     let gateLevel =
@@ -382,7 +434,7 @@ let private build (s: Sources) (transform: WorkItem list -> Requirement list -> 
         |> List.filter (fun r -> not (planIds.Contains(str "id" r)))
         |> List.map (fun r -> str "id" r)
         |> List.sort
-    let items, requirements = transform (workItems (subjects s) dagTasks (planReqs0 @ catalogReqs0) gateLevel) (planReqs0 @ catalogReqs0)
+    let items, requirements = transform (workItems covered dagTasks (planReqs0 @ catalogReqs0) gateLevel) (planReqs0 @ catalogReqs0)
     let planReqs = requirements |> List.filter (fun r -> r.Origin = "v4-plan")
     let catalogReqs = requirements |> List.filter (fun r -> r.Origin = "catalog")
     let producers =
@@ -447,22 +499,30 @@ let private build (s: Sources) (transform: WorkItem list -> Requirement list -> 
           @ extra)
     |> withScopeHash
 
-/// The approved scope of the sources.
-let compile (s: Sources) : Json = build s (fun items reqs -> items, reqs) []
+/// The approved scope of the sources, with the given selector semantics.
+let compileWith (semantics: SelectorSemantics) (s: Sources) : Json = build semantics s (fun items reqs -> items, reqs) []
+
+/// The approved scope of the sources, with the full selector grammar (V2).
+let compile : Sources -> Json = compileWith V2
 
 /// A successor scope: the sources' scope with a split plan applied, recording the plan's digest. Refused (Error) when
 /// the plan would drop, duplicate or reorder any requirement or obligation (applySplit).
-let compileWithSplit (s: Sources) (plan: Json) (planPath: string) (planSha256: string) : Result<Json, string list> =
+let compileWithSplitWith (semantics: SelectorSemantics) (s: Sources) (plan: Json) (planPath: string) (planSha256: string) : Result<Json, string list> =
+    let covered = coveredBy semantics s
     let dagTasks = arr "tasks" s.Dag
-    let reqs = planRequirements s dagTasks @ catalogRequirements s
-    let planIds = planRequirements s dagTasks |> List.map (fun r -> r.Id) |> Set.ofList
+    let planReqs = planRequirements covered s dagTasks
+    let reqs = planReqs @ catalogRequirements s
+    let planIds = planReqs |> List.map (fun r -> r.Id) |> Set.ofList
     let gateLevel = arr "requirements" s.Baseline |> List.filter (fun r -> not (planIds.Contains(str "id" r))) |> List.map (fun r -> str "id" r) |> List.sort
-    match applySplit plan (workItems (subjects s) dagTasks reqs gateLevel) reqs with
+    match applySplit plan (workItems covered dagTasks reqs gateLevel) reqs with
     | Error e -> Error e
     | Ok _ ->
-        build s (fun items rs -> match applySplit plan items rs with Ok x -> x | Error e -> failwithf "%A" e)
+        build semantics s (fun items rs -> match applySplit plan items rs with Ok x -> x | Error e -> failwithf "%A" e)
             [ "workItemSplit", JObj [ "status", JStr "PROPOSED successor scope: it replaces the approved scope only through an owner decision (ODR-R10-01 for this scopeSha256)"; "plan", JStr planPath; "planSha256", JStr planSha256 ] ]
         |> Ok
+
+/// compileWithSplitWith the full selector grammar (V2).
+let compileWithSplit : Sources -> Json -> string -> string -> Result<Json, string list> = compileWithSplitWith V2
 
 // ---- preflight -------------------------------------------------------------------------------------------------------
 

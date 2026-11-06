@@ -55,6 +55,11 @@ let private finish (name: string) (refusals: Refusal list) =
 let private preflightAll (o: Map<string, string>) =
     let manifest = parseFile o["--manifest"]
     let sources = sourcesOf o["--source"] o["--package"]
+    // The selector semantics the manifest was compiled with, from what it records (Scope.recordedSemantics): Legacy
+    // only for a scope of a package up to v4.1.5, so the historical Rehearsal 010 records are judged as compiled.
+    let semantics = recordedSemantics manifest
+    let compile = compileWith semantics
+    let compileWithSplit = compileWithSplitWith semantics
     // A successor scope records the split plan it was compiled with: it is judged against the sources compiled with
     // that plan, and only if the plan file still has the recorded digest. Any other manifest against the plain sources.
     let expected, splitRefusals =
@@ -80,10 +85,13 @@ let scopeCommand (args: string list) : int =
         match o.TryFind "--source", o.TryFind "--package", o.TryFind "--out" with
         | Some s, Some p, Some out ->
             // --split PLAN: a successor scope (a split plan applied); the approved scope is compiled without it.
+            // The selector semantics follow the package version, as preflight reads them back from the manifest.
+            let sources = sourcesOf s p
+            let semantics = semanticsOfSources sources
             let compiled =
                 match o.TryFind "--split" with
-                | None -> Ok(compile (sourcesOf s p))
-                | Some plan -> compileWithSplit (sourcesOf s p) (parseFile plan) plan (Git.sha256Hex (File.ReadAllBytes plan))
+                | None -> Ok(compileWith semantics sources)
+                | Some plan -> compileWithSplitWith semantics sources (parseFile plan) plan (Git.sha256Hex (File.ReadAllBytes plan))
             match compiled with
             | Error problems ->
                 problems |> List.iter (eprintfn "  REFUSED %s")
