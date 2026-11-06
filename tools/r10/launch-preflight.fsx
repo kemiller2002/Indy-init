@@ -16,12 +16,12 @@
 // READY only when every check below passes; otherwise REFUSED with each cause. Exit 0 READY, 4 REFUSED.
 //   LP-00  the Indy-init checkout is clean and is main of the published repository (--origin)
 //   LP-01  the owner's lock kickoff/rehearsal-010/toolchain.lock.json is committed, owner-signed in every change, not a proposal
-//   LP-02  v4.1.4's tag exists on the published repository, the lock's tagCommit is that tag's commit, and the package
+//   LP-02  v4.1.5's tag exists on the published repository, the lock's tagCommit is that tag's commit, and the package
 //          manifest at the tag has the lock's digest
 //   LP-03  every digest in the lock (contracts, rules, the owner-decision requests) is the digest of the file it names
 //   LP-04  the scope manifest's scopeSha256 is the lock's
 //   LP-05  every decision a launch needs (fixed in this file, with the options each can launch with) and
-//          ODR-V414-01..03 is recorded by the operator; every change of the approvals file since the last owner record
+//          ODR-V415-01, -03, -04, -IF-VIEW and -02 (approve) are recorded by the operator; every change of the approvals file since the last owner record
 //          before Rehearsal 010 (55f2467) is committed, and signed, by the owner; no approval id repeats; every pin a decision recorded is the current
 //          file's digest (and the lock's, where the lock pins it)
 //   LP-06  the resolved set carries Dokimos 0.11.1 or later
@@ -227,13 +227,13 @@ let lp02 =
     let manifestRel = $"""{str pkg "path"}/package-manifest.json"""
     let tcode, blobAtTag = git src [ "rev-parse"; "--verify"; "--quiet"; $"{tagCommit}:{manifestRel}" ]
     let _, blobNow = git src [ "hash-object"; manifestRel ]
-    check "LP-02" "v4.1.4 is frozen and tagged on origin" (
+    check "LP-02" "v4.1.5 is frozen and tagged on origin" (
         if isNull lock then [ "no lock" ] else
-        fail (str pkg "packageVersion" = "4.1.4") $"""the lock pins package {str pkg "packageVersion"}, not 4.1.4"""
-        @ fail (code = 0 && tagCommit <> "") $"tag {tag} does not exist on origin (ODR-V414-03, owner-freeze.fsx tag v4.1.4)"
+        fail (str pkg "packageVersion" = "4.1.5") $"""the lock pins package {str pkg "packageVersion"}, not 4.1.5"""
+        @ fail (code = 0 && tagCommit <> "") $"tag {tag} does not exist on origin (ODR-V415-02, owner-freeze.fsx tag v4.1.5)"
         @ fail (tagCommit = "" || str pkg "tagCommit" = tagCommit) $"""the lock's tagCommit {str pkg "tagCommit"} is not {tag}'s commit {tagCommit}"""
         @ fail (tagCommit = "" || tcode = 0) $"the tag's commit {tagCommit} is not in this clone (git fetch --tags origin)"
-        @ fail (tagCommit = "" || tcode <> 0 || (blobAtTag = blobNow && sha256 (path manifestRel) = str pkg "manifestSha256")) "the v4.1.4 package manifest at the tag differs from the lock's manifestSha256")
+        @ fail (tagCommit = "" || tcode <> 0 || (blobAtTag = blobNow && sha256 (path manifestRel) = str pkg "manifestSha256")) "the v4.1.5 package manifest at the tag differs from the lock's manifestSha256")
 
 let pinned =
     [ "catalogVerification", "contract", "contractSha256"
@@ -294,8 +294,8 @@ let lp05 =
     let requests = requiredDecisions
     let lockDigests = pinned |> List.map (fun (s, f, k) -> str (node lock s) f, str (node lock s) k) |> Map.ofList
     let packageDecisions =
-        ([ "ODR-V414-01"; "ODR-V414-02" ] |> List.collect (fun id -> fail (Option.isSome (recordedFor id)) $"{id} is not recorded by the owner (owner-freeze.fsx decide v4.1.4)"))
-        @ fail (ownerChanges |> List.exists (fun c -> str c "decision_id" = "ODR-V414-03" && str c "action" = "approve-package")) "ODR-V414-03 (approve v4.1.4) is not recorded by the owner (owner-freeze.fsx approve v4.1.4)"
+        ([ "ODR-V415-01"; "ODR-V415-03"; "ODR-V415-04"; "ODR-V415-IF-VIEW" ] |> List.collect (fun id -> fail (Option.isSome (recordedFor id)) $"{id} is not recorded by the owner (owner-freeze.fsx decide v4.1.5)"))
+        @ fail (ownerChanges |> List.exists (fun c -> str c "decision_id" = "ODR-V415-02" && str c "action" = "approve-package")) "ODR-V415-02 (approve v4.1.5) is not recorded by the owner (owner-freeze.fsx approve v4.1.5)"
     let r10 =
         requests |> List.collect (fun (id, launchable) ->
             match recordedFor id with

@@ -256,8 +256,14 @@ let recovery () : string list =
 
 let private manifestPath (source: string) = Path.Combine(source, "docs", "rehearsal-010-readiness", "scope-manifest.json")
 
+/// The package the Rehearsal 010 scope is compiled from: the requirements package the lock pins (v4.1.5 since the
+/// owner approved and tagged it), so the scope checks follow the lock rather than a second hard-coded copy.
+let private scopePackage (source: string) =
+    parseFile (Path.Combine(source, "kickoff", "rehearsal-010", "toolchain.lock.proposed.json"))
+    |> field "requirementsPackage" |> Option.bind (strOpt "path") |> Option.defaultValue "requirements-compiled/v4.1.5"
+
 let real (source: string) : string list =
-    let s = ScopeCommands.sourcesOf source "requirements-compiled/v4.1.4"
+    let s = ScopeCommands.sourcesOf source (scopePackage source)
     let m = compile s
     let committed = parseFile (manifestPath source)
     let reqs = arr "requirements" m
@@ -788,7 +794,7 @@ let committedPackage (source: string) : string list =
 /// evidence kind (record-only, or executable/mixed), and the inventory must exclude nothing.
 let reconciliation (source: string) : string list =
     let inventory = parseFile (Path.Combine(source, "docs", "release-gate-repair", "obligation-inventory.json"))
-    let manifest = compile (ScopeCommands.sourcesOf source "requirements-compiled/v4.1.4")
+    let manifest = compile (ScopeCommands.sourcesOf source (scopePackage source))
     let fromManifest =
         arr "requirements" manifest
         |> List.filter (fun r -> str "origin" r = "v4-plan")
@@ -820,7 +826,7 @@ let reconciliation (source: string) : string list =
 let splitScope (source: string) : string list =
     let planPath = "docs/rehearsal-010-optimization/inputs/work-item-split.proposed.json"
     let plan = parseFile (Path.Combine(source, planPath))
-    let sources = ScopeCommands.sourcesOf source "requirements-compiled/v4.1.4"
+    let sources = ScopeCommands.sourcesOf source (scopePackage source)
     let approved = compile sources
     let content (m: Json) = arr "requirements" m |> List.map (fun r -> str "id" r, serialize (JObj [ "o", (field "obligations" r |> Option.defaultValue (JArr [])); "p", JStr(strOpt "priority" r |> Option.defaultValue ""); "m", (field "mandatory" r |> Option.defaultValue JNull) ])) |> Map.ofList
     let mapSplits (f: Json -> Json) (j: Json) =
@@ -891,7 +897,7 @@ let splitScope (source: string) : string list =
 /// obligations, priorities and mandatory flags, and reproduces the committed proposal's digest.
 let milestoneAlignedSplit (source: string) : string list =
     let planPath = "docs/rehearsal-010-optimization/inputs/work-item-split.milestone-aligned.proposed.json"
-    let sources = ScopeCommands.sourcesOf source "requirements-compiled/v4.1.4"
+    let sources = ScopeCommands.sourcesOf source (scopePackage source)
     let content (m: Json) = arr "requirements" m |> List.map (fun r -> str "id" r, serialize (JObj [ "o", (field "obligations" r |> Option.defaultValue (JArr [])); "p", JStr(strOpt "priority" r |> Option.defaultValue ""); "m", (field "mandatory" r |> Option.defaultValue JNull) ])) |> Map.ofList
     let committed = parseFile (Path.Combine(source, "docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json"))
     let planSha = Git.sha256Hex (File.ReadAllBytes(Path.Combine(source, planPath)))
