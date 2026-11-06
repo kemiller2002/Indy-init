@@ -10,10 +10,12 @@ import { listen } from './github-double.mjs';
 const server = await listen(0);
 const base = `http://127.0.0.1:${server.address().port}`;
 test.after(() => server.close());
-const call = async (method, path, body) => {
-  const r = await fetch(base + path, { method, headers: { 'content-type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) });
+const call = async (method, path, body, auth = true) => {
+  const r = await fetch(base + path, { method, headers: { 'content-type': 'application/json', ...(auth ? { authorization: 'Bearer harness-token' } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) });
   return { status: r.status, body: await r.json().catch(() => null), headers: r.headers };
 };
+// Each test starts empty with o/r known (branches main and b).
+const reset = async () => { await call('POST', '/__control', { reset: true }); await call('POST', '/__control', { repository: 'o/r', branch: 'b' }); };
 const gql = (query, variables) => call('POST', '/graphql', { query, variables });
 const b64 = (s) => Buffer.from(s).toString('base64');
 const R = '/repos/o/r';
@@ -32,7 +34,7 @@ const READ = `query Read($owner: String!, $name: String!, $ref: String!) {
 fragment BlobText on Blob { text byteSize }`;
 
 test('the double answers the persistence contract: ref, guarded commit, file read, commit, compare, blob', async () => {
-  await call('POST', '/__control', { reset: true });
+  await reset();
   const ref = await call('GET', `${R}/git/ref/heads/b`);
   assert.equal(ref.status, 200);
   assert.equal(ref.body.ref, 'refs/heads/b');
@@ -98,7 +100,7 @@ test('the double answers the persistence contract: ref, guarded commit, file rea
 });
 
 test('the double refuses what GitHub refuses', async () => {
-  await call('POST', '/__control', { reset: true });
+  await reset();
   const h0 = (await call('GET', `${R}/git/ref/heads/b`)).body.object.sha;
   const missing = await save(h0, {}, ['nope.json']);
   assert.equal(missing.body.errors[0].type, 'UNPROCESSABLE');
@@ -117,14 +119,14 @@ test('the double refuses what GitHub refuses', async () => {
 });
 
 test('the Contents API the positive-control fixture writes with is unchanged', async () => {
-  await call('POST', '/__control', { reset: true });
+  await reset();
   const created = await call('PUT', `${R}/contents/causa/investigations/a.json`, { message: 'm', content: b64('one'), branch: 'b' });
   assert.equal(created.status, 201);
   const read = await call('GET', `${R}/contents/causa/investigations/a.json?ref=b`);
   assert.equal(read.status, 200);
   assert.equal(read.headers.get('cache-control'), 'private, max-age=60, s-maxage=60');
   assert.equal(read.body.sha, created.body.content.sha);
-  assert.equal((await call('PUT', `${R}/contents/causa/investigations/a.json`, { message: 'm', content: b64('two'), branch: 'b' })).status, 409);
+  assert.equal((await call('PUT', `${R}/contents/causa/investigations/a.json`, { message: 'm', content: b64('two'), branch: 'b' })).status, 422);
   assert.equal((await call('PUT', `${R}/contents/causa/investigations/a.json`, { message: 'm', content: b64('two'), branch: 'b', sha: read.body.sha })).status, 200);
   await call('POST', '/__control', { conflictNext: 'causa/investigations/a.json' });
   const now = (await call('GET', `${R}/contents/causa/investigations/a.json?ref=b`)).body.sha;
@@ -133,4 +135,28 @@ test('the Contents API the positive-control fixture writes with is unchanged', a
   assert.equal((await call('PUT', `${R}/contents/causa/investigations/b.json`, { message: 'm', content: b64('x'), branch: 'b' })).status, 422);
   const dir = await call('GET', `${R}/contents/causa/investigations?ref=b`);
   assert.deepEqual(dir.body.map((d) => d.name).sort(), ['a.json']);
+});
+
+test('the double refuses what GitHub refuses: unknown repository or branch, no credential, no headline, no sha', async () => {
+  await reset();
+  assert.equal((await call('GET', '/repos/o/unknown')).status, 404);
+  assert.equal((await call('GET', `${R}/branches/nope`)).status, 404);
+  assert.equal((await call('GET', `${R}/git/ref/heads/nope`)).status, 404);
+  assert.equal((await call('GET', `${R}/contents/x.json?ref=nope`)).status, 404);
+  assert.equal((await call('PUT', `${R}/contents/x.json`, { message: 'm', content: b64('1'), branch: 'nope' })).status, 404);
+  assert.equal((await call('GET', `${R}/git/ref/heads/b`, undefined, false)).status, 401);
+  assert.equal((await call('POST', '/graphql', { query: '{ viewer { login } }' }, false)).status, 401);
+  const repo = await gql('{ repository(owner: "o", name: "unknown") { name } }');
+  assert.equal(repo.body.data.repository, null);
+  assert.equal(repo.body.errors[0].type, 'NOT_FOUND');
+  assert.equal((await gql('{ repository(owner: "o", name: "r") { ref(qualifiedName: "refs/heads/nope") { name } } }')).body.data.repository.ref, null);
+  const h0 = (await call('GET', `${R}/git/ref/heads/b`)).body.object.sha;
+  const noBranch = await gql(COMMIT, { input: { branch: { repositoryNameWithOwner: 'o/r', branchName: 'nope' }, expectedHeadOid: h0, message: { headline: 'h' }, fileChanges: {} } });
+  assert.equal(noBranch.body.errors[0].type, 'NOT_FOUND');
+  const noHeadline = await gql(COMMIT, { input: { branch: { repositoryNameWithOwner: 'o/r', branchName: 'b' }, expectedHeadOid: h0, message: {}, fileChanges: { additions: [{ path: 'x', contents: b64('1') }] } } });
+  assert.equal(noHeadline.body.data, undefined);
+  assert.match(noHeadline.body.errors[0].message, /headline/);
+  assert.equal((await call('GET', `${R}/git/ref/heads/b`)).body.object.sha, h0);
+  assert.equal((await call('PUT', `${R}/contents/a.json`, { message: 'm', content: b64('1'), branch: 'b' })).status, 201);
+  assert.equal((await call('PUT', `${R}/contents/a.json`, { message: 'm', content: b64('2'), branch: 'b' })).status, 422);
 });

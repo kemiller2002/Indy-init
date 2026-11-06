@@ -6,7 +6,10 @@
 //   node verification/harness/github-double.mjs PORT
 //
 // Each repository is a small git model: commits (parents, a tree of path -> blob oid, a message), refs and blobs (oid =
-// git's blob hash). Any branch the double is asked about exists, at the repository's root commit until written.
+// git's blob hash). Only known repositories and branches exist (as on GitHub, an unknown one is 404 / NOT_FOUND): the
+// journeys' default harness/causa-test with its branch main, and any a control call adds; a known branch starts at the
+// repository's root commit. Every API request needs an Authorization header (401 without, as for the private test
+// repository).
 //
 // REST (the persistence contract's reads and the Contents API the positive-control fixture writes with):
 //   GET  /repos/{o}/{r}                       GET /repos/{o}/{r}/branches/{b}
@@ -25,7 +28,8 @@
 //                                            that path when it exists), so a sha- or head-guarded write is stale
 // POST /__control {"failNext": status}     -> the next write (PUT or createCommitOnBranch) fails with that HTTP status
 // POST /__control {"graphqlErrorNext": T}  -> the next createCommitOnBranch answers 200 with a GraphQL error of type T
-// POST /__control {"reset": true}
+// POST /__control {"repository": "o/r", "branch": "b"} -> o/r exists with branches main and b
+// POST /__control {"reset": true}                       -> empty again (harness/causa-test and main stay known)
 import http from 'node:http';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -54,8 +58,10 @@ export const createDouble = () => {
     r.commits.set(oid, c);
     return c;
   };
+  let known = new Map([[ 'harness/causa-test', new Set(['main']) ]]); // repository -> its branches
   const repoOf = (owner, name) => {
     const key = `${owner}/${name}`;
+    if (!known.has(key)) return null;
     if (!repos.has(key)) {
       const r = { owner, name, refs: new Map(), commits: new Map(), root: null };
       r.root = commit(r, [], new Map(), 'Initial commit').oid;
@@ -63,9 +69,12 @@ export const createDouble = () => {
     }
     return repos.get(key);
   };
-  const head = (r, branch) => { if (!r.refs.has(branch)) r.refs.set(branch, r.root); return r.refs.get(branch); };
+  const head = (r, branch) => {
+    if (!r.refs.has(branch)) { if (!known.get(`${r.owner}/${r.name}`).has(branch)) return null; r.refs.set(branch, r.root); }
+    return r.refs.get(branch);
+  };
   const isOid = (s) => /^[0-9a-f]{40}$/.test(s);
-  // A revision: a commit oid this repository holds, or a branch name (which then exists).
+  // A revision: a commit oid this repository holds, or the name of one of its branches; otherwise null.
   const resolve = (r, rev) => (isOid(rev) ? (r.commits.has(rev) ? rev : null) : head(r, rev.replace(/^refs\/heads\//, '')));
   const ancestors = (r, oid) => { const seen = new Set(); const stack = [oid]; while (stack.length) { const o = stack.pop(); if (!seen.has(o)) { seen.add(o); stack.push(...r.commits.get(o).parents); } } return seen; };
   // Another writer: a commit on the branch that rewrites `path` (when it exists) or touches a harness file.
@@ -100,10 +109,11 @@ export const createDouble = () => {
     let m = url.pathname.match(/^\/repos\/([^/]+)\/([^/]+)(?:\/(.*))?$/);
     if (!m) return [404, { message: 'Not Found' }];
     const r = repoOf(m[1], m[2]);
+    if (!r) return [404, { message: 'Not Found' }];
     const sub = m[3] || '';
     if (sub === '' && method === 'GET') return [200, { full_name: `${m[1]}/${m[2]}`, default_branch: 'main', permissions: { pull: true, push: true } }];
-    if ((m = sub.match(/^branches\/(.+)$/)) && method === 'GET') return [200, { name: m[1], commit: { sha: head(r, m[1]) } }];
-    if ((m = sub.match(/^git\/refs?\/heads\/(.+)$/)) && method === 'GET') return [200, { ref: `refs/heads/${m[1]}`, object: { sha: head(r, m[1]), type: 'commit' } }];
+    if ((m = sub.match(/^branches\/(.+)$/)) && method === 'GET') return head(r, m[1]) ? [200, { name: m[1], commit: { sha: head(r, m[1]) } }] : [404, { message: 'Branch not found' }];
+    if ((m = sub.match(/^git\/refs?\/heads\/(.+)$/)) && method === 'GET') return head(r, m[1]) ? [200, { ref: `refs/heads/${m[1]}`, object: { sha: head(r, m[1]), type: 'commit' } }] : [404, { message: 'Not Found' }];
     if ((m = sub.match(/^git\/trees\/([^/]+)$/)) && method === 'GET') {
       const tree = trees.get(m[1]) || r.commits.get(resolve(r, m[1]))?.tree;
       if (!tree) return [404, { message: 'Not Found' }];
@@ -141,9 +151,12 @@ export const createDouble = () => {
     if (method === 'PUT') {
       const branch = body.branch || 'main';
       if (control.failNext) { const s = control.failNext; control.failNext = undefined; return [s, { message: 'injected failure' }]; }
+      if (!head(r, branch)) return [404, { message: `Branch ${branch} not found` }];
       if (control.conflictNext !== undefined) { const p = control.conflictNext; control.conflictNext = undefined; remoteWriter(r, branch, p); }
       const current = head(r, branch);
       const existing = r.commits.get(current).tree.get(path);
+      // GitHub: updating an existing file without its sha is a validation error; a sha that is not the file's is a conflict.
+      if (existing && !body.sha) return [422, { message: 'Invalid request.\n\n"sha" wasn\'t supplied.' }];
       if ((existing && body.sha !== existing) || (!existing && body.sha)) return [409, { message: `${path} does not match ${body.sha || 'nothing'}` }];
       const res = applyCommit(r, branch, current, body.message || `Update ${path}`, [{ path, bytes: Buffer.from(body.content || '', 'base64') }], []);
       return [existing ? 200 : 201, { content: { path, sha: res.commit.tree.get(path) }, commit: { sha: res.commit.oid } }];
@@ -233,7 +246,11 @@ export const createDouble = () => {
   const entryNode = (path, oid) => ({ __typename: 'TreeEntry', path, oid });
   const resolvers = {
     Query: {
-      repository: (_, a) => ({ __typename: 'Repository', r: repoOf(a.owner, a.name) }),
+      repository: (_, a) => {
+        const r = repoOf(a.owner, a.name);
+        if (!r) throw new GqlError(`Could not resolve to a Repository with the name '${a.owner}/${a.name}'.`, 'NOT_FOUND');
+        return { __typename: 'Repository', r };
+      },
       viewer: () => ({ __typename: 'User', login: 'harness' }),
       rateLimit: () => ({ __typename: 'RateLimit', limit: 5000, remaining: 4999, cost: 1, resetAt: new Date(Date.now() + 3600e3).toISOString() }),
     },
@@ -243,8 +260,10 @@ export const createDouble = () => {
         const branch = input.branch || {};
         const [owner, name] = String(branch.repositoryNameWithOwner || '').split('/');
         if (!owner || !name || !branch.branchName) throw new GqlError('Could not resolve to a Ref with the name given.', 'NOT_FOUND');
-        if (!input.expectedHeadOid) throw new GqlError('Argument \'expectedHeadOid\' on InputObject \'CreateCommitOnBranchInput\' is required.', 'UNPROCESSABLE');
+        if (!input.expectedHeadOid) throw new GqlError('Argument \'expectedHeadOid\' on InputObject \'CreateCommitOnBranchInput\' is required.', 'INVALID_INPUT');
+        if (!input.message || !input.message.headline) throw new GqlError('Argument \'headline\' on InputObject \'CommitMessage\' is required. Expected type String!', 'INVALID_INPUT');
         const r = repoOf(owner, name);
+        if (!r || !head(r, branch.branchName)) throw new GqlError(`Could not resolve to a Ref with the name given (${branch.repositoryNameWithOwner} ${branch.branchName}).`, 'NOT_FOUND');
         if (control.graphqlErrorNext) { const type = control.graphqlErrorNext; control.graphqlErrorNext = undefined; throw new GqlError('injected failure', type); }
         if (control.conflictNext !== undefined) { const p = control.conflictNext; control.conflictNext = undefined; remoteWriter(r, branch.branchName, p); }
         const changes = input.fileChanges || {};
@@ -267,7 +286,7 @@ export const createDouble = () => {
       owner: (o) => ({ __typename: 'User', login: o.r.owner }),
       viewerPermission: () => 'WRITE',
       defaultBranchRef: (o) => refNode(o.r, 'main'),
-      ref: (o, a) => (String(a.qualifiedName).startsWith('refs/tags/') ? null : refNode(o.r, String(a.qualifiedName).replace(/^refs\/heads\//, ''))),
+      ref: (o, a) => { const b = String(a.qualifiedName).replace(/^refs\/heads\//, ''); return String(a.qualifiedName).startsWith('refs/tags/') || !head(o.r, b) ? null : refNode(o.r, b); },
       object: (o, a) => {
         if (a.oid) return o.r.commits.has(a.oid) ? commitNode(o.r, a.oid) : blobs.has(a.oid) ? blobNode(a.oid) : null;
         const [rev, ...rest] = String(a.expression || '').split(':');
@@ -344,7 +363,7 @@ export const createDouble = () => {
           if (!r) throw new GqlError(`Field '${f.name}' doesn't exist on type '${obj.__typename}'`, 'undefinedField');
           const args = Object.fromEntries(Object.entries(f.args).map(([k, v]) => [k, evalValue(v, vars)]));
           try { out[f.alias] = complete(r(obj, args), f.sel, [...path, f.alias]); }
-          catch (e) { if (!(e instanceof GqlError) || e.type === 'undefinedField') throw e; errors.push({ type: e.type, path: [...path, f.alias], locations: [{ line: 1, column: 1 }], message: e.message }); out[f.alias] = null; }
+          catch (e) { if (!(e instanceof GqlError) || e.type === 'undefinedField' || e.type === 'INVALID_INPUT') throw e; errors.push({ type: e.type, path: [...path, f.alias], locations: [{ line: 1, column: 1 }], message: e.message }); out[f.alias] = null; }
         }
       };
       walk(sel);
@@ -354,12 +373,18 @@ export const createDouble = () => {
       const data = complete({ __typename: op.kind === 'mutation' ? 'Mutation' : 'Query' }, op.sel, []);
       return [200, errors.length ? { data, errors } : { data }];
     } catch (e) {
-      return [200, { errors: [{ ...(e.type === 'undefinedField' ? { extensions: { code: 'undefinedField' } } : {}), locations: [{ line: 1, column: 1 }], message: e.message }] }];
+      return [200, { errors: [{ ...(e.type === 'undefinedField' || e.type === 'INVALID_INPUT' ? { extensions: { code: e.type === 'INVALID_INPUT' ? 'argumentLiteralsIncompatible' : 'undefinedField' } } : {}), locations: [{ line: 1, column: 1 }], message: e.message }] }];
     }
   };
 
-  const handle = async (method, url, body) => {
-    if (url.pathname === '/__control') { if (body.reset) { repos = new Map(); blobs = new Map(); trees = new Map(); control = {}; } else control = { ...control, ...body }; return [200, control]; }
+  const handle = async (method, url, body, headers = {}) => {
+    if (url.pathname === '/__control') {
+      if (body.reset) { repos = new Map(); blobs = new Map(); trees = new Map(); control = {}; known = new Map([[ 'harness/causa-test', new Set(['main']) ]]); }
+      else if (body.repository) { const branches = known.get(body.repository) || new Set(['main']); if (body.branch) branches.add(body.branch); known.set(body.repository, branches); }
+      else control = { ...control, ...body };
+      return [200, control];
+    }
+    if (!headers.authorization) return [401, { message: 'Requires authentication', documentation_url: 'https://docs.github.com/rest' }];
     if (url.pathname === '/graphql' && method === 'POST') {
       if (control.failNext && /\bmutation\b/.test(String(body.query || ''))) { const s = control.failNext; control.failNext = undefined; return [s, { message: 'injected failure' }]; }
       return graphql(body);
@@ -385,7 +410,7 @@ export const listen = (port) => {
     for await (const chunk of req) text += chunk;
     let body = {};
     try { body = text ? JSON.parse(text) : {}; } catch { return send(400, { message: 'Problems parsing JSON' }); }
-    const [status, answer] = await double.handle(req.method, new URL(req.url, 'http://double'), body);
+    const [status, answer] = await double.handle(req.method, new URL(req.url, 'http://double'), body, req.headers);
     send(status, answer);
   });
   return new Promise((ok) => server.listen(port, '127.0.0.1', () => ok(server)));
