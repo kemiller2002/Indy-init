@@ -258,9 +258,14 @@ let private manifestPath (source: string) = Path.Combine(source, "docs", "rehear
 
 /// The package the Rehearsal 010 scope is compiled from: the requirements package the lock pins (v4.1.5 since the
 /// owner approved and tagged it), so the scope checks follow the lock rather than a second hard-coded copy.
+/// The package the Rehearsal 010 lock pins. A lock without requirementsPackage.path is an error, not a default:
+/// a silent fallback would compile the scope from a package the lock does not name.
 let private scopePackage (source: string) =
-    parseFile (Path.Combine(source, "kickoff", "rehearsal-010", "toolchain.lock.proposed.json"))
-    |> field "requirementsPackage" |> Option.bind (strOpt "path") |> Option.defaultValue "requirements-compiled/v4.1.5"
+    let lock = Path.Combine(source, "kickoff", "rehearsal-010", "toolchain.lock.proposed.json")
+    parseFile lock
+    |> field "requirementsPackage"
+    |> Option.bind (strOpt "path")
+    |> Option.defaultWith (fun () -> failwithf "%s names no requirementsPackage.path" lock)
 
 let real (source: string) : string list =
     let s = ScopeCommands.sourcesOf source (scopePackage source)

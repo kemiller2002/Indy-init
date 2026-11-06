@@ -31,6 +31,7 @@
   - approved (ODR-V414-03);
   - tagged;
   - added to the frozen guard.
+- [ ] 5a. v4.1.5 (superseded v4.1.4 for Rehearsal 010): decided (APR-V415-OWNER-1, -2), approved (APR-V415-OWNER-3), tagged `indy-init-requirements-v4.1.5` on b2b3022, added to the frozen guard (#153), and the lock and scopes re-pinned (#155). Then ODR-R10-01 and ODR-R10-19 are re-recorded against the new scope digests.
 - [ ] 6. Dokimos 0.11.1:
   - merged, tagged and published;
   - artifacts verified;
@@ -50,7 +51,7 @@
   LP-00..10 cover:
   - a clean Indy-init checkout equal to `origin/main`;
   - the lock;
-  - v4.1.4 and its tag;
+  - v4.1.5 and its tag (`indy-init-requirements-v4.1.5`);
   - every contract digest;
   - the scope digest;
   - every owner decision and the digests it approved;
@@ -61,7 +62,7 @@
   - a clean competition repository (no T0).
 - [ ] `r9.fsx spec-preflight --lock kickoff/rehearsal-010/toolchain.lock.json` PASS.
 - [ ] `conditor acceptance preflight` reads READY.
-- [ ] `requirements-compiler scope preflight --source . --package requirements-compiled/v4.1.4 --manifest docs/rehearsal-010-readiness/scope-manifest.json` PASS.
+- [ ] `requirements-compiler scope preflight --source . --package requirements-compiled/v4.1.5 --manifest docs/rehearsal-010-readiness/scope-manifest.json` PASS.
 - [ ] `requirements-compiler slice-manifest … --work-plan …` reproduces `slice-execution-manifest.json` and `praxis-work-inventory.json` byte for byte.
 
 ## D. Launch (starts the clock)

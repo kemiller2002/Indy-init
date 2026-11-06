@@ -325,11 +325,11 @@ jobs:
         run: dotnet build tools/requirements-compiler/src -c Release
       - name: Candidate package v4.1.4 is reproduced byte for byte and X01-X21 pass
         run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --check
-      - name: Percepta's specification preflight finds nothing blocking in v4.1.4 (FREEZE.md step 2)
+      - name: Percepta's specification preflight finds nothing blocking in v4.1.5, the package Rehearsal 010 is pinned to (FREEZE.md step 2)
         run: |
-          percepta spec-preflight --machines requirements-compiled/v4.1.4/state-machine-contracts.json --invariants requirements-compiled/v4/invariants.json \
-            --interfaces requirements-compiled/v4.1.4/analysis/interface-specifications.json --out "$RUNNER_TEMP/spec-preflight-v414.json"
-          jq -e '.blocked == false and (.blockingContradictions | length) == 0 and .analysed.transitions > 0' "$RUNNER_TEMP/spec-preflight-v414.json"
+          percepta spec-preflight --machines requirements-compiled/v4.1.5/state-machine-contracts.json --invariants requirements-compiled/v4/invariants.json \
+            --interfaces requirements-compiled/v4.1.5/analysis/interface-specifications.json --out "$RUNNER_TEMP/spec-preflight-v415.json"
+          jq -e '.blocked == false and (.blockingContradictions | length) == 0 and .analysed.transitions > 0' "$RUNNER_TEMP/spec-preflight-v415.json"
       - name: Playwright test runner (the version the owner locked, ODR-V41-07)
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null && npm install --no-audit --no-fund @playwright/test@1.63.0 > /dev/null
@@ -382,7 +382,7 @@ jobs:
   # Rehearsal 009's release gate failed in run-suites: two `dotnet test` runners named several projects (MSB1008) and
   # SU-BROWSER-WEBKIT named a Playwright project nobody defined. This job proves, on a deterministic fixture tree with
   # the plan's layout (no application code), that the frozen v4.1.2 commands are refused and that every executable
-  # suite of the successor v4.1.4 lists and runs, WebKit included. The release-gate-repair harness lists the same
+  # suite of v4.1.5 (whose commands equal its predecessor v4.1.4's) lists and runs, WebKit included. The release-gate-repair harness lists the same
   # commands; this job also executes them (docs/rehearsal-010-readiness/INTEGRATION-REPORT.md).
   suite-commands:
     runs-on: ubuntu-latest
@@ -408,13 +408,13 @@ jobs:
           dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.2/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v412.json" --require-tests true
           test $? -eq 4 || { echo "::error::v4.1.2 was not refused"; exit 1; }
           jq -e '[.suites[] | select(.cause != "") | .id] == ["SU-OWN-DOTNET","SU-DOTNET-LIVE"]' "$RUNNER_TEMP/v412.json" || exit 1
-          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.4/verification-execution-plan.json --root "$RUNNER_TEMP/fx-nowebkit" --out "$RUNNER_TEMP/nowebkit.json" --require-tests true
+          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.5/verification-execution-plan.json --root "$RUNNER_TEMP/fx-nowebkit" --out "$RUNNER_TEMP/nowebkit.json" --require-tests true
           test $? -eq 4 || { echo "::error::a missing webkit project was not refused"; exit 1; }
           jq -e '[.suites[] | select(.cause != "") | .id] == ["SU-BROWSER-WEBKIT"]' "$RUNNER_TEMP/nowebkit.json" || exit 1
-      - name: Every v4.1.4 suite command lists and runs, each test passing (WebKit included)
+      - name: Every v4.1.5 suite command lists and runs, each test passing (WebKit included; the commands equal v4.1.4's)
         run: |
-          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.4/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v414.json" --require-tests true
-          dotnet fsi tools/r9/r9.fsx -- run-suites --plan requirements-compiled/v4.1.4/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/runs" --require-tests true
+          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.5/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v415.json" --require-tests true
+          dotnet fsi tools/r9/r9.fsx -- run-suites --plan requirements-compiled/v4.1.5/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/runs" --require-tests true
           for f in "$RUNNER_TEMP"/runs/*/run.log; do head -2 "$f"; done
           if grep -l 'outcome="Failed"' "$RUNNER_TEMP"/runs/*/*.trx; then echo "::error::a suite test failed"; exit 1; fi
           for s in SU-OWN-BROWSER SU-BROWSER-CHROMIUM SU-BROWSER-WEBKIT SU-BROWSER-LIVE; do
@@ -584,7 +584,7 @@ jobs:
           dotnet build tools/requirements-compiler/src -c Release -v q
           RC=tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll; P=docs/rehearsal-010-optimization/proposals
           for v in successor milestone-aligned; do
-            dotnet $RC slice-manifest --manifest $P/scope-manifest.$v.json --dag requirements-compiled/v4.1.4/execution-dag.json \
+            dotnet $RC slice-manifest --manifest $P/scope-manifest.$v.json --dag requirements-compiled/v4.1.5/execution-dag.json \
               --journeys verification/journeys/bindings.json --out "$RUNNER_TEMP/slices.$v.json"
             dotnet $RC scope work-plan --manifest $P/scope-manifest.$v.json --out "$RUNNER_TEMP/inventory.$v.json"
             diff <(jq -S . "$RUNNER_TEMP/slices.$v.json") <(jq -S . $P/slice-execution-manifest.$v.json) || { echo "::error::$P/slice-execution-manifest.$v.json is stale or edited"; exit 1; }
