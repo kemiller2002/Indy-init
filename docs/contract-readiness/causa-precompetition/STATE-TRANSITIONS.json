@@ -1,0 +1,177 @@
+{
+  "schema": "causa.contract-readiness.state-transitions/1",
+  "status": "CANDIDATE. Domain machines are transcribed from docs/STATE-TRANSITION-TABLES.md onto the causa-storage v1.0.0 state vocabulary; the validator replays every stored history through them. Persistence machines are not restated: they are indexed from requirements-compiled/v4.1.5/state-machine-contracts.json by digest and checked against the parsed F# unions.",
+  "illegalTransitionRule": "A (state, command) pair not listed is illegal. Decide returns Decision.Blocked with code ILLEGAL_TRANSITION naming the entity, state and command; no event is emitted and no state changes. There is no default case for an unknown command or event: an unregistered eventType fails the whole history closed (CONTRACT §7.1), and an unknown command has no CoreCommand case to compile.",
+  "domainMachines": [
+    {
+      "machineId": "DM-INVESTIGATION",
+      "entity": "Investigation",
+      "stateEnum": "lifecycle",
+      "idField": null,
+      "fromField": "from",
+      "targetField": "to",
+      "creation": [{"eventType": "InvestigationStarted", "state": "draft"}],
+      "transitions": [
+        {"transitionId": "DT-INV-01", "eventType": "LifecycleChanged", "when": {"path": "command", "value": "activateInvestigation"}, "from": ["draft", "awaitingEvidence", "awaitingVerification", "archived"], "to": "active", "source": "docs/STATE-TRANSITION-TABLES.md §1 rows Draft/AwaitingEvidence/AwaitingVerification/Archived -> Active"},
+        {"transitionId": "DT-INV-02", "eventType": "LifecycleChanged", "when": {"path": "command", "value": "markAwaitingEvidence"}, "from": ["active"], "to": "awaitingEvidence", "source": "§1 Active MarkAwaitingEvidence"},
+        {"transitionId": "DT-INV-03", "eventType": "LifecycleChanged", "when": {"path": "command", "value": "markAwaitingVerification"}, "from": ["active"], "to": "awaitingVerification", "source": "§1 Active MarkAwaitingVerification"},
+        {"transitionId": "DT-INV-04", "eventType": "LifecycleChanged", "when": {"path": "command", "value": "resolveInvestigation"}, "from": ["active", "awaitingVerification"], "to": "resolved", "source": "§1 Active/AwaitingVerification ResolveInvestigation"},
+        {"transitionId": "DT-INV-05", "eventType": "LifecycleChanged", "when": {"path": "command", "value": "closeInvestigation"}, "from": ["resolved"], "to": "closed", "source": "§1 Resolved CloseInvestigation"},
+        {"transitionId": "DT-INV-06", "eventType": "LifecycleChanged", "when": {"path": "command", "value": "reopenInvestigation"}, "from": ["resolved", "closed"], "to": "active", "source": "§1 Resolved/Closed ReopenInvestigation"},
+        {"transitionId": "DT-INV-07", "eventType": "LifecycleChanged", "when": {"path": "command", "value": "verificationFailed"}, "from": ["awaitingVerification"], "to": "active", "source": "§1 AwaitingVerification -> Active 'verification failed/new work'; CONTRACT LifecycleChanged rule from=awaitingVerification"}
+      ]
+    },
+    {
+      "machineId": "DM-HYPOTHESIS",
+      "entity": "Hypothesis",
+      "stateEnum": "hypothesisState",
+      "idField": "hypothesisId",
+      "fromField": "from",
+      "targetField": "to",
+      "creation": [{"eventType": "HypothesisRecorded", "state": "proposed"}],
+      "transitions": [
+        {"transitionId": "DT-HYP-01", "eventType": "HypothesisTransitioned", "when": {"path": "command", "value": "markPlausible"}, "from": ["proposed", "weakened"], "to": "plausible", "source": "§2 Proposed/Weakened MarkHypothesisPlausible"},
+        {"transitionId": "DT-HYP-02", "eventType": "HypothesisTransitioned", "when": {"path": "command", "value": "markSupported"}, "from": ["plausible", "weakened"], "to": "supported", "source": "§2 Plausible/Weakened MarkHypothesisSupported"},
+        {"transitionId": "DT-HYP-03", "eventType": "HypothesisTransitioned", "when": {"path": "command", "value": "markWeakened"}, "from": ["plausible", "supported"], "to": "weakened", "source": "§2 Plausible/Supported MarkHypothesisWeakened"},
+        {"transitionId": "DT-HYP-04", "eventType": "HypothesisTransitioned", "when": {"path": "command", "value": "falsify"}, "from": ["proposed", "plausible", "supported", "weakened"], "to": "falsified", "source": "§2 FalsifyHypothesis"},
+        {"transitionId": "DT-HYP-05", "eventType": "HypothesisTransitioned", "when": {"path": "command", "value": "supersede"}, "from": ["proposed", "plausible", "supported", "weakened"], "to": "superseded", "source": "§2 SupersedeHypothesis"},
+        {"transitionId": "DT-HYP-06", "eventType": "HypothesisTransitioned", "when": {"path": "command", "value": "reopen"}, "from": ["falsified"], "to": "plausible", "source": "§2 Falsified ReopenHypothesis"}
+      ]
+    },
+    {
+      "machineId": "DM-UNKNOWN",
+      "entity": "Unknown",
+      "stateEnum": "unknownState",
+      "idField": "unknownId",
+      "fromField": null,
+      "targetField": "state",
+      "creation": [{"eventType": "UnknownIdentified", "state": "identified"}],
+      "transitions": [
+        {"transitionId": "DT-UNK-01", "eventType": "UnknownTransitioned", "when": null, "from": ["identified"], "to": "investigating", "source": "§6 StartInvestigatingUnknown"},
+        {"transitionId": "DT-UNK-02", "eventType": "UnknownTransitioned", "when": null, "from": ["identified", "investigating"], "to": "resolved", "source": "§6 ResolveUnknown"},
+        {"transitionId": "DT-UNK-03", "eventType": "UnknownTransitioned", "when": null, "from": ["identified", "investigating"], "to": "acceptedResidual", "source": "§6 AcceptUnknownAsResidual"}
+      ]
+    },
+    {
+      "machineId": "DM-ASSUMPTION",
+      "entity": "Assumption",
+      "stateEnum": "assumptionState",
+      "idField": "assumptionId",
+      "fromField": null,
+      "targetField": "state",
+      "creation": [{"eventType": "AssumptionRecorded", "state": "explicitUnverified"}],
+      "transitions": [
+        {"transitionId": "DT-ASM-01", "eventType": "AssumptionTransitioned", "when": null, "from": ["explicitUnverified"], "to": "provisionallyAccepted", "source": "§3 ProvisionallyAcceptAssumption"},
+        {"transitionId": "DT-ASM-02", "eventType": "AssumptionTransitioned", "when": null, "from": ["explicitUnverified", "provisionallyAccepted"], "to": "verified", "source": "§3 VerifyAssumption"},
+        {"transitionId": "DT-ASM-03", "eventType": "AssumptionTransitioned", "when": null, "from": ["explicitUnverified", "provisionallyAccepted"], "to": "rejected", "source": "§3 RejectAssumption"}
+      ]
+    },
+    {
+      "machineId": "DM-CONTRADICTION",
+      "entity": "Contradiction",
+      "stateEnum": "contradictionState",
+      "idField": "contradictionId",
+      "fromField": null,
+      "targetField": "state",
+      "creation": [{"eventType": "ContradictionRecorded", "state": "detected"}],
+      "transitions": [
+        {"transitionId": "DT-CON-01", "eventType": "ContradictionTransitioned", "when": null, "from": ["detected"], "to": "triaged", "source": "§8 TriageContradiction"},
+        {"transitionId": "DT-CON-02", "eventType": "ContradictionTransitioned", "when": null, "from": ["detected", "triaged", "investigating"], "to": "resolved", "source": "§8 ResolveContradiction"},
+        {"transitionId": "DT-CON-03", "eventType": "ContradictionTransitioned", "when": null, "from": ["detected", "triaged", "investigating"], "to": "acceptedResidual", "source": "§8 AcceptContradictionAsResidual"}
+      ]
+    },
+    {
+      "machineId": "DM-ACTION",
+      "entity": "InvestigationAction",
+      "stateEnum": "actionState",
+      "idField": "actionId",
+      "fromField": null,
+      "targetField": "state",
+      "creation": [{"eventType": "ActionRecorded", "state": "proposed"}],
+      "transitions": [
+        {"transitionId": "DT-ACT-01", "eventType": "ActionTransitioned", "when": null, "from": ["proposed"], "to": "approved", "source": "§5 ApproveInvestigationAction"},
+        {"transitionId": "DT-ACT-02", "eventType": "ActionTransitioned", "when": null, "from": ["proposed"], "to": "rejected", "source": "§5 RejectInvestigationAction"},
+        {"transitionId": "DT-ACT-03", "eventType": "ActionTransitioned", "when": null, "from": ["approved"], "to": "inProgress", "source": "§5 StartInvestigationAction"},
+        {"transitionId": "DT-ACT-04", "eventType": "ActionTransitioned", "when": null, "from": ["approved", "inProgress"], "to": "cancelled", "source": "§5 CancelInvestigationAction"},
+        {"transitionId": "DT-ACT-05", "eventType": "ActionTransitioned", "when": null, "from": ["inProgress"], "to": "completed", "source": "§5 CompleteInvestigationAction"}
+      ]
+    },
+    {
+      "machineId": "DM-CAUSE",
+      "entity": "CausalAssertion",
+      "stateEnum": "causeState",
+      "idField": "causeId",
+      "fromField": null,
+      "targetField": null,
+      "creation": [{"eventType": "CausalAssertionRecorded", "state": "proposed"}],
+      "transitions": [
+        {"transitionId": "DT-CAUSE-01", "eventType": "CausalAssertionConfirmed", "when": null, "from": ["proposed", "reopened"], "to": "confirmed", "source": "§10 Proposed/Reopened ConfirmCause"},
+        {"transitionId": "DT-CAUSE-02", "eventType": "CausalAssertionReopened", "when": null, "from": ["confirmed"], "to": "reopened", "source": "§10 Confirmed ReopenConfirmedCause"}
+      ]
+    },
+    {
+      "machineId": "DM-CORRECTIVE-ACTION",
+      "entity": "CorrectiveAction",
+      "stateEnum": "correctiveActionState",
+      "idField": "correctiveActionId",
+      "fromField": null,
+      "targetField": "state",
+      "creation": [{"eventType": "CorrectiveActionRecorded", "state": "proposed"}],
+      "transitions": [
+        {"transitionId": "DT-CA-01", "eventType": "CorrectiveActionTransitioned", "when": null, "from": ["proposed"], "to": "approved", "source": "§11 ApproveCorrectiveAction"},
+        {"transitionId": "DT-CA-02", "eventType": "CorrectiveActionTransitioned", "when": null, "from": ["proposed", "approved"], "to": "cancelled", "source": "§11 CancelCorrectiveAction"},
+        {"transitionId": "DT-CA-03", "eventType": "CorrectiveActionTransitioned", "when": null, "from": ["approved", "reworkRequired"], "to": "inProgress", "source": "§11 StartCorrectiveAction"},
+        {"transitionId": "DT-CA-05", "eventType": "CorrectiveActionTransitioned", "when": null, "from": ["inProgress"], "to": "implemented", "source": "§11 MarkCorrectiveActionImplemented"},
+        {"transitionId": "DT-CA-06", "eventType": "CorrectiveActionTransitioned", "when": null, "from": ["implemented"], "to": "awaitingVerificationOfEffect", "source": "§11 StartCorrectiveActionVerification"},
+        {"transitionId": "DT-CA-07", "eventType": "CorrectiveActionTransitioned", "when": null, "from": ["awaitingVerificationOfEffect"], "to": "verifiedEffective", "source": "§11 MarkCorrectiveActionVerified"},
+        {"transitionId": "DT-CA-08", "eventType": "CorrectiveActionTransitioned", "when": null, "from": ["awaitingVerificationOfEffect"], "to": "verificationFailed", "source": "§11 MarkCorrectiveActionVerificationFailed"},
+        {"transitionId": "DT-CA-09", "eventType": "CorrectiveActionTransitioned", "when": null, "from": ["verificationFailed"], "to": "reworkRequired", "source": "§11 RequireCorrectiveActionRework"}
+      ]
+    },
+    {
+      "machineId": "DM-PROPOSAL",
+      "entity": "Proposal",
+      "stateEnum": "proposalState",
+      "idField": "proposalId",
+      "fromField": null,
+      "targetField": null,
+      "creation": [{"eventType": "ProposalRecorded", "state": "active"}],
+      "transitions": [
+        {"transitionId": "DT-PROP-01", "eventType": "ProposalWasAccepted", "when": null, "from": ["active"], "to": "accepted", "source": "§12 AcceptProposal (Revised/Deferred have no v1.0.0 form)"},
+        {"transitionId": "DT-PROP-02", "eventType": "ProposalWasRejected", "when": null, "from": ["active"], "to": "rejected", "source": "§12 RejectProposal"}
+      ]
+    },
+    {
+      "machineId": "DM-RELATIONSHIP",
+      "entity": "EvidenceRelationship",
+      "stateEnum": "relationshipStatus (proposed causa-storage 1.1.0)",
+      "idField": "relationshipId",
+      "fromField": null,
+      "targetField": null,
+      "creation": [{"eventType": "EvidenceRelated", "state": "current"}],
+      "transitions": [
+        {"transitionId": "DT-REL-01", "eventType": "EvidenceRelationshipRevised", "when": null, "from": ["current"], "to": "current", "source": "OD-INDY-23 (3) reassess: at most one current assessment per pair; the earlier one stays in history"},
+        {"transitionId": "DT-REL-02", "eventType": "EvidenceRelationshipWithdrawn", "when": null, "from": ["current"], "to": "withdrawn", "source": "OD-INDY-23 (3) withdraw"}
+      ]
+    }
+  ],
+  "persistenceMachines": {
+    "source": "requirements-compiled/v4.1.5/state-machine-contracts.json",
+    "sha256": "d58d21f9c11b23238402727c39ce6045a960dbf248fe0f58bf3a30a2bc4a8bc2",
+    "machines": ["SM-SAVE", "SM-CONFLICT", "SM-LOAD", "SM-CONNECTION", "SM-NETWORK"],
+    "unionBinding": [
+      {"machine": "SM-SAVE", "stateUnion": "SaveState", "inputUnion": "SaveInput"},
+      {"machine": "SM-CONFLICT", "stateUnion": "ConflictView", "inputUnion": "ConflictInput"},
+      {"machine": "SM-LOAD", "stateUnion": "LoadState", "inputUnion": "LoadInput"}
+    ]
+  },
+  "saveDurability": [
+    {"stateId": "PS-LOCAL", "name": "Local changes", "saveStates": ["Unsaved"], "durable": false, "mayDisplaySaved": false, "evidence": "Edits applied to the session; nothing sent."},
+    {"stateId": "PS-PENDING", "name": "Save pending", "saveStates": ["Saving"], "durable": false, "mayDisplaySaved": false, "evidence": "Mutation prepared or sent (MutationSent); no provider answer yet."},
+    {"stateId": "PS-ACK", "name": "Provider write acknowledged", "saveStates": ["Saving"], "durable": false, "mayDisplaySaved": false, "evidence": "The provider answered the write; the read-back at the new commit is still outstanding. An acknowledgement is not durability (PERSIST-023)."},
+    {"stateId": "PS-VERIFIED", "name": "Provider read-back verified", "saveStates": ["Saved"], "durable": true, "mayDisplaySaved": true, "evidence": "SavedBasis.Confirmed: Confirmation.ofReadBack requires the bytes re-read at the commit to equal the bytes written; or SavedBasis.VerifiedAt: the files were read from the provider and verified. Real-provider durability is established only against GitHub (live preflight J3-05); a provider double proves protocol behaviour only."},
+    {"stateId": "PS-CONFLICT", "name": "Save conflict", "saveStates": ["Conflict"], "durable": false, "mayDisplaySaved": false, "evidence": "Stale head for the same investigation; SM-CONFLICT runs."},
+    {"stateId": "PS-FAILED", "name": "Save failed", "saveStates": ["SaveFailed"], "durable": false, "mayDisplaySaved": false, "evidence": "SaveFailure: Refused, RepositoryKeptChanging, BytesDiffer, HistoryWasRewritten, CredentialNotAccepted."},
+    {"stateId": "PS-OFFLINE", "name": "Offline / unverified", "saveStates": ["Offline", "UnknownOutcome"], "durable": false, "mayDisplaySaved": false, "evidence": "Offline: no write attempted. UnknownOutcome: the answer was lost; reconciliation reads the WriteMarker before any retry."}
+  ]
+}

@@ -1,0 +1,798 @@
+{
+  "schema": "causa.contract-readiness.readiness/1",
+  "generatedBy": "tools/contract-readiness (dotnet run -- generate); do not edit by hand",
+  "contractPackage": "causa-precompetition 1.0.0-candidate",
+  "verdict": "BLOCKED",
+  "blockedReasons": ["owner decision ODR-V415-02 is open: Approve package v4.1.5 (existing request, not created here)", "owner decision OD-CR-01 is open: Adopt the causa-storage 1.1.0 additive extension and a v4.1.6 successor that carries it", "owner decision OD-CR-02 is open: Evidence category on write", "owner decision OD-CR-03 is open: Evidence source reference: optional in the catalog, required on the wire", "owner decision OD-CR-04 is open: Conclusion strength on write", "owner decision OD-CR-05 is open: INV-011 'Hypothesis explanation' maps to HypothesisRecorded.mechanism", "owner decision OD-CR-06 is open: INV-035 for evidence: which parts are editable with the same id", "owner decision OD-CR-08 is open: Adopt this contract package and its validator as owner-controlled verification assets", "owner decision OD-CR-07 is open: Actor identity for UI writes", "14 UI bindings have no defined write path: UB-011 INV-011, UB-012 INV-012, UB-023 INV-023, UB-025 INV-025, UB-027 INV-027, UB-028 INV-028, UB-029 INV-029, UB-030U INV-030, UB-031 INV-031, UB-032 INV-032, UB-033 INV-033, UB-034 INV-034, UB-035 INV-035, UB-037 INV-037", "7 required commands are undefined in the successor candidate: CMD-INV-EDIT, CMD-OBS-EDIT, CMD-HYP-EDIT, CMD-EVD-EDIT, CMD-REL-REVISE, CMD-REL-WITHDRAW, CMD-CONCL-RECORD"],
+  "unverifiedReasons": ["CR-LIVE-01: Needs a GitHub credential and a writable repository; none is available to this validator. A provider double tests protocol behaviour only and is not substituted. Run the live-provider preflight (.github/workflows/live-provider-preflight.yml)."],
+  "waivers": [],
+  "waiverPolicy": "No waiver exists. BLOCKED and UNVERIFIED change only when the cause is removed: an owner record, a released contract, or executed evidence.",
+  "source": {
+    "causaDataRepository": "https://github.com/kemiller2002/causa-data",
+    "causaDataCommitPinned": "e8259df74add723765c57a5b1a5888d9c3f707af",
+    "schemaBundleSha256": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
+    "storageContract": "causa-storage v1.0.0 (contract/v1.0.0)",
+    "successorCandidate": "requirements-compiled/v4.1.5 (CANDIDATE)",
+    "successorContractsSha256": "90a1b34cfbdc0fa17437e293344d5ab27f446b218bc8ec08fb712e8d0ffd829c",
+    "frozenBaseline": "requirements-compiled/v4.1.4 (tag indy-init-requirements-v4.1.4)",
+    "frozenContractsSha256": "861a5651073d05840632649f61bc97f53a39261f5b31619b128df4e3dedab266",
+    "catalogSha256": "7e5e8a400b52d79218e2fb42927d5cb122cc0e6c8ab002f146b33198647ce53c",
+    "screenManifestSha256": "49a155be72d3d550b9f7ca3aca69ec8a4bd24efda961a513270fb346e19ed534",
+    "dotnetSdk": "10.0.402"
+  },
+  "criteria": [
+    {
+      "criterion": "Every mandatory contract obligation is represented",
+      "met": false
+    },
+    {
+      "criterion": "All pinned historical records are compatible (lossless under the successor candidate)",
+      "met": true
+    },
+    {
+      "criterion": "Required fields and commands are covered",
+      "met": false
+    },
+    {
+      "criterion": "Negative controls fail as expected",
+      "met": true
+    },
+    {
+      "criterion": "No unresolved blocking owner decision remains",
+      "met": false
+    },
+    {
+      "criterion": "The contract package is versioned and reproducible",
+      "met": true
+    }
+  ],
+  "answers": {
+    "historicalEventsExamined": {
+      "historicalCases": 1315,
+      "activeCatalog": 1363,
+      "allDistinctHistories": 1583,
+      "allCopies": 5672
+    },
+    "representedLosslessly": {
+      "successorCandidateV415": {
+        "contract": "v4.1.5 (candidate)",
+        "eventsExamined": 1583,
+        "losslessIncludingEnvelope": 1583,
+        "payloadCaseMissing": 0,
+        "payloadCaseLossy": 0,
+        "noWireVariant": 0,
+        "envelopeFieldsDropped": [],
+        "eventsLosingEnvelopeFields": 0,
+        "missingCaseByVariant": {},
+        "lossyByVariant": []
+      },
+      "frozenV414HistoricalCases": {
+        "contract": "v4.1.4 (frozen)",
+        "eventsExamined": 1315,
+        "losslessIncludingEnvelope": 0,
+        "payloadCaseMissing": 487,
+        "payloadCaseLossy": 63,
+        "noWireVariant": 0,
+        "envelopeFieldsDropped": ["formatVersion", "occurredAt", "actor", "semanticVersion", "correlationId"],
+        "eventsLosingEnvelopeFields": 1315,
+        "missingCaseByVariant": {
+          "ActionTransitioned": 9,
+          "AssumptionTransitioned": 3,
+          "ConclusionRecorded": 3,
+          "ContradictionTransitioned": 45,
+          "CorrectiveActionTransitioned/approved": 9,
+          "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 5,
+          "CorrectiveActionTransitioned/inProgress": 7,
+          "CorrectiveActionTransitioned/verificationFailed": 1,
+          "CorrectiveActionTransitioned/verifiedEffective": 3,
+          "EvidenceVerificationAssessed": 376,
+          "HypothesisTransitioned/markWeakened": 7,
+          "LifecycleChanged/markAwaitingEvidence": 1,
+          "LifecycleChanged/markAwaitingVerification": 2,
+          "LifecycleChanged/verificationFailed": 1,
+          "NegativeKnowledgeEstablished": 6,
+          "UnknownTransitioned": 9
+        },
+        "lossyByVariant": [
+          {
+            "variant": "CausalAssertionConfirmed",
+            "droppedFields": ["policy"],
+            "events": 3
+          },
+          {
+            "variant": "HypothesisTransitioned/falsify",
+            "droppedFields": ["evidenceIds", "from", "(argument Scope has no wire source)"],
+            "events": 6
+          },
+          {
+            "variant": "HypothesisTransitioned/markPlausible",
+            "droppedFields": ["evidenceIds", "from", "reason"],
+            "events": 29
+          },
+          {
+            "variant": "HypothesisTransitioned/markSupported",
+            "droppedFields": ["evidenceIds", "from", "reason"],
+            "events": 22
+          },
+          {
+            "variant": "LifecycleChanged/activateInvestigation",
+            "droppedFields": ["from"],
+            "events": 3
+          }
+        ]
+      }
+    },
+    "fieldsDefined": {
+      "total": 296,
+      "wire": 277,
+      "proposed": 19
+    },
+    "commandsDefined": {
+      "total": 52,
+      "definedInV415": 41,
+      "proposed": 7,
+      "uiOnly": 2,
+      "deferredOrRefused": 2
+    },
+    "eventsDefined": {
+      "variants": 56,
+      "wire": 49,
+      "proposed": 6,
+      "v415CoreEventCases": 50
+    },
+    "uiBindings": {
+      "total": 45,
+      "covered": 30,
+      "blocked": 14,
+      "notApplicable": 1
+    },
+    "verificationObligations": {
+      "obligations": 121,
+      "BLOCKED": 28,
+      "NOT-APPLICABLE": 1,
+      "PASS": 49,
+      "PENDING-IMPLEMENTATION": 42,
+      "UNVERIFIED": 1
+    },
+    "checks": {
+      "total": 32,
+      "passed": 31,
+      "failed": 0,
+      "unverified": 1
+    },
+    "negativeControls": {
+      "total": 18,
+      "failedAsExpected": 18
+    },
+    "openBlockingDecisions": ["ODR-V415-02", "OD-CR-01", "OD-CR-02", "OD-CR-03", "OD-CR-04", "OD-CR-05", "OD-CR-06", "OD-CR-08", "OD-CR-07"],
+    "readyToFreeze": false
+  },
+  "checks": [
+    {
+      "checkId": "CR-SRC-02",
+      "title": "The causa-data checkout is the pinned commit",
+      "category": "sources",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "head": "e8259df74add723765c57a5b1a5888d9c3f707af"
+      }
+    },
+    {
+      "checkId": "CR-SRC-01",
+      "title": "Pinned historical data matches the source pin (causa-data e8259df, PR #126/#141 source-pin.json)",
+      "category": "sources",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "pinnedCases": 3
+      }
+    },
+    {
+      "checkId": "CR-REG-01",
+      "title": "FIELD-REGISTRY.json equals a fresh generation from the pinned schemas, FIELD-MAPPING.md and DOMAIN-CONTRACT.json",
+      "category": "reproducibility",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {}
+    },
+    {
+      "checkId": "CR-REG-02",
+      "title": "Field IDs are unique",
+      "category": "schema",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "fields": 296
+      }
+    },
+    {
+      "checkId": "CR-REG-03",
+      "title": "Schema completeness: every event type has a payload type, every object type has fields, every reference and rule resolves",
+      "category": "schema",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "eventTypes": 31,
+        "objectTypes": 62,
+        "rules": 72
+      }
+    },
+    {
+      "checkId": "CR-CER-01",
+      "title": "Command, event-variant, transition and binding IDs are unique",
+      "category": "registry",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "variants": 56,
+        "commands": 52
+      }
+    },
+    {
+      "checkId": "CR-CER-02",
+      "title": "Wire variants partition every registered event type and discriminator value (no silent default)",
+      "category": "registry",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "wireEventTypes": 31,
+        "wireVariants": 49
+      }
+    },
+    {
+      "checkId": "CR-CER-03",
+      "title": "Every v4.1.5 CoreEvent case is bound to exactly one variant; proposed cases are absent from v4.1.5",
+      "category": "registry",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "coreEventCases": 50
+      }
+    },
+    {
+      "checkId": "CR-CER-04",
+      "title": "Every v4.1.5 CoreCommand case has a command entry; defined commands exist in the parsed contracts and proposed ones do not",
+      "category": "registry",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "coreCommandCases": 29
+      }
+    },
+    {
+      "checkId": "CR-CER-05",
+      "title": "Command result events, input fields, transitions and blocking decisions all resolve",
+      "category": "registry",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {}
+    },
+    {
+      "checkId": "CR-CER-06",
+      "title": "Every required domain input has a documented input path (UI field, derivation or session), or is a named gap tied to an open owner decision",
+      "category": "registry",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "inputGapsTiedToDecisions": ["CMD-EVD-ADD F.Payload.EvidenceAdmitted.category", "CMD-CONCL-RECORD F.Payload.ConclusionRecorded.strength"]
+      }
+    },
+    {
+      "checkId": "CR-HIST-01",
+      "title": "Every stored event decodes strictly into registered typed fields and re-encodes to its exact stored bytes",
+      "category": "historical",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "distinctHistories": 16,
+        "eventsExamined": 1583,
+        "eventsLossless": 1583,
+        "unknownFieldsPreserved": 0
+      }
+    },
+    {
+      "checkId": "CR-HIST-02",
+      "title": "Every stored event maps to exactly one registered wire variant",
+      "category": "historical",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "unmapped": 0
+      }
+    },
+    {
+      "checkId": "CR-HIST-03",
+      "title": "Envelope integrity: contiguous aggregateVersion, UUIDv5 eventId derivation, one correlation group per id, InvestigationStarted first",
+      "category": "historical",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "problems": 0
+      }
+    },
+    {
+      "checkId": "CR-HIST-04",
+      "title": "Every manifest.json and snapshot.json decodes against the registry, round-trips, and the manifest pins the events bytes",
+      "category": "historical",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "investigationDirectories": 28
+      }
+    },
+    {
+      "checkId": "CR-HIST-05",
+      "title": "Every catalog case exists with its pinned events digest and expected version",
+      "category": "historical",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "catalogs": ["demonstration-v1", "historical-v1"],
+        "activeCatalog": "demonstration-v1"
+      }
+    },
+    {
+      "checkId": "CR-HIST-06",
+      "title": "Every stored state transition is legal under the domain transition tables and its stored 'from' equals the replayed state",
+      "category": "historical",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "transitionsChecked": 273,
+        "violations": 0
+      }
+    },
+    {
+      "checkId": "CR-HIST-07",
+      "title": "Historical provenance records and admitted evidence correspond one to one, and each source text carries its URL",
+      "category": "historical",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "cases": 3,
+        "provenanceRecords": 376
+      }
+    },
+    {
+      "checkId": "CR-REP-01",
+      "title": "The successor candidate represents every pinned catalog event and every stored history losslessly (payload case and envelope)",
+      "category": "historical",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "activeCatalog": {
+          "contract": "v4.1.5 (candidate)",
+          "eventsExamined": 1363,
+          "losslessIncludingEnvelope": 1363,
+          "payloadCaseMissing": 0,
+          "payloadCaseLossy": 0,
+          "noWireVariant": 0,
+          "envelopeFieldsDropped": [],
+          "eventsLosingEnvelopeFields": 0,
+          "missingCaseByVariant": {},
+          "lossyByVariant": []
+        },
+        "allDistinctHistories": {
+          "contract": "v4.1.5 (candidate)",
+          "eventsExamined": 1583,
+          "losslessIncludingEnvelope": 1583,
+          "payloadCaseMissing": 0,
+          "payloadCaseLossy": 0,
+          "noWireVariant": 0,
+          "envelopeFieldsDropped": [],
+          "eventsLosingEnvelopeFields": 0,
+          "missingCaseByVariant": {},
+          "lossyByVariant": []
+        }
+      }
+    },
+    {
+      "checkId": "CR-REP-02",
+      "title": "Reproduce PR #141 against the frozen v4.1.4 contract: 487 of 1,315 historical events have no case, 63 more are lossy, and every event loses envelope provenance",
+      "category": "historical",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "historicalCases": {
+          "contract": "v4.1.4 (frozen)",
+          "eventsExamined": 1315,
+          "losslessIncludingEnvelope": 0,
+          "payloadCaseMissing": 487,
+          "payloadCaseLossy": 63,
+          "noWireVariant": 0,
+          "envelopeFieldsDropped": ["formatVersion", "occurredAt", "actor", "semanticVersion", "correlationId"],
+          "eventsLosingEnvelopeFields": 1315,
+          "missingCaseByVariant": {
+            "ActionTransitioned": 9,
+            "AssumptionTransitioned": 3,
+            "ConclusionRecorded": 3,
+            "ContradictionTransitioned": 45,
+            "CorrectiveActionTransitioned/approved": 9,
+            "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 5,
+            "CorrectiveActionTransitioned/inProgress": 7,
+            "CorrectiveActionTransitioned/verificationFailed": 1,
+            "CorrectiveActionTransitioned/verifiedEffective": 3,
+            "EvidenceVerificationAssessed": 376,
+            "HypothesisTransitioned/markWeakened": 7,
+            "LifecycleChanged/markAwaitingEvidence": 1,
+            "LifecycleChanged/markAwaitingVerification": 2,
+            "LifecycleChanged/verificationFailed": 1,
+            "NegativeKnowledgeEstablished": 6,
+            "UnknownTransitioned": 9
+          },
+          "lossyByVariant": [
+            {
+              "variant": "CausalAssertionConfirmed",
+              "droppedFields": ["policy"],
+              "events": 3
+            },
+            {
+              "variant": "HypothesisTransitioned/falsify",
+              "droppedFields": ["evidenceIds", "from", "(argument Scope has no wire source)"],
+              "events": 6
+            },
+            {
+              "variant": "HypothesisTransitioned/markPlausible",
+              "droppedFields": ["evidenceIds", "from", "reason"],
+              "events": 29
+            },
+            {
+              "variant": "HypothesisTransitioned/markSupported",
+              "droppedFields": ["evidenceIds", "from", "reason"],
+              "events": 22
+            },
+            {
+              "variant": "LifecycleChanged/activateInvestigation",
+              "droppedFields": ["from"],
+              "events": 3
+            }
+          ]
+        },
+        "historicalCasesSuccessor": {
+          "contract": "v4.1.5 (candidate)",
+          "eventsExamined": 1315,
+          "losslessIncludingEnvelope": 1315,
+          "payloadCaseMissing": 0,
+          "payloadCaseLossy": 0,
+          "noWireVariant": 0,
+          "envelopeFieldsDropped": [],
+          "eventsLosingEnvelopeFields": 0,
+          "missingCaseByVariant": {},
+          "lossyByVariant": []
+        },
+        "activeCatalogFrozen": {
+          "contract": "v4.1.4 (frozen)",
+          "eventsExamined": 1363,
+          "losslessIncludingEnvelope": 0,
+          "payloadCaseMissing": 502,
+          "payloadCaseLossy": 71,
+          "noWireVariant": 0,
+          "envelopeFieldsDropped": ["formatVersion", "occurredAt", "actor", "semanticVersion", "correlationId"],
+          "eventsLosingEnvelopeFields": 1363,
+          "missingCaseByVariant": {
+            "ActionTransitioned": 9,
+            "AssumptionTransitioned": 3,
+            "ConclusionRecorded": 4,
+            "ContradictionTransitioned": 45,
+            "CorrectiveActionTransitioned/approved": 10,
+            "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 6,
+            "CorrectiveActionTransitioned/inProgress": 8,
+            "CorrectiveActionTransitioned/verificationFailed": 1,
+            "CorrectiveActionTransitioned/verifiedEffective": 4,
+            "EvidenceVerificationAssessed": 382,
+            "HypothesisTransitioned/markWeakened": 10,
+            "LifecycleChanged/markAwaitingEvidence": 1,
+            "LifecycleChanged/markAwaitingVerification": 3,
+            "LifecycleChanged/verificationFailed": 1,
+            "NegativeKnowledgeEstablished": 6,
+            "UnknownTransitioned": 9
+          },
+          "lossyByVariant": [
+            {
+              "variant": "CausalAssertionConfirmed",
+              "droppedFields": ["policy"],
+              "events": 4
+            },
+            {
+              "variant": "HypothesisTransitioned/falsify",
+              "droppedFields": ["evidenceIds", "from", "(argument Scope has no wire source)"],
+              "events": 6
+            },
+            {
+              "variant": "HypothesisTransitioned/markPlausible",
+              "droppedFields": ["evidenceIds", "from", "reason"],
+              "events": 33
+            },
+            {
+              "variant": "HypothesisTransitioned/markSupported",
+              "droppedFields": ["evidenceIds", "from", "reason"],
+              "events": 23
+            },
+            {
+              "variant": "LifecycleChanged/activateInvestigation",
+              "droppedFields": ["from"],
+              "events": 4
+            },
+            {
+              "variant": "LifecycleChanged/resolveInvestigation",
+              "droppedFields": ["from"],
+              "events": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "checkId": "CR-UI-01",
+      "title": "Every catalog requirement has a binding whose label, accessible name source, input type, required flag, screen and validation equal the catalog",
+      "category": "ui",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "catalogRequirements": 44,
+        "bindings": 45
+      }
+    },
+    {
+      "checkId": "CR-UI-02",
+      "title": "Binding references resolve: screens and states (equal to SCREEN-MANIFEST), commands, write and read-back field IDs, verification ids",
+      "category": "ui",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "screens": 3,
+        "catalogVerificationKinds": 277,
+        "screenManifestMandatoryIds": 213
+      }
+    },
+    {
+      "checkId": "CR-UI-03",
+      "title": "Coverage is not claimed for a binding that needs a proposed field or command or a blocked command",
+      "category": "ui",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "covered": 30,
+        "blocked": 14,
+        "notApplicable": 1
+      }
+    },
+    {
+      "checkId": "CR-UI-04",
+      "title": "Reverse coverage: every command fed by a UI field is reachable from a binding, and every bound domain action has a state transition or result event",
+      "category": "ui",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {}
+    },
+    {
+      "checkId": "CR-ST-01",
+      "title": "Domain transition tables use only wire states, agree with schema-pinned targets, and cover every state-changing variant",
+      "category": "transitions",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "machines": 10,
+        "transitions": 41
+      }
+    },
+    {
+      "checkId": "CR-ST-02",
+      "title": "Persistence machines are indexed by digest and every machine's states and inputs equal the parsed v4.1.5 F# unions (no silent default case)",
+      "category": "persistence",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "machines": 5,
+        "pairsDecided": 354
+      }
+    },
+    {
+      "checkId": "CR-ST-03",
+      "title": "Save durability: seven distinct states; only provider read-back verified (SaveState.Saved) is durable or may be displayed as saved",
+      "category": "persistence",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "saveStates": ["Saved", "Unsaved", "Saving", "Offline", "Conflict", "UnknownOutcome", "SaveFailed"]
+      }
+    },
+    {
+      "checkId": "CR-DOM-01",
+      "title": "Every required domain concept is defined with a stable type ID and registered fields",
+      "category": "domain",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "entities": 14
+      }
+    },
+    {
+      "checkId": "CR-DOM-02",
+      "title": "The proposed causa-storage 1.1.0 extension is purely additive: no v1.0.0 type changes, every proposed event has a closed payload",
+      "category": "domain",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "proposedEvents": 6,
+        "proposedFields": 19
+      }
+    },
+    {
+      "checkId": "CR-DEC-01",
+      "title": "Owner decision requests are unique and every blocker names one",
+      "category": "governance",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "open": 9,
+        "openBlocking": ["ODR-V415-02", "OD-CR-01", "OD-CR-02", "OD-CR-03", "OD-CR-04", "OD-CR-05", "OD-CR-06", "OD-CR-08", "OD-CR-07"]
+      }
+    },
+    {
+      "checkId": "CR-SEC-01",
+      "title": "No credential or access token appears in any contract package file or fixture",
+      "category": "security",
+      "outcome": "PASS",
+      "details": [],
+      "metrics": {
+        "filesScanned": 17
+      }
+    },
+    {
+      "checkId": "CR-LIVE-01",
+      "title": "Real-provider durability: a save shown as saved is read back from GitHub (PERSIST-023, J3-05, INV-037)",
+      "category": "persistence",
+      "outcome": "UNVERIFIED",
+      "details": ["Needs a GitHub credential and a writable repository; none is available to this validator. A provider double tests protocol behaviour only and is not substituted. Run the live-provider preflight (.github/workflows/live-provider-preflight.yml)."],
+      "metrics": {}
+    }
+  ],
+  "negativeControls": [
+    {
+      "controlId": "NC-01",
+      "defect": "Remove a required field (EvidenceAdmitted.source) from the field registry",
+      "mustFail": ["CR-HIST-01"],
+      "failedAsExpected": ["CR-HIST-01"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-02",
+      "defect": "Remove an event case binding (variant EV-033 CausalAssertionConfirmed)",
+      "mustFail": ["CR-HIST-02", "CR-CER-02", "CR-CER-03"],
+      "failedAsExpected": ["CR-HIST-02", "CR-CER-02", "CR-CER-03"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-03",
+      "defect": "Remove CoreEvent.EvidenceVerificationAssessed from the parsed v4.1.5 contract",
+      "mustFail": ["CR-REP-01", "CR-CER-03"],
+      "failedAsExpected": ["CR-REP-01", "CR-CER-03"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-04",
+      "defect": "Remove a command (CMD-REL-LINK) that UI bindings use",
+      "mustFail": ["CR-UI-02"],
+      "failedAsExpected": ["CR-UI-02"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-05",
+      "defect": "Remove the binding of a required UI field (UB-024, INV-024 observation text)",
+      "mustFail": ["CR-UI-01", "CR-UI-04"],
+      "failedAsExpected": ["CR-UI-01", "CR-UI-04"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-06",
+      "defect": "Duplicate a field ID",
+      "mustFail": ["CR-REG-02"],
+      "failedAsExpected": ["CR-REG-02"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-07",
+      "defect": "Make one stored Challenger event non-canonical (insert a space)",
+      "mustFail": ["CR-HIST-01"],
+      "failedAsExpected": ["CR-HIST-01"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-08",
+      "defect": "Drop Provenance from the parsed v4.1.5 EventEnvelope record",
+      "mustFail": ["CR-REP-01"],
+      "failedAsExpected": ["CR-REP-01"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-09",
+      "defect": "Claim durability for 'Provider write acknowledged' (no read-back)",
+      "mustFail": ["CR-ST-03"],
+      "failedAsExpected": ["CR-ST-03"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-10",
+      "defect": "Narrow a transition table entry (DT-HYP-02 markSupported only from proposed)",
+      "mustFail": ["CR-HIST-06"],
+      "failedAsExpected": ["CR-HIST-06"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-11",
+      "defect": "Mark a blocked binding (UB-023 primary question) as covered",
+      "mustFail": ["CR-UI-03"],
+      "failedAsExpected": ["CR-UI-03"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-12",
+      "defect": "Remove SaveState.Conflict from the parsed v4.1.5 contract",
+      "mustFail": ["CR-ST-02", "CR-ST-03"],
+      "failedAsExpected": ["CR-ST-02", "CR-ST-03"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-13",
+      "defect": "Add an unknown payload field to one stored event",
+      "mustFail": ["CR-HIST-01"],
+      "failedAsExpected": ["CR-HIST-01"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-14",
+      "defect": "Give one stored event an unregistered event type",
+      "mustFail": ["CR-HIST-01", "CR-HIST-02"],
+      "failedAsExpected": ["CR-HIST-01", "CR-HIST-02"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-15",
+      "defect": "Tamper with the committed FIELD-REGISTRY.json",
+      "mustFail": ["CR-REG-01"],
+      "failedAsExpected": ["CR-REG-01"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-16",
+      "defect": "Place an access token in a contract fixture",
+      "mustFail": ["CR-SEC-01"],
+      "failedAsExpected": ["CR-SEC-01"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-17",
+      "defect": "Remove the documented input path of a required field (ObservationRecorded.observedAt)",
+      "mustFail": ["CR-CER-06"],
+      "failedAsExpected": ["CR-CER-06"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    },
+    {
+      "controlId": "NC-18",
+      "defect": "Remove a v4.1.5 CoreCommand case's registry entries (RecordFinding)",
+      "mustFail": ["CR-CER-04"],
+      "failedAsExpected": ["CR-CER-04"],
+      "didNotFail": [],
+      "outcome": "FAILED-AS-EXPECTED"
+    }
+  ]
+}

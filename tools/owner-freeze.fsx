@@ -47,6 +47,9 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide implementation-conventions --repo Indy-init  # ODR-IC-01..06
 //        (docs/optimization/implementation-conventions/proposals/owner-decision-requests.json, PR #141); decisions only.
 //        Skip any request you do not want to answer now; it stays pending.
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide contract-readiness --repo Indy-init  # OD-CR-01..08 of the Causa
+//        pre-competition contract package (docs/contract-readiness/causa-precompetition/proposals/owner-decision-requests.json,
+//        PR #147); decisions only. A request that pins a file records its sha256 at origin/main, shown before you answer.
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- acceptance --repo Indy-init     # the scope-change approvals the acceptance verifier
 //                                                                                  # reads (none today), and their pin in conditor.acceptance.json
 //
@@ -107,7 +110,10 @@ let packages =
       // The implementation-convention decisions ODR-IC-01..06 (docs/optimization/implementation-conventions/
       // PROPOSED-REQUIREMENTS-CHANGES.md): decisions only, no package approval and no tag. Each is applied by an agent
       // in the next successor package; nothing frozen changes.
-      { Name = "implementation-conventions"; Dir = "docs/optimization/implementation-conventions"; ApprovalPrefix = "APR-IC-OWNER"; PackageApprovalId = ""; Tag = "" } ]
+      { Name = "implementation-conventions"; Dir = "docs/optimization/implementation-conventions"; ApprovalPrefix = "APR-IC-OWNER"; PackageApprovalId = ""; Tag = "" }
+      // The Causa pre-competition contract-readiness decisions OD-CR-01..08 (docs/contract-readiness/causa-precompetition/
+      // OWNER-DECISIONS.proposed.json): decisions only, no package approval and no tag. A pinned file's digest is recorded.
+      { Name = "contract-readiness"; Dir = "docs/contract-readiness/causa-precompetition"; ApprovalPrefix = "APR-CR-OWNER"; PackageApprovalId = ""; Tag = "" } ]
 
 // ---- processes, files and JSON -------------------------------------------------------------------------------------
 
@@ -255,7 +261,7 @@ let commitAndPropose repo dryRun branch title body (content: string) =
 let requestsOf repo (p: Package) =
     match (try Some(atMain repo $"{p.Dir}/proposals/owner-decision-requests.json") with Stop _ -> None) with
     | Some bytes -> items (parse bytes) "requests"
-    | None when p.Name = "historical-compatibility" || p.Name = "implementation-conventions" -> say $"  ({p.Dir}/proposals/owner-decision-requests.json is not on origin/main yet: merge its pull request first)"; []
+    | None when p.Name = "historical-compatibility" || p.Name = "implementation-conventions" || p.Name = "contract-readiness" -> say $"  ({p.Dir}/proposals/owner-decision-requests.json is not on origin/main yet: merge its pull request first)"; []
     | None -> stop $"{p.Dir}/proposals/owner-decision-requests.json is missing on origin/main"
 
 let isRecorded (changes: JsonNode list) (request: JsonNode) =
@@ -401,7 +407,7 @@ let decideR10 repo (earlier: (JsonNode * Answer) list) (request: JsonNode) =
 let decideOne repo (p: Package) (earlier: (JsonNode * Answer) list) (request: JsonNode) =
     show request
     match str request "kind" with
-    | _ when p.Name = "rehearsal-010" || p.Name = "historical-compatibility" -> decideR10 repo earlier request
+    | _ when p.Name = "rehearsal-010" || p.Name = "historical-compatibility" || p.Name = "contract-readiness" -> decideR10 repo earlier request
     | "decision" when p.Name = "contract-first-ui" || p.Name = "implementation-conventions" -> decideOption "decide" request
     | "obligation-amendment" -> decideAmendment request
     | "scope-or-topology" -> decideTopology request
@@ -478,7 +484,7 @@ let unsignedApprovalChanges repo =
 
 /// Refuses to build on an approvals file that holds a change you did not sign (v4.1.4 and Rehearsal 010 only).
 let requireSignedApprovals repo (p: Package) =
-    if p.Name = "v4.1.4" || p.Name = "v4.1.5" || p.Name = "rehearsal-010" || p.Name = "historical-compatibility" || p.Name = "contract-first-ui" || p.Name = "implementation-conventions" then
+    if p.Name = "v4.1.4" || p.Name = "v4.1.5" || p.Name = "rehearsal-010" || p.Name = "historical-compatibility" || p.Name = "contract-first-ui" || p.Name = "implementation-conventions" || p.Name = "contract-readiness" then
         match unsignedApprovalChanges repo with
         | [] -> ()
         | unsigned ->
@@ -533,6 +539,7 @@ let decide repo dryRun (p: Package) =
          elif p.Name = "historical-compatibility" then $"Next (agent): act on these decisions as {p.Dir}/OWNER-DECISIONS-REQUIRED.md describes (for OD-HC-01 A: compile the successor package from SUCCESSOR-CONTRACT.md).\n"
          elif p.Name = "contract-first-ui" then "Next (agent): apply each recorded decision in its own reviewed pull request, as proposals/r10-contract-first-ui/OWNER-DECISIONS-REQUIRED.md describes (CF-07 first). Nothing frozen changes without its successor package.\n"
          elif p.Name = "implementation-conventions" then "Next (agent): apply each recorded decision as docs/optimization/implementation-conventions/PROPOSED-REQUIREMENTS-CHANGES.md describes, in the next successor package; v4.1.5 and every frozen package stay unchanged.\n"
+         elif p.Name = "contract-readiness" then "Next (agent): apply each recorded decision as docs/contract-readiness/causa-precompetition/OWNER-DECISIONS.proposed.json describes, then run `contract-readiness generate`; the readiness gate reads these records. Frozen packages stay unchanged.\n"
          elif p.Name = "v4" then "Next (agent): apply the approved amendments in the curation's obligationAmendments, re-pin the approvals commit, recompile, and run a fresh independent review if the plan changed."
          else $"Next (agent): apply these decisions in {p.Dir} (FREEZE.md step 2), recompile {p.Name}, and run a fresh independent review.")
     commitAndPropose repo dryRun $"owner/{p.Name}-decisions-{stamp ()}" title body (render (withApproval approvals approvalId changes))
@@ -810,7 +817,7 @@ let argv = fsi.CommandLineArgs |> Array.toList |> List.tail
 let flag name = List.contains name argv
 let option name = argv |> List.pairwise |> List.tryFind (fst >> (=) name) |> Option.map snd
 let repo = option "--repo" |> Option.defaultValue (Directory.GetCurrentDirectory()) |> Path.GetFullPath
-let packageNamed name = packages |> List.tryFind (fun p -> p.Name = name) |> Option.defaultWith (fun () -> stop "the package must be v4, v4.1, v4.1.1, v4.1.2, v4.1.4, v4.1.5, rehearsal-010, historical-compatibility, contract-first-ui or implementation-conventions (historical-compatibility needs PR #120 and implementation-conventions PR #141 merged, and your clone on the new main)")
+let packageNamed name = packages |> List.tryFind (fun p -> p.Name = name) |> Option.defaultWith (fun () -> stop "the package must be v4, v4.1, v4.1.1, v4.1.2, v4.1.4, v4.1.5, rehearsal-010, historical-compatibility, contract-first-ui, implementation-conventions or contract-readiness (historical-compatibility needs PR #120 and implementation-conventions PR #141 merged, and your clone on the new main)")
 
 /// RDP-003: a record or tag is the owner's own act. Refuses to write when an agent runs the script or nobody can type.
 let ownerAtTerminal () =
@@ -832,7 +839,7 @@ let exitCode =
         | [ "approve"; name ] -> approve repo (flag "--dry-run") (packageNamed name) |> ignore; 0
         | [ "freeze"; name ] -> freeze repo (flag "--dry-run") (packageNamed name); 0
         | [ "tag"; name ] -> tag repo (flag "--dry-run") (packageNamed name) (option "--commit"); 0
-        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5|rehearsal-010|historical-compatibility|contract-first-ui|implementation-conventions | approve v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5 | tag v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5 [--commit SHA] | freeze v4.1.1 | ratify rehearsal-010 | acceptance [--repo DIR] [--dry-run]"; 2
+        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5|rehearsal-010|historical-compatibility|contract-first-ui|implementation-conventions|contract-readiness | approve v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5 | tag v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5 [--commit SHA] | freeze v4.1.1 | ratify rehearsal-010 | acceptance [--repo DIR] [--dry-run]"; 2
     with Stop message -> eprintfn "stopped: %s" message; 1
 
 exit exitCode
