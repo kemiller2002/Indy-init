@@ -1,0 +1,802 @@
+{
+ "schema": "indy-init.v411-amendment/1",
+ "packageVersion": "4.1.6",
+ "description": "Successor amendment v4.1.6 of the approved, frozen package v4.1.5 (APR-V415-OWNER-3, tag indy-init-requirements-v4.1.5): the contract change OD-CR-01 A (APR-CR-OWNER-1/-2) commissions, as one package (RC-1 A) narrowed to the minimal causa-storage 1.1.0 (S-1 B). CoreCommand gains RecordConclusion (after RecordVerification, RC-7 A; it emits only ConclusionRecorded, which causa-storage v1.0.0 already stores), ReviseObservation and ReviseEvidence; CoreEvent gains ObservationRevised and EvidenceRevised (causa-storage 1.1.0); IF41-STORAGE is pinned to causa-storage 1.1.0, reading 1.0.0 unchanged; IF41-VIEW's ConclusionCard shows the strength (RC-6 A). No state, event, task or contract file is added; no requirement, obligation or acceptance condition is removed or weakened. The other four OD-CR-01 A events follow as causa-storage 1.2.0 and a later package.",
+ "approvalDecision": "ODR-V416-02",
+ "amends": {
+  "package": "requirements-compiled/v4.1.5",
+  "packageVersion": "4.1.5",
+  "manifestSha256": "3c54fffa3eeafb3717e15ed172726c527851a3db1fe696ecf183f7b6b02b9977",
+  "approval": "APR-V415-OWNER-3"
+ },
+ "inputs": [
+  "analysis/bootstrap-measurement.json"
+ ],
+ "documents": [
+  "STARTING-STATE.md",
+  "AMENDMENT-4.1.6.md"
+ ],
+ "changes": [
+  {
+   "id": "V416-RC",
+   "area": "contracts",
+   "summary": "ODR-V416-01: 00-DOMAIN-STUBS.fs CoreCommand gains RecordConclusion of RecordConclusion after RecordVerification (RC-7 A). It emits exactly one ConclusionRecorded (causa-storage v1.0.0), validated by V1-V6 (the reference engine's replay rules) and V7-V8 (Decide-time policy, RC-5 A); see AMENDMENT-4.1.6.md."
+  },
+  {
+   "id": "V416-ST",
+   "area": "contracts",
+   "summary": "ODR-V416-01 with S-1 B: CoreEvent gains ObservationRevised and EvidenceRevised, CoreCommand gains ReviseObservation and ReviseEvidence (causa-storage 1.1.0: label, source, sourceUrl; observation source); the 1.1.0 relationship kinds consistentWith and inconclusive are the domain's EvidenceRelationship kind; a reassessment is a new EvidenceRelationshipRecorded for the same pair (S-8 B). 02-IF41-STORAGE.fs is pinned to causa-storage 1.1.0 (S-6 A)."
+  },
+  {
+   "id": "V416-VIEW",
+   "area": "contracts",
+   "summary": "ODR-V416-RC6 (RC-6 A): 07-IF41-VIEW.fs ConclusionCard gains Strength."
+  }
+ ],
+ "bootstrap": {
+  "task": "T10",
+  "measurement": "analysis/bootstrap-measurement.json",
+  "layersOnto": "conditor",
+  "order": [
+   "Record the start timestamp; git init -b main in the empty competition repository (git metadata only)",
+   "conditor init --preset indy-init --target . (Conditor 0.10.18: Echelon scaffold, Praxis init, requirements import)",
+   "requirements-compiler v41 --source INDY-INIT --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --bootstrap . (layers onto Conditor's repository: merges package.json, Directory.Build.props and .gitignore, refuses any other overlap)",
+   "dotnet build Causa.slnx; conditor ci-policy check --target .",
+   "git commit (the initial bootstrap commit), conditor repo create, push; first green CI"
+  ],
+  "playwrightConfig": "playwright.config.ts"
+ },
+ "contractControls": [
+  {
+   "file": "99-Usage.fs",
+   "classification": "compile control: generated positive control that the contract cases are usable unambiguously; typecheck only, never materialized into the application"
+  }
+ ],
+ "contractImplementations": [
+  {
+   "file": "03-IF41-WIRE.fs",
+   "scope": "Credential.T",
+   "symbol": "ToString",
+   "requirements": [
+    "PF-015",
+    "INV-21"
+   ],
+   "rationale": "The credential type's printed form is fixed to <credential>, so no log, exception or interpolation can show the token. Boundary code: the type is the requirement, not application behavior.",
+   "sha256": "d77df01002dca4b35e3fc460273e05a73ab8ad1a459543ee8c7f7bc48647742b"
+  },
+  {
+   "file": "03-IF41-WIRE.fs",
+   "scope": "Credential",
+   "symbol": "create",
+   "requirements": [
+    "PF-015",
+    "INV-21"
+   ],
+   "rationale": "The only constructor of the private credential representation. Boundary code: without it the private type cannot be created at all.",
+   "sha256": "2193946f45de21738e7e6d82988dac5ea0c4cea7c34b715dd918b16914ec7721"
+  },
+  {
+   "file": "03-IF41-WIRE.fs",
+   "scope": "Credential",
+   "symbol": "authorization",
+   "requirements": [
+    "PF-015",
+    "INV-21"
+   ],
+   "rationale": "The only way to read the token, as an Authorization header. Boundary code: it is what keeps the token out of every other code path; the negative control ReadCredential.fs proves no other reader compiles.",
+   "sha256": "b2b542329f835af8111a0e81537c7b7651b2b663837741f6637d1b8388b3e4aa"
+  },
+  {
+   "file": "05-IF41-SAVE.fs",
+   "scope": "Confirmation.T",
+   "symbol": "InvestigationId",
+   "requirements": [
+    "PERSIST-023"
+   ],
+   "rationale": "Read-only accessor of the private confirmation representation. Boundary code: consumers can read a confirmation but never build one.",
+   "sha256": "3be44399e836906f680fdd24c4715302a6a9cf4ec6ba00205168469455f6d6a4"
+  },
+  {
+   "file": "05-IF41-SAVE.fs",
+   "scope": "Confirmation.T",
+   "symbol": "CommitOid",
+   "requirements": [
+    "PERSIST-023"
+   ],
+   "rationale": "Read-only accessor of the private confirmation representation (as InvestigationId).",
+   "sha256": "c1438354e2d91f4b7bf87e7e844465c1f2a872931bec0ad772ce976ad96dab88"
+  },
+  {
+   "file": "05-IF41-SAVE.fs",
+   "scope": "Confirmation.T",
+   "symbol": "CommitTime",
+   "requirements": [
+    "PERSIST-023"
+   ],
+   "rationale": "Read-only accessor of the private confirmation representation (as InvestigationId).",
+   "sha256": "f5b4ddb5687d6c050e1eef145f0f1c2dfa6ef3f6e26fd364eef83b969b75a4e0"
+  },
+  {
+   "file": "05-IF41-SAVE.fs",
+   "scope": "Confirmation",
+   "symbol": "ofReadBack",
+   "requirements": [
+    "PERSIST-023"
+   ],
+   "rationale": "The only constructor: a confirmation exists only when the read-back equals what was written (one equality test). Boundary code: it is the type-level form of PERSIST-023; the negative control ForgeConfirmation.fs proves nothing else can create one. The save workflow that calls it is persistence's timed work.",
+   "sha256": "f349c1d6ccf4b4c27c1c6e051d6147a507c1faa79300baed6ecd54637d3d8346"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "Writable",
+   "symbol": "ofAddress",
+   "requirements": [
+    "EXT-DATA-006",
+    "EXT-DATA-013"
+   ],
+   "rationale": "The only constructor of the private writable-address representation; it refuses a Catalog, so no catalog investigation can reach a save session. Boundary code: the type is the requirement.",
+   "sha256": "e9850db55677c5c15c6c0684fd43d81c0cf633610a00692244f94e8ba78107b1"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "Writable",
+   "symbol": "address",
+   "requirements": [
+    "EXT-DATA-006",
+    "EXT-DATA-013"
+   ],
+   "rationale": "Reads the address back out of the private representation (the path and role a save writes under). Boundary code: without it the private type cannot be used.",
+   "sha256": "c5b2b96cb6c29d09dc268521a32b5ef71a95a1cf3ed8cc796f817ea71dd21cd4"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "WorkspaceAddress.T",
+   "symbol": "Workspace",
+   "requirements": [
+    "EXT-DATA-006",
+    "EXT-DATA-013"
+   ],
+   "rationale": "Reads the workspace out of the private address representation. Boundary code: the representation is private so a role cannot be asserted.",
+   "sha256": "8873029797f0c4528b1fa0972b6468360a8c819f57a188d5bae3087c1678271f"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "WorkspaceAddress.T",
+   "symbol": "Role",
+   "requirements": [
+    "EXT-DATA-006",
+    "EXT-DATA-013"
+   ],
+   "rationale": "Reads the derived role out of the private address representation. Boundary code: the representation is private so a role cannot be asserted.",
+   "sha256": "ee59b2ea451959e18c730813a5182498f17cac5ee088aacffbdcb8f65bbb7887"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "WorkspaceAddress",
+   "symbol": "catalog",
+   "requirements": [
+    "EXT-DATA-013"
+   ],
+   "rationale": "The only constructor of a catalog address, which is read-only (Writable.ofAddress refuses it). Boundary code: the type is the requirement.",
+   "sha256": "8f41f593b819e5dbef93b527a50baaef8db5ba35ba1760510c45b8ed3f66f87c"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "WorkspaceAddress",
+   "symbol": "workingCopy",
+   "requirements": [
+    "EXT-DATA-006",
+    "EXT-DATA-013"
+   ],
+   "rationale": "The only constructor of a working-copy address: the reserved workspaces/demo/causa-app-<run> namespace with a CONTRACT section 3 run id, refusing any workspace a catalog names, so no working copy can be a catalog workspace (independent review H1). Boundary code: the type is the requirement.",
+   "sha256": "646e21c5a2fd91425eb2b5de85db8aa68e3d7f3bd27d3d0abafcb77977a6c56f"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "FixtureLabel",
+   "symbol": "create",
+   "requirements": [
+    "WDL-011",
+    "UI-039"
+   ],
+   "rationale": "The only constructor of the private fixture label; it prefixes FIXTURE: so no fixture-backed value can be presented as integrated. Boundary code: the private type is the requirement. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "20189d5aada679746050e7e13bc95a281990e32d7c90442724451f89aae2818e"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "FixtureLabel",
+   "symbol": "value",
+   "requirements": [
+    "WDL-011",
+    "UI-039"
+   ],
+   "rationale": "Read-only accessor of the private fixture label. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "22768da5ca187a1a954521b6746843d5ad0f0b33aca04e1f442e089344940ee1"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Visible",
+   "symbol": "stored",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Constructor of the private Data Visible representation from a stored read; there is no conversion to Understood, so stored data cannot be shown as the kernel's interpretation. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "146233da50c2ee61bbb9e083d9bc02faf083175f7a5ef1d2f83fb27959780a49"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Visible",
+   "symbol": "fixture",
+   "requirements": [
+    "UI-023",
+    "WDL-011"
+   ],
+   "rationale": "Constructor of a fixture Data Visible value; it carries its FixtureLabel. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "d47cb79380abdae6faf630d65a788900196dfa5d76d47e06c31c32fba47f5654"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Visible",
+   "symbol": "value",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Read-only accessor of the private Data Visible representation. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "73fa627b3c2c39d9f2378ff3699563322a77ace3eaaa8ac139f40fd172ef952e"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Visible",
+   "symbol": "fixtureLabel",
+   "requirements": [
+    "UI-023",
+    "WDL-011"
+   ],
+   "rationale": "Reads the fixture label, so a view can show that a value is a fixture. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "679e4647f9271f0c4eb46812fb4d7f0dd101e91da408162a989435b27471a70c"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Visible",
+   "symbol": "map",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Maps the value and keeps its provenance (stored reference or fixture label); without it the private case could not be transformed. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "3e2b6a34a4562c2bbf0c2f0fa200f4dd4b9ec5cd76e97891a449f312c8b59b67"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "projected",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Constructor of the private Data Understood representation; only an adapter holding a domain projection at a version calls it. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "54ed100a0443b45667ae7a8a3459d95264a4f5713ffe01d1d7769ee450cd61e0"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "fixture",
+   "requirements": [
+    "UI-023",
+    "WDL-011"
+   ],
+   "rationale": "Constructor of a fixture Data Understood value; it carries its FixtureLabel. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "be223444c335a9317c5a95599784d727981e2f766eb8a299db2228c2aab26315"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "value",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Read-only accessor of the private Data Understood representation. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "7ed9216d3252edef53958c28666a0267fdf705edbf19a3763fe18695f45dd8d9"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "version",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Reads the projection version; a fixture has none. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "2845a4dc989b192a92ea51f05b2539fec04371bed6ceb8207121d70f33605762"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "fixtureLabel",
+   "requirements": [
+    "UI-023",
+    "WDL-011"
+   ],
+   "rationale": "Reads the fixture label, so a view can show that a value is a fixture. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "34a1a97fb3b1cc821b1e2a09d216abbbd272f253a28f9629ca8c1526ce376dc6"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "map",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Maps the value and keeps its provenance (version or fixture label). Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "567a67b5a170a20cfe1b1daf685c7d4477c3a6833e5405522db8bd4ccf7ee322"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "SafeUrl",
+   "symbol": "pattern",
+   "requirements": [
+    "PF-015",
+    "UI-039"
+   ],
+   "rationale": "The URL pattern the only constructor enforces. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "fbb223d6fc15438ba6ac08ec087a07f50ff4e0ff7953c6e983f693d27960be7b"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "SafeUrl",
+   "symbol": "tryCreate",
+   "requirements": [
+    "PF-015",
+    "UI-039"
+   ],
+   "rationale": "The only constructor of the private SafeUrl: an absolute http(s) URL, well formed, at most 2000 characters; any other link text is never rendered as a link. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "248abc3847bb5cc2a486b847b43a78cb20086c700ae02052012825c42e050d9e"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "SafeUrl",
+   "symbol": "value",
+   "requirements": [
+    "PF-015",
+    "UI-039"
+   ],
+   "rationale": "Read-only accessor of the private SafeUrl. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "9d6afccf4e7d2e5c53065d27b45018c9e6481bd7c3dd7b6f37e4d991a958fbf1"
+  }
+ ],
+ "sharedEntrypoints": {
+  "files": [
+   "web/index.html",
+   "web/causa.css"
+  ],
+  "changeRequests": {
+   "owner": "integration",
+   "requesters": [
+    "ui",
+    "ui-2",
+    "ui-3"
+   ],
+   "protocol": "A UI role that needs a change to a shared entrypoint does not edit it. It opens a change request naming the file, the change (the exact markup or Forma-token rule) and the task it serves; integration applies it in its own pull request, in order, and the requesting role reviews that pull request. UI roles own their view modules (src/Causa.App/Views/*) and component-level presentation; the entrypoints only load them.",
+   "record": "a Praxis work item owned by integration whose title starts with CR- and names the file, linked to the requesting task's work item",
+   "ruleSentence": "It changes `web/index.html` and `web/causa.css` only through a change request to integration"
+  },
+  "ruleLinesSha256": [
+   "fc0db8076bad3eaa043b9f5ad601cd254942eb12903279ca4ead63c2fc10a179",
+   "1a27617ff39f74d59e7acfc6527cf39030292add2fa83ab849ab3989e1f3d109",
+   "580b8773a4c4a1605e928b8459544de927621e361b65050b6cb37e1edaba3a85",
+   "a3a109c75efac4da13c3f89d426beeb6066bcbb7953088e26d2e9c5140a7da23",
+   "1f2a84dfbc807c24ff6b78183d2950637338d4e97e9e732b730bc732afbd44d3"
+  ]
+ },
+ "startingState": {
+  "document": "STARTING-STATE.md",
+  "externalConstraints": [
+   "the repository starts empty",
+   "code starts at kickoff",
+   "teams may plan beforehand, including the problem, stack, and sketch",
+   "the build window is currently published as 9:30 AM to 5:00 PM on November 7, 2026"
+  ],
+  "removedGates": [
+   {
+    "task": "T06",
+    "was": "T10 preferred to follow T06 (organizer confirmation for prepared requirements, data and tooling)"
+   }
+  ],
+  "historicalRecords": [
+   {
+    "id": "ODR-V41-06",
+    "source": "requirements-compiled/v4.1/proposals/owner-decision-requests.json",
+    "quote": "On 2026-10-30 the owner told the package author in session that the organizers allow pre-kickoff scaffolding.",
+    "disposition": "kept unchanged"
+   },
+   {
+    "id": "APR-V41-OWNER-1",
+    "source": "kickoff/rehearsal-007/approvals.causa.json",
+    "quote": "\"organizer_confirmation\": \"I approved it.\"",
+    "disposition": "kept unchanged"
+   },
+   {
+    "id": "docs/HACKATHON-BOUNDARIES.md: the quoted published rules (the list under 'Published rule verification'; other lines of that section were edited under OD-INDY-18 on 2026-11-01)",
+    "source": "docs/HACKATHON-BOUNDARIES.md",
+    "quote": "- the repository starts empty;\n- teams may plan beforehand, including the problem, stack, and sketch;\n- code starts at kickoff;",
+    "disposition": "kept unchanged"
+   }
+  ],
+  "residualRisk": "The published rules say the repository starts empty and code starts at kickoff. They do not say whether material prepared before kickoff in executable form counts as planning or as code. Four kinds of material are at issue: the F# contract declarations, the deterministic generator, the layout assertions, and what conditor init writes at T0. conditor init writes the Echelon scaffold and imports 68 requirement documents (42 from this planning repository at commit 2eee2d5, 26 from Percepta). HACKATHON-BOUNDARIES lists, as an open question, whether a separate planning repository may be consumed directly by the blank implementation repository. The plan's boundary is that nothing is written to the competition repository before T0, and that everything written at T0 comes from approved, published sources. An organizer could read the materialized contract declarations, the Conditor scaffold, the requirements import, or the bootstrap itself as material prepared before kickoff. The plan does not claim otherwise. Whether organizer approval of the prepared material (ADRP-016-O2) is sought, and how it and R0.1-O1 are reported, is the owner's decision ODR-V411-02; the package as proposed does not seek it. If an organizer rules on the day, the team follows the ruling.",
+  "organizerDocuments": [
+   "docs/OWNER-DECISIONS-2026-10-26.md",
+   "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+   "docs/HACKATHON-BOUNDARIES.md",
+   "docs/CAUSA-DATA-CONTRACT-v1.md",
+   "docs/DOMAIN-TEST-MATRIX.md",
+   "docs/PRODUCT-REQUIREMENTS.md",
+   "AGENT-RULES.md",
+   "README.md",
+   "FREEZE.md"
+  ],
+  "organizerReferences": [
+   {
+    "id": "PRE-ORG-01",
+    "source": "requirements-compiled/v4/preflight-manifest.json",
+    "decision": "ODR-V411-02",
+    "disposition": "Stays in v4's frozen preflight manifest, unchanged and NOT_RUN. No timed task waits on it. How it is reported at gate G0 is the owner's decision ODR-V411-02."
+   },
+   {
+    "id": "T06",
+    "source": "requirements-compiled/v4/curation/tasks.json",
+    "decision": "ODR-V411-02",
+    "disposition": "Stays in v4's frozen task list (preflight, operator). No v4.1.1 task depends on it or prefers to follow it (T10's preference is dropped). Whether it runs at all is the owner's decision ODR-V411-02."
+   },
+   {
+    "id": "ADRP-016-O2",
+    "source": "requirements-compiled/v4/requirements-inventory.json",
+    "decision": "ODR-V411-02",
+    "disposition": "A must obligation of the frozen baseline with two clauses. First: prepared requirements, library capabilities, design guidance, frozen fixtures and scripts are subject to organizer approval. Second: do not transfer a prebuilt competition app where prohibited. Both stay unchanged, and neither is claimed met here. The package as proposed (option A of ODR-V411-02) does not seek organizer approval. At T0 it writes the material prepared before kickoff into the competition repository: the contract declarations, the generator output, the executable layout-assertion module, the Conditor scaffold and the requirements import. Whether that counts as transferring a prebuilt app is the open question of STARTING-STATE.md. The obligation is verified by its own evidence at G0 and G10, and the owner decides how it is treated (ODR-V411-02)."
+   },
+   {
+    "id": "AGENT-DECISION-REDUCTION-PROFILE§pre-experiment-readiness-checklist-O7",
+    "source": "requirements-compiled/v4/requirements-inventory.json",
+    "decision": "ODR-V411-02",
+    "disposition": "The readiness-checklist form of ADRP-016-O2 (\"Obtain organizer rule confirmation ... where necessary\"); handled with it under ODR-V411-02."
+   },
+   {
+    "id": "STORAGE-008-O1",
+    "source": "requirements-compiled/v4/requirements-inventory.json",
+    "decision": "ODR-V411-02",
+    "disposition": "Organizer permission for the pre-created datastore and test data (causa-data). The package as proposed (option A of ODR-V411-02) does not seek it; the obligation stays unchanged and is not claimed met. The owner decides (ODR-V411-02)."
+   },
+   {
+    "id": "R0.1-O1",
+    "source": "requirements-compiled/v4/requirements-inventory.json",
+    "decision": "ODR-V411-02",
+    "disposition": "A must obligation: 'source implementation must begin at hackathon kickoff from a blank application repository or the organizer-approved equivalent'. It stays unchanged and is not claimed met here. The plan starts from a blank repository at T0, but whether material authored before kickoff and written at T0 (the contract declarations, the generator's output, the Conditor scaffold, the requirements import) satisfies it is the open question of STARTING-STATE.md. It is verified by its own obligation at acceptance, and the owner decides how it is treated (ODR-V411-02)."
+   },
+   {
+    "id": "KICKOFF-EXECUTION-PACKET§1-9-30-baseline-O2",
+    "source": "requirements-compiled/v4/requirements-inventory.json",
+    "decision": "ODR-V411-02",
+    "disposition": "'verify target implementation repository is empty/organizer-compliant'. Not claimed met here: T10 records that the repository is empty at T0, and the obligation is verified by its own check. Whether 'organizer-compliant' needs an organizer record is the owner's decision ODR-V411-02."
+   },
+   {
+    "id": "KICKOFF-EXECUTION-PACKET§preamble-O4",
+    "source": "requirements-compiled/v4/requirements-inventory.json",
+    "decision": "ODR-V411-02",
+    "disposition": "As KICKOFF-EXECUTION-PACKET§1-9-30-baseline-O2."
+   },
+   {
+    "id": "PRE-REQ-04",
+    "source": "requirements-compiled/v4/preflight-manifest.json",
+    "decision": "OD-INDY-18",
+    "disposition": "Unchanged. It needs 'an owner or organizer record'; the plan provides the owner's record (the package approval) and plans no organizer record. Its own check decides whether it passes; nothing is claimed here."
+   },
+   {
+    "id": "PRE-TOOL-03",
+    "source": "requirements-compiled/v4/preflight-manifest.json",
+    "decision": "OD-INDY-18",
+    "disposition": "Unchanged. It needs 'an owner or organizer record'; the plan provides the owner's record and plans no organizer record. Its own check decides whether it passes; nothing is claimed here."
+   },
+   {
+    "id": "waiver T12>T14",
+    "source": "analysis/task-adjustments.json",
+    "decision": "ODR-V411-02",
+    "disposition": "The waiver rests on ODR-V41-06, which the owner recorded (APR-V41-OWNER-1) with an organizer_confirmation text. The decision stands as recorded. Whether it stands without that organizer premise is the owner's decision ODR-V411-02 (option B withdraws the contract-first ordering)."
+   },
+   {
+    "id": "waiver T13>T14",
+    "source": "analysis/task-adjustments.json",
+    "decision": "ODR-V411-02",
+    "disposition": "As waiver T12>T14."
+   },
+   {
+    "id": "waiver T13>T19",
+    "source": "analysis/task-adjustments.json",
+    "decision": "ODR-V411-02",
+    "disposition": "As waiver T12>T14."
+   },
+   {
+    "id": "waiver T13>T20",
+    "source": "analysis/task-adjustments.json",
+    "decision": "ODR-V411-02",
+    "disposition": "As waiver T12>T14."
+   },
+   {
+    "id": "OD-INDY-12",
+    "source": "docs/OWNER-DECISIONS-2026-10-26.md",
+    "quote": "only after the organizer confirms (PRE-ORG-01)",
+    "decision": "ODR-V411-02",
+    "disposition": "OD-INDY-12 governs interfaces extracted from earlier rehearsals' source. v4.1.1 carries none (X11): its contracts are authored from the requirements. Its organizer condition, and how it applies to the materialized contract declarations, is the owner's decision ODR-V411-02.",
+    "lineSha256": "3ab30e19cb16cc98a0706773400564466525c255d6f3d69ece22624fded32b0a"
+   },
+   {
+    "id": "ADRP consequences",
+    "source": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+    "quote": "subject to organizer approval",
+    "decision": "ODR-V411-02",
+    "disposition": "The prose source of ADRP-016-O2; handled with it.",
+    "lineSha256": "36da039960b784f791d871aa22888a877959eb7f0de9684e7c9b7a6d209f3acd"
+   },
+   {
+    "id": "ADRP readiness checklist",
+    "source": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+    "quote": "Obtain organizer rule confirmation",
+    "decision": "ODR-V411-02",
+    "disposition": "The prose source of the readiness-checklist obligation; handled with ADRP-016-O2.",
+    "lineSha256": "d532ef04045090148080ba7847c4813f7acdabda4d82280247c9e5107bb039d0"
+   },
+   {
+    "id": "HACKATHON-BOUNDARIES organizer verification",
+    "source": "docs/HACKATHON-BOUNDARIES.md",
+    "quote": "## Organizer verification",
+    "decision": "OD-INDY-18",
+    "disposition": "Rewritten by OD-INDY-18: the section lists the interpretation questions and states that no task waits on an organizer response.",
+    "lineSha256": "21b6326dc7822b81e132e2bb65e8acc73f394c6a8d2fc103baf7ee1389caab86"
+   },
+   {
+    "id": "HACKATHON-BOUNDARIES no organizer wait",
+    "source": "docs/HACKATHON-BOUNDARIES.md",
+    "quote": "No task waits on an organizer response",
+    "decision": "OD-INDY-18",
+    "disposition": "OD-INDY-18's own statement.",
+    "lineSha256": "a75ddaf571a83da459d5171ace0776e6bd828a01288ed4b9d7db5f50ece29e3d"
+   },
+   {
+    "id": "HACKATHON-BOUNDARIES scaffolding rule",
+    "source": "docs/HACKATHON-BOUNDARIES.md",
+    "quote": "Organizer confirmation is not a prerequisite",
+    "decision": "OD-INDY-18",
+    "disposition": "OD-INDY-18's rewrite of the former 'confirm organizer interpretation' rule.",
+    "lineSha256": "c36e48c99716f4136cab2632fb67aaf1b10aa5d3e1a0c7023281f6f4d9b41f34"
+   },
+   {
+    "id": "RISK-12",
+    "source": "requirements-compiled/v4/risk-register.json",
+    "decision": "ODR-V411-02",
+    "disposition": "v4's risk 'Organizer confirmation for prepared data and requirements (PRE-ORG-01) not obtained', mitigated by 'Owner obtains it before the event (ADRP-016)'. The risk stays as frozen. Under ODR-V411-02 the owner decides whether the mitigation is pursued (C), dropped and the risk accepted (A), or required (B)."
+   },
+   {
+    "id": "CAUSA-DATA-CONTRACT-v1 §10.8",
+    "source": "docs/CAUSA-DATA-CONTRACT-v1.md",
+    "quote": "verify organizer permission for pre-created dataset and app-specific executable schemas",
+    "decision": "ODR-V411-02",
+    "disposition": "The data contract's pre-competition step: verify organizer permission for the pre-created dataset and executable schemas, else seed at kickoff. Handled with STORAGE-008-O1 under ODR-V411-02.",
+    "lineSha256": "7a5f085b0528f84745b8345449f8c4c4275e6e7a55f0d90ce38031d8615ce7f5"
+   },
+   {
+    "id": "DOMAIN-TEST-MATRIX §29 and introduction",
+    "source": "docs/DOMAIN-TEST-MATRIX.md",
+    "quote": "If organizer rules permit pre-written executable acceptance tests",
+    "decision": "ODR-V411-02",
+    "disposition": "The matrix converts to executable tests before kickoff only if organizer rules permit (§29: 'verify event rules regarding pre-written executable tests'). At T0, v4.1.1 writes empty namespaces for the plan's test files, plus one pre-written executable test module: tests/browser/support/layout-assertions.mjs, the layout contract's 979-line assertion kit, which the plan's browser tests import. Whether pre-written executable test code may be written at T0 is part of ODR-V411-02.",
+    "lineSha256": "43a8aa8969ef822ed00c20ecc5f8a229be3f5a9d171faa8f5ea45366df46f642"
+   },
+   {
+    "id": "PRODUCT-REQUIREMENTS line 1056",
+    "source": "docs/PRODUCT-REQUIREMENTS.md",
+    "quote": "subject to organizer rules about when executable comp",
+    "decision": "ODR-V411-02",
+    "disposition": "The product requirement that ties DOMAIN-TEST-MATRIX verification to organizer rules on when executable components may be written; handled with DOMAIN-TEST-MATRIX §29 under ODR-V411-02.",
+    "lineSha256": "0621205029961102b30b106d3e42fb2d9817bb4673ec05f3a82656b682060391"
+   },
+   {
+    "id": "ADRP precedence order",
+    "source": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+    "quote": "(1) organizer rules and explicit safety/security invariants",
+    "decision": "OD-INDY-18",
+    "disposition": "Ranks organizer rules first among the sources an agent follows: the published rules as external constraints. Not a gate; unchanged.",
+    "lineSha256": "ca73ac0edad436f000af82d06a78632f509e3e8d04ccce5a3ac7e39ad151638b"
+   },
+   {
+    "id": "v4.1.1 README status",
+    "source": "README.md",
+    "quote": "ODR-V411-02 (the organizer-approval obligations)",
+    "decision": "ODR-V411-02",
+    "disposition": "States that ODR-V411-02 is pending. Not a gate.",
+    "lineSha256": "08bf321fb73bfac2dbf56ce0450a45859e61c86cacf15464941aa6db24c84f1b"
+   },
+   {
+    "id": "v4.1.1 README change list",
+    "source": "README.md",
+    "quote": "**No organizer gate.**",
+    "decision": "OD-INDY-18",
+    "disposition": "States OD-INDY-18. Not a gate.",
+    "lineSha256": "0f5fc8dbca1187d5212c2327f50dd127fc8ea4fb6f9fb43940584f762cf93904"
+   },
+   {
+    "id": "v4.1.1 FREEZE status",
+    "source": "FREEZE.md",
+    "quote": "ODR-V411-02 (the organizer-approval obligations)",
+    "decision": "ODR-V411-02",
+    "disposition": "States that ODR-V411-02 is pending. Not a gate.",
+    "lineSha256": "e912485da1587b1597a378ed276e2a75959e48aea40bb642f939417f58432a7a"
+   },
+   {
+    "id": "v4.1.1 FREEZE step 2",
+    "source": "FREEZE.md",
+    "quote": "2. **Decide ODR-V411-02**",
+    "decision": "ODR-V411-02",
+    "disposition": "The owner's step that records ODR-V411-02. Not a gate on any task.",
+    "lineSha256": "1c812ea6ed6ac1ae2defd46f3d40173461a8755e83939ba0d2c62ddaab2987f6"
+   },
+   {
+    "id": "v4.1.4 AGENT-RULES duty 1",
+    "source": "AGENT-RULES.md",
+    "quote": "No organizer response is a prerequisite of this step",
+    "decision": "OD-INDY-18",
+    "disposition": "OD-INDY-18 in the bootstrap duty itself: the step does not wait on organizers. Not a gate.",
+    "lineSha256": "8160e034a0ae1a2cd7207bc4a884c5dbde2d314a5b66fa1bc54884c3981dc483"
+   }
+  ],
+  "externalConstraintsSource": "docs/HACKATHON-BOUNDARIES.md"
+ },
+ "sensitivity": [
+  {
+   "id": "SENS-BOOT-150",
+   "description": "the bootstrap (T10) takes half again as long as planned (29 minutes: 2 measured, 27 estimated)",
+   "scale": [
+    {
+     "tasks": [
+      "T10"
+     ],
+     "percent": 150
+    }
+   ]
+  },
+  {
+   "id": "SENS-BOOT-200",
+   "description": "the bootstrap (T10) takes twice as long as planned (29 minutes: 2 measured, 27 estimated)",
+   "scale": [
+    {
+     "tasks": [
+      "T10"
+     ],
+     "percent": 200
+    }
+   ]
+  },
+  {
+   "id": "SENS-INT-125",
+   "description": "every integration task overruns by a quarter",
+   "scale": [
+    {
+     "owner": "integration",
+     "percent": 125
+    }
+   ]
+  },
+  {
+   "id": "SENS-INT-150",
+   "description": "every integration task overruns by half",
+   "scale": [
+    {
+     "owner": "integration",
+     "percent": 150
+    }
+   ]
+  },
+  {
+   "id": "SENS-BOOT-200-INT-125",
+   "description": "the bootstrap takes twice as long as planned and every other integration task overruns by a quarter (a rule naming T10 replaces the owner rule for it)",
+   "scale": [
+    {
+     "tasks": [
+      "T10"
+     ],
+     "percent": 200
+    },
+    {
+     "owner": "integration",
+     "percent": 125
+    }
+   ]
+  },
+  {
+   "id": "SENS-CR-200",
+   "description": "applying UI change requests to the shared web entrypoints takes twice the 5 minutes T17 carries for it (T17 25 minutes)",
+   "scale": [
+    {
+     "tasks": [
+      "T17"
+     ],
+     "percent": 125
+    }
+   ]
+  }
+ ],
+ "contractBaseline": {
+  "package": "requirements-compiled/v4.1.5",
+  "approval": "APR-V415-OWNER-3",
+  "note": "v4.1.5 contracts as approved; v4.1.6 changes the three files contractChanges declares"
+ },
+ "pinnedDocuments": [
+  {
+   "path": "docs/TOKEN-ECONOMICS.md",
+   "sha256": "afa3fb2ac348ec51a78675b0e78f17b9a1795886d249ddd3e3b5e5b03c9c91b3",
+   "purpose": "the token-economics runbook the coordinator follows (AGENT-RULES, coordinator duty 1); pinned by digest, because it names earlier rehearsal repositories (it compares their telemetry) and so is not a document of the package itself (X11)"
+  }
+ ],
+ "contractChanges": [
+  {
+   "file": "contracts/00-DOMAIN-STUBS.fs",
+   "sha256": "5c7848dfb04ea7380f8b0053c3706850ce647dc1b03d6e097e2833a84cb78ee2",
+   "decision": "ODR-V416-01",
+   "approval": "",
+   "summary": "RecordConclusion (RC-7 A: after RecordVerification), ReviseObservation and ReviseEvidence commands; ObservationRevised and EvidenceRevised events (causa-storage 1.1.0, S-1 B)."
+  },
+  {
+   "file": "contracts/02-IF41-STORAGE.fs",
+   "sha256": "df1793acad247e0ab0cfa6c29274ef5a36b229a2a8c725bb57819a9ba8f941cd",
+   "decision": "ODR-V416-01",
+   "approval": "",
+   "summary": "IF41-STORAGE pinned to causa-storage 1.1.0: 1.0.0 file sets read unchanged; a 1.0.0 investigation refuses events it cannot store (S-6 A); mixed versions refused. Doc comment only; no type changes."
+  },
+  {
+   "file": "contracts/07-IF41-VIEW.fs",
+   "sha256": "b322053a9e52144a778bdd4497e7a03f1ebc37c736fd6508166307d8d2c63b68",
+   "decision": "ODR-V416-RC6",
+   "approval": "",
+   "summary": "RC-6 A: ConclusionCard.Strength (the stored conclusionStrength, shown with the residual uncertainty); EvidenceCard.Label comment names causa-storage 1.1.0."
+  }
+ ],
+ "suiteRunners": [
+  {
+   "suite": "SU-OWN-DOTNET",
+   "decision": "ODR-V414-01",
+   "approval": "APR-V414-OWNER-1",
+   "runner": "dotnet test Causa.slnx --filter \"FullyQualifiedName~Causa.Contract.Tests.|FullyQualifiedName~Causa.Domain.Tests.|FullyQualifiedName~Causa.Persistence.Tests.|FullyQualifiedName~Causa.App.Tests.\""
+  },
+  {
+   "suite": "SU-DOTNET-LIVE",
+   "decision": "ODR-V414-01",
+   "approval": "APR-V414-OWNER-1",
+   "runner": "dotnet test Causa.slnx --filter \"FullyQualifiedName~Causa.Acceptance.Live.|FullyQualifiedName~Causa.Invariants.Live.\""
+  },
+  {
+   "suite": "SU-OWN-BROWSER",
+   "decision": "ODR-V414-02",
+   "approval": "APR-V414-OWNER-1",
+   "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/contract"
+  },
+  {
+   "suite": "SU-BROWSER-CHROMIUM",
+   "decision": "ODR-V414-02",
+   "approval": "APR-V414-OWNER-1",
+   "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/acceptance tests/browser/invariants"
+  },
+  {
+   "suite": "SU-BROWSER-WEBKIT",
+   "decision": "ODR-V414-02",
+   "approval": "APR-V414-OWNER-1",
+   "runner": "npx playwright test --config playwright.config.ts --project=webkit tests/browser/acceptance tests/browser/invariants"
+  },
+  {
+   "suite": "SU-BROWSER-LIVE",
+   "decision": "ODR-V414-02",
+   "approval": "APR-V414-OWNER-1",
+   "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/live"
+  }
+ ]
+}

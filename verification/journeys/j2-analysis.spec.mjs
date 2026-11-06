@@ -7,6 +7,12 @@ const kind = async (page, value) => {
   const group = page.getByRole('group', { name: /evidence relationship kind/i }).or(page.getByRole('radiogroup', { name: /evidence relationship kind/i })).first();
   await group.getByLabel(value, { exact: true }).check();
 };
+// ODR-V416-RC3 A: the required choice groups INV-045 (evidence category) and INV-046 (conclusion strength) start
+// with nothing selected, so the journey chooses a value; the label may be the wire value or its words.
+const choose = async (page, groupName, label) => {
+  const group = page.getByRole('group', { name: groupName }).or(page.getByRole('radiogroup', { name: groupName })).first();
+  await group.getByLabel(label).check();
+};
 const pick = async (page, pattern, label) => {
   const select = page.getByRole('combobox', { name: pattern }).first();
   await select.selectOption({ label });
@@ -48,6 +54,7 @@ test('J2 complete investigation analysis', async ({ browser }) => {
       await fieldNamed(page, 'Evidence label').fill(e.label);
       await fieldNamed(page, 'Evidence source reference').fill(e.source);
       await fieldNamed(page, 'Evidence original content').fill(e.content);
+      await choose(page, /evidence category/i, /^(document)$/i);
       await page.getByRole('button', { name: /record evidence|add evidence/i }).first().click();
     }
     for (const e of [e1, e2]) await expect(page.getByText(e.label).first()).toBeVisible();
@@ -79,6 +86,7 @@ test('J2 complete investigation analysis', async ({ browser }) => {
   await assertion('J2', 'J2-07', async () => {
     await section(page, 'Overview');
     await fieldNamed(page, 'Conclusion statement').fill(conclusion);
+    await choose(page, /conclusion strength/i, /^(plausible ?explanation)$/i);
     await button(page, 'Record a conclusion').click();
     await expect(page.getByText(conclusion).first()).toBeVisible();
   });
