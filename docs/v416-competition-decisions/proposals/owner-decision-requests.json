@@ -1,0 +1,253 @@
+{
+ "schema": "indy-init.competition-owner-decision-requests/1",
+ "status": "PROPOSED requests for section B of DECISIONS-FOR-TONIGHT.md. None is recorded; agents never record (RDP-003). The owner records them with tools/owner-freeze.fsx decide competition. Each recommended option is the one the owner accepted in session.",
+ "requests": [
+  {
+   "id": "ODR-COMP-P01",
+   "kind": "decision",
+   "title": "Merge PR #174 process fixes",
+   "question": "Merge each of Indy-init PR #174's process fixes 1, 2, 5, 6, 7, 8 and 10 that the independent review approves, fixing any marked changes-required first?",
+   "options": [
+    "A: merge each fix the independent review approves; a changes-required fix is fixed and re-reviewed first",
+    "B: merge none before the competition"
+   ],
+   "recommendation": "A: each fixes a defect that blocked this run. The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "Process fixes change governed tooling; only the owner merges.",
+   "impact": "With B the defects that blocked Rehearsal 010 remain.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P01\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P02",
+   "kind": "decision",
+   "title": "FSharp.Core 10.1.402 as a central package (fix 2)",
+   "question": "Approve FSharp.Core 10.1.402 as a central package version (Directory.Packages.props) for the competition repository?",
+   "options": [
+    "A: approve FSharp.Core@10.1.402",
+    "B: decline"
+   ],
+   "recommendation": "A: without it no test runs (0 tests). The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "A dependency decision.",
+   "impact": "With B the test projects do not run.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P02\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P03",
+   "kind": "decision",
+   "title": "@echelon-foundry/forma-workflow 1.2.0",
+   "question": "Approve @echelon-foundry/forma-workflow 1.2.0 (PolyForm-NC, the owner's product) as a competition dependency for the causal graph (T23/T24/WDL)?",
+   "options": [
+    "A: approve @echelon-foundry/forma-workflow@1.2.0",
+    "B: decline"
+   ],
+   "recommendation": "A: the owner said yes in session; this records it. The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "A dependency and licence decision.",
+   "impact": "With B the causal graph has no library.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P03\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P04",
+   "kind": "decision",
+   "title": "Gate: bounded journeys, always-run verdict, longer job (fix 5)",
+   "question": "Approve fix 5's gate changes: journeys bounded in time, a verdict step that always runs, and a longer job timeout?",
+   "options": [
+    "A: approve",
+    "B: decline"
+   ],
+   "recommendation": "A: removes the 40-minute deadlock. The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "Governed gate behaviour.",
+   "impact": "With B the gate can deadlock again.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P04\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P05",
+   "kind": "decision",
+   "title": "Owner-approved re-govern mechanism (fix 5)",
+   "question": "Approve fix 5's mechanism by which an owner record lets a fixed template be adopted (re-governed) without a bypass?",
+   "options": [
+    "A: approve; each re-govern needs its own owner record",
+    "B: decline"
+   ],
+   "recommendation": "A: a fixed template can be adopted without bypassing the gate. The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "Changes how governed assets are adopted.",
+   "impact": "With B a fixed template can only be adopted by a new package.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P05\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P06",
+   "kind": "decision",
+   "title": "Read-only and write tokens; 'live' judged per slice (fix 6, ODR-R10-28 A)",
+   "question": "Approve two scoped tokens of the same GitHub App (read-only and write), with live tests judged per slice (PF-015-O2/O3)?",
+   "options": [
+    "A: approve; same App, two scoped tokens; live judged per slice",
+    "B: one token as today"
+   ],
+   "recommendation": "A: one failing live test no longer fails every slice. The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "Credential scope and gate semantics.",
+   "impact": "With B a single live failure fails every slice.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P06\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P07",
+   "kind": "decision",
+   "title": "Competition repository pre-created by the owner",
+   "question": "Before T0 the owner pre-creates the competition repository empty, with both App secrets, and, if ODR-COMP-P13 is A, the four deploy secrets CAUSA_BRANCH, DATA_ACCESS_KEY_CAUSA, DATA_SOURCE and REPO_OWNER (TEST-DEPLOY-KEY.md section 7), and branch protection requiring a pull request; the bootstrap pushes to it (Conditor 'repo create' refuses an existing repository); STARTUP section 2 step 4 is amended to say so?",
+   "options": [
+    "A: pre-create, and amend STARTUP section 2 step 4",
+    "B: the session creates it as today"
+   ],
+   "recommendation": "A: today the secrets were missing and protection could not be set from the session. The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "Repository settings and secrets are the owner's.",
+   "impact": "With B the secrets and protection are again missing at T0.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P07\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P08",
+   "kind": "decision",
+   "title": "Agent actor identity in Praxis",
+   "question": "Which actor id do agents use in Praxis records?",
+   "options": [
+    "A: claude (the roster identity), never a lane name",
+    "B: the lane name"
+   ],
+   "recommendation": "A: verify-process would flag lane actors. The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "Process-record identity.",
+   "impact": "With B verify-process flags every lane actor.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P08\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P09",
+   "kind": "decision",
+   "title": "Design-contract populate step",
+   "question": "Amend the governed design-contract populate step so evidence it records carries content and a source, not a label only?",
+   "options": [
+    "A: amend it to fill content and source",
+    "B: keep it"
+   ],
+   "recommendation": "A: INV-028 becomes required (OD-CR-03 A, ODR-V416-CAT); otherwise it fails honestly. The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "A governed asset.",
+   "impact": "With B the populate step fails once INV-028 is required.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P09\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P10",
+   "kind": "decision",
+   "title": "Fallback merge rule if the governed gate cannot run",
+   "question": "Record rule B as a contingency only: if the governed gate cannot run, a slice may merge labelled 'implementer-verified, not governed-accepted'?",
+   "options": [
+    "A: record rule B as a labelled contingency only",
+    "B: no fallback; nothing merges without the gate"
+   ],
+   "recommendation": "A: no one has to ask during the competition. The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "Changes what may merge; only the owner decides.",
+   "impact": "With B a gate outage stops every merge.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P10\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P11",
+   "kind": "decision",
+   "title": "WDL-013 obligations",
+   "question": "Derive WDL-013's obligations (the owner's direction); if that needs a frozen-plan change, include it in v4.1.6?",
+   "options": [
+    "A: derive the obligations; a frozen-plan change goes into v4.1.6",
+    "B: leave WDL-013 as it is"
+   ],
+   "recommendation": "A: removes WDL-015-O2's failure. The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "A requirement change.",
+   "impact": "With B WDL-015-O2 keeps failing.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P11\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P12",
+   "kind": "decision",
+   "title": "Competition lock",
+   "question": "Re-pin the competition lock to the Indy-init commit that has P-1 merged, v4.1.6 tagged and the new scope digest, then rerun the live preflight and launch-preflight until READY tonight?",
+   "options": [
+    "A: re-pin and rerun to READY",
+    "B: keep the current lock"
+   ],
+   "recommendation": "A: launch with zero open items. The owner answered \"accept all\" to DECISIONS-FOR-TONIGHT.md on 2026-11-06 in session; that answer is not a record. This request is how it is recorded.",
+   "rationale": "The lock is committed by the owner (ODR-RG-04).",
+   "impact": "With B the competition runs on v4.1.5 and the old scope.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P12\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P13",
+   "kind": "decision",
+   "title": "Test deploy key: amend the credential rule for the deployed test build",
+   "question": "The owner added four Actions secrets (REPO_OWNER, DATA_SOURCE, CAUSA_BRANCH, DATA_ACCESS_KEY_CAUSA) so the deployed app (deploy-pages.yml) reaches the live test data repository by itself. EXT-DATA-004-O1 ('Credentials MUST never be committed, bundled, logged, ...') and DF-CON-2026-A002's bootstrap criterion ('no credential ... is committed, bundled into the client ... A CI check fails the build when one appears') forbid it. Amend them, for the competition build against v4.1.6, with the minimum exception, the amended wording, the added obligation EXT-DATA-004-O5 and its tests, and the changed CI check that docs/v416-competition-decisions/TEST-DEPLOY-KEY.md states (pinned)?",
+   "options": [
+    "A: approve the exception exactly as TEST-DEPLOY-KEY.md states it (sections 2, 4 and 5)",
+    "B: keep the prohibition; the key is entered per session in the Connect form"
+   ],
+   "recommendation": "A: the owner's direction (a test, no secret data, access acceptable; amend rather than avoid bundling). The owner stated this in session; that statement is not a record. This request is how it is recorded.",
+   "rationale": "Changes a P0 security requirement and a Conditor baseline decision; only the owner amends requirements (RDP-003), and frozen packages are never edited.",
+   "impact": "A: an agent applies the amended text, EXT-DATA-004-O5 and its tests to the v4.1.6 candidate after claude/v4.1.6-review-fixes merges (or to its successor), the competing build's integration lane adds the deploy connection and the scan step to its Conditor-generated deploy-pages.yml (reference: indy-init-rehearsal-010 branch setup/test-deploy-key), and the owner adds the four secrets with the App secrets before T0 (with P-7). The key in the public site is readable by anyone until revoked. B: nothing changes; the four secrets stay unused and DATA_ACCESS_KEY_CAUSA should be deleted.",
+   "exception": "Only the one key of the secret DATA_ACCESS_KEY_CAUSA; only for the designated test data repository REPO_OWNER/DATA_SOURCE on branch CAUSA_BRANCH; only in the deployed test build (the build step of .github/workflows/deploy-pages.yml, CAUSA_DEPLOY_CONNECTION=1); only in dist/deploy-connection.json of the deploy artifact. Never committed, never logged, never in events, reports, Praxis state, URLs, error text, localStorage or any browser store. Least privilege: a fine-grained token on that one repository with Contents read and write (Metadata read, added by GitHub) and nothing else, short expiry, revocable. The deployed site is public: anyone can extract the key and read and write that repository until it is revoked; this is the accepted risk.",
+   "amendsRequirements": [
+    "EXT-DATA-004-O1",
+    "EXT-DATA-004-O3",
+    "EXT-DATA-002-O1",
+    "PF-015-O4",
+    "DF-CON-2026-A002 (bootstrap criterion)",
+    "DF-CON-2026-A002 (persistence authentication criterion)"
+   ],
+   "addsRequirements": [
+    "EXT-DATA-004-O5"
+   ],
+   "ciCheck": "The DF-CON-2026-A002 CI check changes from 'fails when a credential appears' to: fails on any credential except exactly the injected DATA_ACCESS_KEY_CAUSA value in the deploy artifact's deploy-connection.json, and on that value anywhere else (source scan EXT-DATA-004-O1 unchanged; build scan in every build; an independent scan step in deploy-pages.yml before upload). Findings name the file, never the value.",
+   "dependsOn": [
+    "claude/v4.1.6-review-fixes (in flight on v4.1.6; P13 is applied after it merges, not on it)",
+    "ODR-COMP-P07 (the owner adds the four secrets when pre-creating the competition repository)"
+   ],
+   "pins": [
+    {
+     "path": "docs/v416-competition-decisions/TEST-DEPLOY-KEY.md"
+    }
+   ],
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P13\", \"action\": \"decide\", \"option\": \"A\", \"pins\": [{\"path\": \"docs/v416-competition-decisions/TEST-DEPLOY-KEY.md\", \"sha256\": \"<at origin/main>\"}]}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+    "id": "ODR-COMP-P14",
+    "kind": "decision",
+    "title": "forma-workflow in the indy-init preset and the competition lock",
+    "question": "forma-workflow is not an echelon-current 1.37.0 selection, and the Conditor indy-init preset test requires every preset component to be one. How does the competition lock it?",
+    "options": [
+      "A: owner exemption: the indy-init preset pins forma-workflow 1.2.0 and its test exempts exactly that component and version (Conditor PR #134, released in v0.10.21); the competition toolchain lock pins Conditor v0.10.21",
+      "B: Registry route: add forma-workflow to an echelon-current 1.38.0 cut first",
+      "C: day-of manual: add it to conditor.json after init during the timed run"
+    ],
+    "recommendation": "A: the owner answered \"A\" in session on 2026-11-06 (that answer is not a record; this request is how it is recorded). Conditor #132 and #134 are merged and v0.10.21 is released (commit 528ef4576fc79540953226b7dcfd3957654e3a29); `conditor components` of the released linux-x64 binary lists forma-workflow@1.2.0.",
+    "rationale": "VER-001 refuses any @echelon-foundry package outside the locked set; P03 approved the dependency but the lock could not contain it.",
+    "impact": "With B the Registry cut must happen before kickoff; with C the timed run carries manual lock steps.",
+    "approvalRecord": {
+      "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P14\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+    }
+  }
+ ]
+}

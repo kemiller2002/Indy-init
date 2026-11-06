@@ -1,0 +1,1364 @@
+{
+  "schema": "indy-init.v41-forma-layout-contract/1",
+  "description": "Layout and presentation contract for the event build, using only the published Forma 0.12.0 package (dependency-lock.json; npm @echelon-foundry/design-system 0.12.0, sha256 b824568d528562658ded3d53ecd06504e907f7d42129facd86a8f298d1cb7aae, equal to the registry artifact). Every token, class and pattern named here exists in forma-0.12.0-inventory.json, which the compiler extracts from that tarball. No new CSS framework: web/causa.css composes Forma classes and sets layout only through Forma custom properties. An agent that needs something not listed asks the coordinator; it does not invent a token.",
+  "forma": {
+    "package": "@echelon-foundry/design-system",
+    "version": "0.12.0",
+    "tarballSha256": "b824568d528562658ded3d53ecd06504e907f7d42129facd86a8f298d1cb7aae",
+    "stylesheet": "dist/all.css",
+    "inventory": "analysis/forma-0.12.0-inventory.json"
+  },
+  "viewports": [
+    {
+      "id": "VP-320",
+      "width": 320,
+      "height": 640,
+      "purpose": "narrow phone; PERSIST-030 reflow minimum"
+    },
+    {
+      "id": "VP-IPAD-PORTRAIT",
+      "width": 820,
+      "height": 1180,
+      "purpose": "iPad Air portrait (DEC-020 primary target)"
+    },
+    {
+      "id": "VP-IPAD-LANDSCAPE",
+      "width": 1180,
+      "height": 820,
+      "purpose": "iPad Air landscape"
+    },
+    {
+      "id": "VP-DESKTOP",
+      "width": 1440,
+      "height": 900,
+      "purpose": "desktop"
+    },
+    {
+      "id": "VP-200-TEXT",
+      "width": 1280,
+      "height": 800,
+      "textZoom": 2,
+      "purpose": "200% text size (WCAG 1.4.4, PERSIST-030)",
+      "emulation": "the runner sets the root font size to 200% (WCAG 1.4.4 resize text); media queries keep their 16 px rem, as with a browser's text-only zoom"
+    }
+  ],
+  "breakpoints": {
+    "source": "Forma 0.12.0 dist/all.css media-query widths (min-width and max-width), as listed by the generated inventory",
+    "values": [
+      "30rem",
+      "36rem",
+      "40rem",
+      "44rem",
+      "48rem",
+      "64rem"
+    ],
+    "rule": "web/causa.css uses only these widths in media queries; container queries only where a Forma pattern defines them. Height and preference queries (reduced motion, forced colours, print) follow Forma."
+  },
+  "reuse": [
+    {
+      "need": "Workspace shell, navigation and header",
+      "patterns": [
+        "workspace-shell",
+        "navigation-shell",
+        "site-header",
+        "skip-link",
+        "landmark-region"
+      ],
+      "requirements": [
+        "UI-014",
+        "UI-020",
+        "UI-029",
+        "PERSIST-033"
+      ]
+    },
+    {
+      "need": "Save-state indicator",
+      "patterns": [
+        "status-lozenge",
+        "operation-status",
+        "freshness"
+      ],
+      "requirements": [
+        "PERSIST-030",
+        "PERSIST-031"
+      ]
+    },
+    {
+      "need": "Conflict review and discard confirmation",
+      "patterns": [
+        "conflict-review",
+        "dialog",
+        "diff-viewer",
+        "recovery-actions"
+      ],
+      "requirements": [
+        "PERSIST-012",
+        "PERSIST-019"
+      ]
+    },
+    {
+      "need": "Errors, empty and loading states",
+      "patterns": [
+        "fault-banner",
+        "fault-inline",
+        "fault-details",
+        "empty-state",
+        "skeleton",
+        "spinner",
+        "validation-message",
+        "validation-summary"
+      ],
+      "requirements": [
+        "UI-010",
+        "WASM-LOAD-001"
+      ]
+    },
+    {
+      "need": "Investigation overview, timeline, evidence inspector, records",
+      "patterns": [
+        "record-header",
+        "timeline",
+        "master-detail",
+        "key-value-list",
+        "evidence-relationship",
+        "provenance-trail",
+        "facts"
+      ],
+      "requirements": [
+        "UI-003",
+        "UI-005",
+        "UI-025",
+        "UI-033",
+        "UI-034"
+      ]
+    },
+    {
+      "need": "Causal graph textual equivalent and hierarchy",
+      "patterns": [
+        "diagram",
+        "hierarchy-tree",
+        "relationship-index"
+      ],
+      "requirements": [
+        "UI-026",
+        "UI-011",
+        "WDL-007"
+      ]
+    },
+    {
+      "need": "Forms and commands",
+      "patterns": [
+        "form",
+        "form-row",
+        "text-field",
+        "textarea",
+        "select",
+        "button",
+        "command-group"
+      ],
+      "requirements": [
+        "UI-004",
+        "UI-032"
+      ]
+    },
+    {
+      "need": "Layout primitives",
+      "patterns": [
+        "stack",
+        "cluster",
+        "grid",
+        "split",
+        "sidebar",
+        "container",
+        "measure"
+      ],
+      "requirements": [
+        "UI-011",
+        "UI-029"
+      ]
+    }
+  ],
+  "tokens": {
+    "required": [
+      "--ef-layout-target-min",
+      "--ef-layout-measure",
+      "--ef-layout-stack-space",
+      "--ef-layout-block-space",
+      "--ef-layout-section-space",
+      "--ef-focus-ring-width",
+      "--ef-focus-ring-offset",
+      "--ef-color-focus-ring",
+      "--ef-color-status-success",
+      "--ef-color-status-warning",
+      "--ef-color-status-danger",
+      "--ef-color-status-info",
+      "--ef-color-surface-primary",
+      "--ef-color-surface-secondary",
+      "--ef-color-text-primary",
+      "--ef-color-text-secondary",
+      "--ef-motion-base-duration"
+    ],
+    "rule": "web/causa.css may read any --ef-* property in the inventory and must not declare a new --ef-* property; colours come only from semantic tokens (UI-016), never from primitives or literals."
+  },
+  "rules": [
+    {
+      "id": "FL-01",
+      "rule": "Every interactive control is at least --ef-layout-target-min (2.75rem, 44px) in both dimensions.",
+      "requirements": [
+        "UI-011"
+      ],
+      "assertion": "browser: bounding box of every button, link and form control >= 44x44 CSS px at every viewport",
+      "invariants": [
+        {
+          "id": "FL-01a",
+          "invariant": "every interactive or clickable control is at least 44x44 CSS px",
+          "assertions": [
+            "touchTargets"
+          ]
+        }
+      ],
+      "tests": [
+        "playwright:acceptance/UI-011.spec.js > UI-011-O1 [chromium]",
+        "playwright:acceptance/UI-011.spec.js > UI-011-O1 [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "touchTargets",
+          "patterns": [
+            "button",
+            "navigation-shell",
+            "recovery-actions",
+            "conflict-review",
+            "dialog",
+            "skip-link"
+          ],
+          "viewports": "all"
+        },
+        {
+          "assertion": "touchTargets",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
+        }
+      ]
+    },
+    {
+      "id": "FL-02",
+      "rule": "No horizontal scrolling of the page at any viewport; wide content (tables, diagrams, diffs) scrolls inside its own Forma container with a visible scroll affordance.",
+      "requirements": [
+        "UI-011",
+        "PERSIST-030"
+      ],
+      "assertion": "browser: document.scrollingElement.scrollWidth <= innerWidth at every viewport; screenshot per screen",
+      "invariants": [
+        {
+          "id": "FL-02a",
+          "invariant": "the page never scrolls or clips sideways",
+          "assertions": [
+            "noHorizontalScroll"
+          ]
+        },
+        {
+          "id": "FL-02b",
+          "invariant": "wide content scrolls inside its own container, focusable, named and with a visible scroll bar",
+          "assertions": [
+            "scrollRegionsAccessible"
+          ]
+        }
+      ],
+      "tests": [
+        "playwright:acceptance/UI-011.spec.js > UI-011-O2 [chromium]",
+        "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "noHorizontalScroll",
+          "patterns": [
+            "workspace-shell",
+            "navigation-shell",
+            "conflict-review",
+            "diff-viewer",
+            "record-header",
+            "key-value-list",
+            "timeline",
+            "fault-banner",
+            "data-grid"
+          ],
+          "viewports": "all"
+        },
+        {
+          "assertion": "scrollRegionsAccessible",
+          "patterns": [
+            "data-grid",
+            "diff-viewer",
+            "conflict-review",
+            "workspace-shell"
+          ],
+          "viewports": "all"
+        },
+        {
+          "assertion": "noHorizontalScroll",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
+        },
+        {
+          "assertion": "scrollRegionsAccessible",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
+        }
+      ]
+    },
+    {
+      "id": "FL-03",
+      "rule": "Text wraps; nothing is truncated without an accessible full value; line length is limited by --ef-layout-measure (72ch).",
+      "requirements": [
+        "UI-011",
+        "UI-024"
+      ],
+      "assertion": "browser: no element with overflow hidden clips text without a title or accessible description; the 200% text viewport shows every save-state word",
+      "invariants": [
+        {
+          "id": "FL-03a",
+          "invariant": "text is never clipped or truncated without an accessible full value",
+          "assertions": [
+            "textNotClipped"
+          ]
+        },
+        {
+          "id": "FL-03b",
+          "invariant": "running text stays within the 72ch measure",
+          "assertions": [
+            "lineLength"
+          ]
+        }
+      ],
+      "tests": [
+        "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [chromium]",
+        "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "textNotClipped",
+          "patterns": [
+            "record-header",
+            "key-value-list",
+            "status-lozenge",
+            "operation-status",
+            "freshness",
+            "timeline"
+          ],
+          "viewports": "all"
+        },
+        {
+          "assertion": "lineLength",
+          "patterns": [
+            "prose",
+            "measure"
+          ],
+          "viewports": "all"
+        },
+        {
+          "assertion": "textNotClipped",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
+        }
+      ]
+    },
+    {
+      "id": "FL-04",
+      "rule": "Keyboard: every action reachable in DOM order; skip link first; visible focus ring from --ef-focus-ring-width, --ef-focus-ring-offset and --ef-color-focus-ring; dialogs trap and return focus.",
+      "requirements": [
+        "UI-011",
+        "PERSIST-012"
+      ],
+      "assertion": "browser: tab through each screen and dialog; every focused element has a visible outline at least the ring width; focus returns to the invoking control after a dialog closes",
+      "invariants": [
+        {
+          "id": "FL-04a",
+          "invariant": "the skip link is first and visible when focused",
+          "assertions": [
+            "skipLinkFirst"
+          ]
+        },
+        {
+          "id": "FL-04b",
+          "invariant": "Tab follows document order",
+          "assertions": [
+            "focusOrder"
+          ]
+        },
+        {
+          "id": "FL-04c",
+          "invariant": "every focused element shows a contrasting focus ring of the ring width",
+          "assertions": [
+            "focusVisible"
+          ]
+        },
+        {
+          "id": "FL-04d",
+          "invariant": "dialogs take focus, keep it, close on Escape and return it",
+          "assertions": [
+            "dialogFocus"
+          ]
+        }
+      ],
+      "tests": [
+        "playwright:acceptance/UI-011.spec.js > UI-011-O1 [chromium]",
+        "playwright:invariants/INV-24.spec.js > save-state and conflict actions by keyboard and screen reader [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "focusVisible",
+          "patterns": [
+            "button",
+            "navigation-shell",
+            "conflict-review",
+            "recovery-actions",
+            "skip-link"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
+        },
+        {
+          "assertion": "focusOrder",
+          "patterns": [
+            "navigation-shell",
+            "conflict-review",
+            "recovery-actions",
+            "record-header"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
+        },
+        {
+          "assertion": "skipLinkFirst",
+          "patterns": [
+            "skip-link"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
+        },
+        {
+          "assertion": "dialogFocus",
+          "patterns": [
+            "dialog",
+            "fault-blocking"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "FL-05",
+      "rule": "Reduced motion: honour prefers-reduced-motion as Forma does; no essential information conveyed by motion.",
+      "requirements": [
+        "UI-011"
+      ],
+      "assertion": "browser: with reducedMotion 'reduce', computed transition and animation durations of animated Forma components are 0s or Forma's reduced values",
+      "invariants": [
+        {
+          "id": "FL-05a",
+          "invariant": "no animation or transition outlasts 10 ms under reduced motion",
+          "assertions": [
+            "reducedMotion"
+          ]
+        }
+      ],
+      "tests": [
+        "playwright:acceptance/UI-011.spec.js > UI-011-O2 [chromium]",
+        "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "reducedMotion",
+          "patterns": [
+            "skeleton",
+            "spinner",
+            "operation-status",
+            "dialog",
+            "toast"
+          ],
+          "viewports": [
+            "VP-DESKTOP"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "FL-06",
+      "rule": "Contrast: text 4.5:1 (3:1 large), non-text marks 3:1 in light, dark and forced-colors modes; amber (UI-016's #E9A23B, drawn with Forma's --ef-color-status-warning as the owner decided in ODR-V41-05) only with a text label (DEC-R7-002).",
+      "requirements": [
+        "UI-016",
+        "PERSIST-030"
+      ],
+      "assertion": "browser: axe WCAG 2.1 AA in light and dark; forced-colors emulation keeps every save state distinguishable Text over a background image or gradient is judged by the axe run of the plan test, not by textContrast.",
+      "invariants": [
+        {
+          "id": "FL-06a",
+          "invariant": "text contrast 4.5:1 (3:1 large) in light and dark",
+          "assertions": [
+            "textContrast"
+          ]
+        },
+        {
+          "id": "FL-06b",
+          "invariant": "non-text marks and focus rings 3:1",
+          "assertions": [
+            "nonTextContrast"
+          ]
+        },
+        {
+          "id": "FL-06c",
+          "invariant": "states stay distinguishable under forced colours",
+          "assertions": [
+            "forcedColorsDistinct"
+          ]
+        },
+        {
+          "id": "FL-06d",
+          "invariant": "amber (#E9A23B or Forma's warning-status colour) only with a text label",
+          "assertions": [
+            "amberLabelled"
+          ]
+        },
+        {
+          "id": "FL-06e",
+          "invariant": "automated WCAG 2.0-2.2 A and AA checks (axe-core) report no violation, in light and dark",
+          "assertions": [
+            "axeClean"
+          ]
+        }
+      ],
+      "tests": [
+        "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [chromium]",
+        "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [webkit]"
+      ],
+      "literals": [
+        {
+          "value": "#E9A23B",
+          "source": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md, UI-016 colour table: 'Amber | Amber | `#E9A23B`'",
+          "note": "A requirement identity colour, not a Forma value (Forma 0.12.0 has no such colour). The owner mapped it to Forma's warning-status token --ef-color-status-warning (ODR-V41-05, option A, APR-V41-OWNER-2): web/causa.css declares no amber of its own, and the hex is named here only because UI-016 names it."
+        }
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "textContrast",
+          "patterns": [
+            "status-lozenge",
+            "operation-status",
+            "fault-banner",
+            "freshness",
+            "record-header",
+            "conflict-review",
+            "button"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "colorSchemes": [
+            "light",
+            "dark"
+          ]
+        },
+        {
+          "assertion": "nonTextContrast",
+          "patterns": [
+            "text-field",
+            "button",
+            "select"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "colorSchemes": [
+            "light",
+            "dark"
+          ]
+        },
+        {
+          "assertion": "forcedColorsDistinct",
+          "patterns": [
+            "status-lozenge",
+            "operation-status",
+            "record-header"
+          ],
+          "viewports": [
+            "VP-DESKTOP"
+          ],
+          "emulate": {
+            "forcedColors": "active"
+          }
+        },
+        {
+          "assertion": "amberLabelled",
+          "patterns": [
+            "status-lozenge",
+            "record-header",
+            "operation-status"
+          ],
+          "fixtures": [
+            "amberLabelled"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "colorSchemes": [
+            "light",
+            "dark"
+          ]
+        },
+        {
+          "assertion": "textContrast",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "colorSchemes": [
+            "light",
+            "dark"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
+        },
+        {
+          "assertion": "axeClean",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "colorSchemes": [
+            "light",
+            "dark"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
+        }
+      ]
+    },
+    {
+      "id": "FL-07",
+      "rule": "Save-state indicator (PERSIST-030): Forma status lozenge naming the state plus freshness in the investigation header, with Forma operation status for Unknown commit outcome and Save failed and Forma conflict review for Conflict; Saved, Unsaved, Saving and Offline have no operation status or conflict review; their PERSIST-031 words and actions (for example \"exist only in this tab\" and Save) still appear. Visible without scrolling at every viewport. Order: the header line (record header with its status lozenge) and the freshness line come first, then the operation status or conflict review, so the lozenge and freshness stay in the first screen at 320 px and 200% text. At 200% text a long investigation title must not push the indicator out of the first screen: the title uses Forma's heading size, and a title that would is clamped with its full value in an accessible name.",
+      "requirements": [
+        "PERSIST-030",
+        "PERSIST-031"
+      ],
+      "assertion": "browser: the indicator's bounding box intersects the initial viewport at every viewport and state; screenshot per state from the deployed SHA",
+      "invariants": [
+        {
+          "id": "FL-07a",
+          "invariant": "the indicator carries text and is visible without scrolling",
+          "assertions": [
+            "statusVisible"
+          ]
+        },
+        {
+          "id": "FL-07b",
+          "invariant": "lozenge in the record header, freshness with it, then the operation status (Unknown commit outcome, Save failed) or conflict review (Conflict) the state needs",
+          "assertions": [
+            "indicatorComposed"
+          ]
+        }
+      ],
+      "tests": [
+        "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [chromium]",
+        "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "statusVisible",
+          "patterns": [
+            "status-lozenge",
+            "operation-status"
+          ],
+          "viewports": "all",
+          "composed": [
+            [
+              "record-header",
+              "operation-status",
+              "timeline"
+            ],
+            [
+              "record-header",
+              "operation-status",
+              "form"
+            ],
+            [
+              "record-header",
+              "conflict-review",
+              "data-grid"
+            ]
+          ]
+        },
+        {
+          "assertion": "indicatorComposed",
+          "patterns": [],
+          "viewports": "all",
+          "fixtures": [
+            "stateSaved",
+            "stateUnsaved",
+            "stateSaving",
+            "stateOffline",
+            "stateConflict",
+            "stateUnknown",
+            "stateSaveFailed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "FL-08",
+      "rule": "Loading and errors: the HTML/CSS shell renders before WASM with a Forma skeleton; failures use Forma fault patterns stating what happened, what was preserved and a safe next step.",
+      "requirements": [
+        "UI-010",
+        "WASM-LOAD-001"
+      ],
+      "assertion": "browser: shell visible before the runtime boots; an injected boot failure shows a fault pattern with a working retry",
+      "invariants": [
+        {
+          "id": "FL-08a",
+          "invariant": "loading placeholders are announced",
+          "assertions": [
+            "loadingAnnounced"
+          ]
+        },
+        {
+          "id": "FL-08b",
+          "invariant": "faults state what happened and offer a next step",
+          "assertions": [
+            "faultActionable"
+          ]
+        },
+        {
+          "id": "FL-08c",
+          "invariant": "faults state what was preserved and never that work was lost",
+          "assertions": [
+            "faultStatesPreserved"
+          ]
+        }
+      ],
+      "tests": [
+        "playwright:acceptance/UI-010.spec.js > UI-010-O2 [chromium]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "loadingAnnounced",
+          "patterns": [
+            "skeleton",
+            "spinner"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
+        },
+        {
+          "assertion": "faultActionable",
+          "patterns": [
+            "fault-banner",
+            "fault-blocking"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "fixtures": [
+            "faultOffline",
+            "faultSaveFailed",
+            "stateSaveFailed"
+          ]
+        },
+        {
+          "assertion": "faultStatesPreserved",
+          "patterns": [
+            "conflict-review"
+          ],
+          "fixtures": [
+            "faultStatesPreserved",
+            "faultSaveFailed",
+            "faultOffline",
+            "faultUnsaved",
+            "conflictWithDiff"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "FL-09",
+      "rule": "Navigation: two levels (workspace, investigation) with the Forma navigation shell; under 48rem the navigation collapses through Forma's own pattern, never a custom menu.",
+      "requirements": [
+        "UI-020",
+        "UI-029"
+      ],
+      "assertion": "browser: at VP-320 the navigation is reachable and operable by keyboard and touch",
+      "invariants": [
+        {
+          "id": "FL-09a",
+          "invariant": "navigation is labelled, operable and reachable by keyboard",
+          "assertions": [
+            "navigationReachable"
+          ]
+        },
+        {
+          "id": "FL-09b",
+          "invariant": "at 48rem and narrower it collapses through Forma's own pattern",
+          "assertions": [
+            "navigationCollapses"
+          ]
+        }
+      ],
+      "tests": [
+        "playwright:acceptance/UI-029.spec.js > UI-029-O1 [chromium]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "navigationReachable",
+          "patterns": [
+            "navigation-shell",
+            "workspace-shell"
+          ],
+          "viewports": "all"
+        },
+        {
+          "assertion": "navigationCollapses",
+          "patterns": [
+            "navigation-shell"
+          ],
+          "viewports": "all",
+          "composed": [
+            [
+              "site-header",
+              "navigation-shell"
+            ],
+            [
+              "navigation-shell",
+              "landmark-region"
+            ],
+            [
+              "workspace-shell",
+              "navigation-shell"
+            ],
+            [
+              "navigation-shell",
+              "record-header",
+              "sidebar"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "FL-10",
+      "rule": "Only tokens in the inventory: a stylesheet reference to an --ef-* property the inventory lacks fails the build.",
+      "requirements": [
+        "PERSIST-030",
+        "UI-016"
+      ],
+      "assertion": "build: dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist scans web/causa.css against the inventory",
+      "invariants": [
+        {
+          "id": "FL-10a",
+          "invariant": "no stylesheet or style attribute declares or uses an --ef-* property Forma lacks",
+          "assertions": [
+            "onlyFormaTokens"
+          ]
+        }
+      ],
+      "tests": [
+        "dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "onlyFormaTokens",
+          "patterns": [
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-DESKTOP"
+          ]
+        },
+        {
+          "assertion": "onlyFormaTokens",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-DESKTOP"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
+        }
+      ]
+    }
+  ],
+  "executableTests": {
+    "module": "layout-tests/assertions.mjs",
+    "brokenFixtures": "layout-tests/fixtures.mjs",
+    "runner": "layout-tests/run.mjs",
+    "meaning": "Every rule is critical and lists the invariants it states; each invariant names the assertions that test it, and every assertion a rule runs tests one of its invariants (X15). CI runs each against the listed Forma 0.12.0 pattern pages, pages composed from several patterns, and conforming fixtures, at the listed viewports and colour schemes (and forced colours where named), in Chromium and WebKit; every run must pass. It also runs each against its broken fixture, where every run must fail. In the event build, the bootstrap copies assertions.mjs to tests/browser/support/layout-assertions.mjs (integration), and the plan-bound browser tests each rule names import it and run it against Causa's screens (T16, T22).",
+    "eventBuildCopy": "tests/browser/support/layout-assertions.mjs"
+  },
+  "formaGaps": [
+    {
+      "assertion": "touchTargets",
+      "pattern": "navigation-shell",
+      "viewports": [
+        "VP-320",
+        "VP-IPAD-PORTRAIT",
+        "VP-IPAD-LANDSCAPE",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's navigation-shell links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-IPAD-PORTRAIT, VP-IPAD-LANDSCAPE, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "cluster",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's cluster links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "diagram",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's diagram links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "landmark-region",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's landmark-region links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "record-header",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's record-header links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "relationship-index",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's relationship-index links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "sidebar",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's sidebar links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "validation-summary",
+      "viewports": [
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's validation-summary links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "workspace-shell",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's workspace-shell links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    }
+  ]
+}

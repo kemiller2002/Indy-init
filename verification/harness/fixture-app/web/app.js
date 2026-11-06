@@ -29,7 +29,7 @@ const stamp = (inv, what) => ({ ...inv, history: [...inv.history, { at: now(), w
 const newInvestigation = (f) => ({ id: f.id, createdAt: now(), title: f.title, problem: f.problem, question: f.question, state: 'Open', observations: [], hypotheses: [], evidence: [], links: [], conclusions: [], history: [{ at: now(), what: 'Investigation started' }] });
 const addObservation = (inv, f) => stamp({ ...inv, observations: [...inv.observations, { id: uid(), text: f.obsText, source: f.obsSource }] }, `Observation recorded: ${f.obsText}`);
 const addHypothesis = (inv, f) => stamp({ ...inv, hypotheses: [...inv.hypotheses, { id: uid(), statement: f.hypStatement, assessment: 'Proposed' }] }, `Hypothesis recorded: ${f.hypStatement}`);
-const addEvidence = (inv, f) => stamp({ ...inv, evidence: [...inv.evidence, { id: uid(), label: f.evLabel, source: f.evSource, url: f.evUrl, content: f.evContent }] }, `Evidence recorded: ${f.evLabel}`);
+const addEvidence = (inv, f) => stamp({ ...inv, evidence: [...inv.evidence, { id: uid(), label: f.evLabel, source: f.evSource, url: f.evUrl, content: f.evContent, category: f.category }] }, `Evidence recorded: ${f.evLabel}`);
 const pairOf = (inv, e, h) => inv.links.find((l) => l.evidence === e && l.hypothesis === h);
 const link = (inv, f) => pairOf(inv, f.linkEvidence, f.linkHypothesis)
   ? { error: 'This evidence is already assessed against this hypothesis; use Reassess.' }
@@ -40,7 +40,7 @@ const reassess = (inv, f) => {
   const links = inv.links.map((x) => (x === l ? { ...x, kind: f.kind, rationale: f.rationale, history: [...x.history, { kind: x.kind, rationale: x.rationale, at: now() }] } : x));
   return { inv: stamp({ ...inv, links }, `Reassessed: ${l.kind} -> ${f.kind}`) };
 };
-const conclude = (inv, f) => stamp({ ...inv, conclusions: [...inv.conclusions, { id: uid(), statement: f.conclusion, at: now() }] }, `Conclusion recorded: ${f.conclusion}`);
+const conclude = (inv, f) => stamp({ ...inv, conclusions: [...inv.conclusions, { id: uid(), statement: f.conclusion, strength: f.strength, at: now() }] }, `Conclusion recorded: ${f.conclusion}`);
 
 // ---- save (PERSIST-030/031 states driven by real outcomes) ----------------------------------------------------------
 const save = async () => {
@@ -81,6 +81,10 @@ const field = (id, label, kind = 'input', extra = '') => kind === 'textarea'
 const options = (xs, f) => xs.map((x) => `<option value="${x.id}">${esc(f(x))}</option>`).join('');
 const sectionNames = [['overview', 'Overview'], ['analysis', 'Causal Analysis'], ['evidence', 'Evidence'], ['hypotheses', 'Hypotheses'], ['timeline', 'Timeline'], ['report', 'Report']];
 const byId = (xs, id) => xs.find((x) => x.id === id) || {};
+// ODR-V416-RC3 A: the required choice groups INV-045 and INV-046, with nothing selected initially.
+const choices = (legend, name, values) => `<fieldset><legend>${legend}</legend>${values.map((k) => `<label><input type="radio" name="${name}" value="${k}"> ${k}</label>`).join('')}</fieldset>`;
+const evidenceCategories = ['directObservation', 'measurement', 'log', 'document', 'experimentResult', 'testimony', 'externalReference'];
+const conclusionStrengths = ['plausibleExplanation', 'leadingExplanation', 'supportedCause', 'confirmedCause', 'acceptedWithResidualUncertainty'];
 
 const views = {
   connect: () => state.conn ? '' : `<section class="causa-card" aria-labelledby="c"><h1 id="c">No repository connected</h1>
@@ -104,12 +108,12 @@ const views = {
         <p>Creation timestamp: <time>${esc(inv.createdAt)}</time></p><p>Investigation state: ${esc(inv.state)}</p><p>Primary investigative question: ${esc(inv.question)}</p>
         <form id="obs">${field('obsText', 'Observation text', 'textarea')}${field('obsSource', 'Observation source reference')}<button type="submit">Record an observation</button></form>
         <ul aria-label="Observations">${inv.observations.map((o) => `<li>${esc(o.text)} <small>(${esc(o.source)})</small></li>`).join('')}</ul>
-        <form id="conc">${field('conclusion', 'Conclusion statement', 'textarea')}<button type="submit">Record a conclusion</button></form>
-        <ul aria-label="Conclusions">${inv.conclusions.map((c) => `<li>${esc(c.statement)}</li>`).join('')}</ul>`,
+        <form id="conc">${field('conclusion', 'Conclusion statement', 'textarea')}${choices('Conclusion strength', 'strength', conclusionStrengths)}<button type="submit">Record a conclusion</button></form>
+        <ul aria-label="Conclusions">${inv.conclusions.map((c) => `<li>${esc(c.statement)} <small>(${esc(c.strength)})</small></li>`).join('')}</ul>`,
       hypotheses: `<form id="hyp">${field('hypStatement', 'Hypothesis statement', 'textarea')}<button type="submit">Record a hypothesis</button></form>
         <section aria-label="Hypotheses">${inv.hypotheses.map((h) => `<article class="causa-card"><h3>${esc(h.statement)}</h3><p>Evidence:</p><ul>${linksOf((l) => l.hypothesis === h.id, (l) => `<li class="${l.kind === 'contradicts' ? 'causa-contradicts' : ''}">${esc(byId(inv.evidence, l.evidence).label)}: ${esc(l.kind)} — ${esc(l.rationale)}</li>`)}</ul></article>`).join('')}</section>`,
-      evidence: `<form id="ev">${field('evLabel', 'Evidence label')}${field('evSource', 'Evidence source reference')}${field('evUrl', 'Evidence source URL', 'input', 'type="url"')}${field('evContent', 'Evidence original content', 'textarea')}<button type="submit">Record evidence</button></form>
-        <section aria-label="Evidence">${inv.evidence.map((e) => `<article class="causa-card"><h3>${esc(e.label)}</h3><p>${esc(e.content)}</p><p>Hypotheses:</p><ul>${linksOf((l) => l.evidence === e.id, (l) => `<li class="${l.kind === 'contradicts' ? 'causa-contradicts' : ''}">${esc(byId(inv.hypotheses, l.hypothesis).statement)}: ${esc(l.kind)} — ${esc(l.rationale)}</li>`)}</ul></article>`).join('')}</section>
+      evidence: `<form id="ev">${field('evLabel', 'Evidence label')}${field('evSource', 'Evidence source reference')}${field('evUrl', 'Evidence source URL', 'input', 'type="url"')}${field('evContent', 'Evidence original content', 'textarea')}${choices('Evidence category', 'category', evidenceCategories)}<button type="submit">Record evidence</button></form>
+        <section aria-label="Evidence">${inv.evidence.map((e) => `<article class="causa-card"><h3>${esc(e.label)}</h3><p>${esc(e.content)}</p><p>Category: ${esc(e.category)}</p><p>Hypotheses:</p><ul>${linksOf((l) => l.evidence === e.id, (l) => `<li class="${l.kind === 'contradicts' ? 'causa-contradicts' : ''}">${esc(byId(inv.hypotheses, l.hypothesis).statement)}: ${esc(l.kind)} — ${esc(l.rationale)}</li>`)}</ul></article>`).join('')}</section>
         <form id="link"><label for="linkEvidence">Evidence item</label><select id="linkEvidence" name="linkEvidence">${options(inv.evidence, (e) => e.label)}</select>
         <label for="linkHypothesis">Hypothesis to assess</label><select id="linkHypothesis" name="linkHypothesis">${options(inv.hypotheses, (h) => h.statement)}</select>
         <fieldset><legend>Evidence relationship kind</legend>${['supports', 'contradicts', 'consistent-with', 'inconclusive'].map((k) => `<label><input type="radio" name="kind" value="${k}"> ${k}</label>`).join('')}</fieldset>

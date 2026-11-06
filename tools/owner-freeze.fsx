@@ -1,4 +1,5 @@
-// owner-freeze.fsx: the owner's steps to freeze Indy-init's compiled requirements packages v4, v4.1, v4.1.1, v4.1.2, v4.1.4 and v4.1.5
+// owner-freeze.fsx: the owner's steps to freeze Indy-init's compiled requirements packages v4, v4.1, v4.1.1, v4.1.2, v4.1.4, v4.1.5
+// and v4.1.6
 // (the FREEZE.md of each package under requirements-compiled/).
 //
 // Every decision is yours. The script shows each owner decision request as the package states it and records
@@ -31,7 +32,18 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.5 --repo Indy-init  # ODR-V415-01, -03, -04 and -IF-VIEW; then the agent compiles v4.1.5
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.5 --repo Indy-init # ODR-V415-02, after the compiled package is reviewed
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.5 --repo Indy-init --commit <merge commit of the ODR-V415-02 pull request>
-//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide rehearsal-010 --repo Indy-init  # ODR-RG-03, -05 and ODR-R10-01..35
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.6 --repo Indy-init  # ODR-V416-01, -RC1, -RC3..-RC7, -S1..-S9, -CAT, -FSCORE,
+//        -WDL013 and -SCOPE-SELECTORS
+//        (section A of docs/v416-competition-decisions/DECISIONS-FOR-TONIGHT.md); a request that pins a file (ODR-V416-CAT,
+//        the successor catalog) records its sha256 at origin/main, shown before you answer; then the agent completes v4.1.6
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.6 --repo Indy-init # ODR-V416-02, after the compiled package is reviewed
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.6 --repo Indy-init --commit <merge commit of the ODR-V416-02 pull request>
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- ratify v4.1.6-catalog --repo Indy-init  # applies ODR-V416-CAT (A): the
+//        v4.1.6 successor catalog becomes the ratified catalog, only if it is the file you approved, drops nothing and
+//        changes no ratified requirement other than those the request names
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide competition --repo Indy-init  # ODR-COMP-P01..P14, sections B and D of the
+//        decisions sheet (docs/v416-competition-decisions/proposals/owner-decision-requests.json); decisions only
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide rehearsal-010 --repo Indy-init  # ODR-RG-03, -05 and ODR-R10-01..36
 //        (kickoff/rehearsal-010/proposals/owner-decision-requests.json). A request that pins a file records the sha256
 //        of that file at origin/main, shown before you answer; ODR-R10-01 is asked only once v4.1.5 is tagged. A recorded
 //        decision whose pinned file has changed since is asked again, with what changed (as ODR-R10-01 and -19 were for
@@ -98,6 +110,8 @@ let packages =
       { Name = "v4.1.4"; Dir = "requirements-compiled/v4.1.4"; ApprovalPrefix = "APR-V414-OWNER"; PackageApprovalId = "ODR-V414-03"; Tag = "indy-init-requirements-v4.1.4" }
       // v4.1.5 (docs/rehearsal-010-dependency-reduction): the minimum contract change for real causa-data.
       { Name = "v4.1.5"; Dir = "requirements-compiled/v4.1.5"; ApprovalPrefix = "APR-V415-OWNER"; PackageApprovalId = "ODR-V415-02"; Tag = "indy-init-requirements-v4.1.5" }
+      // v4.1.6 (OD-CR-01 A, narrowed by ODR-V416-S1): RecordConclusion and the causa-storage 1.1.0 revision events.
+      { Name = "v4.1.6"; Dir = "requirements-compiled/v4.1.6"; ApprovalPrefix = "APR-V416-OWNER"; PackageApprovalId = "ODR-V416-02"; Tag = "indy-init-requirements-v4.1.6" }
       // Rehearsal 010's owner decisions (docs/rehearsal-010-readiness/OWNER-APPROVAL-EXECUTION.md): decisions only, no
       // package approval and no tag.
       { Name = "rehearsal-010"; Dir = "kickoff/rehearsal-010"; ApprovalPrefix = "APR-R10-OWNER"; PackageApprovalId = ""; Tag = "" }
@@ -113,7 +127,10 @@ let packages =
       { Name = "implementation-conventions"; Dir = "docs/optimization/implementation-conventions"; ApprovalPrefix = "APR-IC-OWNER"; PackageApprovalId = ""; Tag = "" }
       // The Causa pre-competition contract-readiness decisions OD-CR-01..08 (docs/contract-readiness/causa-precompetition/
       // OWNER-DECISIONS.proposed.json): decisions only, no package approval and no tag. A pinned file's digest is recorded.
-      { Name = "contract-readiness"; Dir = "docs/contract-readiness/causa-precompetition"; ApprovalPrefix = "APR-CR-OWNER"; PackageApprovalId = ""; Tag = "" } ]
+      { Name = "contract-readiness"; Dir = "docs/contract-readiness/causa-precompetition"; ApprovalPrefix = "APR-CR-OWNER"; PackageApprovalId = ""; Tag = "" }
+      // The gate and process decisions for the 7 November competition, ODR-COMP-P01..P14 (sections B and D of
+      // docs/v416-competition-decisions/DECISIONS-FOR-TONIGHT.md): decisions only, no package approval and no tag.
+      { Name = "competition"; Dir = "docs/v416-competition-decisions"; ApprovalPrefix = "APR-COMP-OWNER"; PackageApprovalId = ""; Tag = "" } ]
 
 // ---- processes, files and JSON -------------------------------------------------------------------------------------
 
@@ -261,7 +278,7 @@ let commitAndPropose repo dryRun branch title body (content: string) =
 let requestsOf repo (p: Package) =
     match (try Some(atMain repo $"{p.Dir}/proposals/owner-decision-requests.json") with Stop _ -> None) with
     | Some bytes -> items (parse bytes) "requests"
-    | None when p.Name = "historical-compatibility" || p.Name = "implementation-conventions" || p.Name = "contract-readiness" -> say $"  ({p.Dir}/proposals/owner-decision-requests.json is not on origin/main yet: merge its pull request first)"; []
+    | None when p.Name = "historical-compatibility" || p.Name = "implementation-conventions" || p.Name = "contract-readiness" || p.Name = "competition" || p.Name = "v4.1.6" -> say $"  ({p.Dir}/proposals/owner-decision-requests.json is not on origin/main yet: merge its pull request first)"; []
     | None -> stop $"{p.Dir}/proposals/owner-decision-requests.json is missing on origin/main"
 
 let isRecorded (changes: JsonNode list) (request: JsonNode) =
@@ -401,13 +418,17 @@ let decideR10 repo (earlier: (JsonNode * Answer) list) (request: JsonNode) =
                 pins |> List.map (fun (path, sha, field, value, _) ->
                     obj ([ "path", jstr path; "sha256", jstr sha ] @ (if field = "" then [] else [ "field", jstr field; "value", jstr value ])))
             change.AsObject().Add("pins", jarr pinNodes)
+            // A request that names the requirements a pinned catalog changes and adds (ODR-V416-CAT) records the lists
+            // with the decision, so ratification checks exactly what was decided, not a later edit of the request.
+            [ "amendsRequirements"; "addsRequirements" ]
+            |> List.iter (fun (k: string) -> match request[k] with null -> () | n -> change.AsObject().Add(k, n.DeepClone()))
             Select change
         | answer -> answer
 
 let decideOne repo (p: Package) (earlier: (JsonNode * Answer) list) (request: JsonNode) =
     show request
     match str request "kind" with
-    | _ when p.Name = "rehearsal-010" || p.Name = "historical-compatibility" || p.Name = "contract-readiness" -> decideR10 repo earlier request
+    | _ when p.Name = "rehearsal-010" || p.Name = "historical-compatibility" || p.Name = "contract-readiness" || p.Name = "v4.1.6" || p.Name = "competition" -> decideR10 repo earlier request
     | "decision" when p.Name = "contract-first-ui" || p.Name = "implementation-conventions" -> decideOption "decide" request
     | "obligation-amendment" -> decideAmendment request
     | "scope-or-topology" -> decideTopology request
@@ -484,7 +505,7 @@ let unsignedApprovalChanges repo =
 
 /// Refuses to build on an approvals file that holds a change you did not sign (v4.1.4 and Rehearsal 010 only).
 let requireSignedApprovals repo (p: Package) =
-    if p.Name = "v4.1.4" || p.Name = "v4.1.5" || p.Name = "rehearsal-010" || p.Name = "historical-compatibility" || p.Name = "contract-first-ui" || p.Name = "implementation-conventions" || p.Name = "contract-readiness" then
+    if p.Name = "v4.1.4" || p.Name = "v4.1.5" || p.Name = "v4.1.6" || p.Name = "rehearsal-010" || p.Name = "historical-compatibility" || p.Name = "contract-first-ui" || p.Name = "implementation-conventions" || p.Name = "contract-readiness" || p.Name = "competition" then
         match unsignedApprovalChanges repo with
         | [] -> ()
         | unsigned ->
@@ -503,7 +524,7 @@ let decide repo dryRun (p: Package) =
             // A Rehearsal 010 decision whose pinned file has changed since it was recorded is asked again; the
             // later record supersedes it (the lock and launch-preflight read the latest).
             let stale =
-                done' && (p.Name = "rehearsal-010" || p.Name = "contract-readiness")
+                done' && (p.Name = "rehearsal-010" || p.Name = "contract-readiness" || p.Name = "v4.1.6" || p.Name = "competition")
                 && (recorded |> List.filter (fun c -> str c "decision_id" = str r "id") |> List.tryLast
                     |> Option.exists (fun c -> staleRecord repo c))
             if stale then
@@ -540,6 +561,8 @@ let decide repo dryRun (p: Package) =
          elif p.Name = "contract-first-ui" then "Next (agent): apply each recorded decision in its own reviewed pull request, as proposals/r10-contract-first-ui/OWNER-DECISIONS-REQUIRED.md describes (CF-07 first). Nothing frozen changes without its successor package.\n"
          elif p.Name = "implementation-conventions" then "Next (agent): apply each recorded decision as docs/optimization/implementation-conventions/PROPOSED-REQUIREMENTS-CHANGES.md describes, in the next successor package; v4.1.5 and every frozen package stay unchanged.\n"
          elif p.Name = "contract-readiness" then "Next (agent): apply each recorded decision as docs/contract-readiness/causa-precompetition/OWNER-DECISIONS.proposed.json describes, then run `contract-readiness generate`; the readiness gate reads these records. Frozen packages stay unchanged.\n"
+         elif p.Name = "competition" then "Next (agent): apply each recorded decision as docs/v416-competition-decisions/DECISIONS-FOR-TONIGHT.md section B orders it; frozen packages stay unchanged.\n"
+         elif p.Name = "v4.1.6" then "Next (agent): write the recorded approval ids into requirements-compiled/v4.1.6 (FREEZE.md step 2), recompile v4.1.6 until X01-X21 pass, and run a fresh independent review. After ODR-V416-CAT: owner-freeze.fsx ratify v4.1.6-catalog.\n"
          elif p.Name = "v4" then "Next (agent): apply the approved amendments in the curation's obligationAmendments, re-pin the approvals commit, recompile, and run a fresh independent review if the plan changed."
          else $"Next (agent): apply these decisions in {p.Dir} (FREEZE.md step 2), recompile {p.Name}, and run a fresh independent review.")
     commitAndPropose repo dryRun $"owner/{p.Name}-decisions-{stamp ()}" title body (render (withApproval approvals approvalId changes))
@@ -564,7 +587,7 @@ let approve repo dryRun (p: Package) =
     if p.Name = "v4.1.1" && not conflicts.IsEmpty then stop $"""decide {String.Join(", ", conflicts)} first (owner-freeze.fsx decide v4.1.1): the package approval depends on it"""
     // v4.1.2: the package applies its decisions (ODR-V412-01..03, -05), so each must be recorded, and the package recompiled
     // from them, before it can be approved.
-    if (p.Name = "v4.1.2" || p.Name = "v4.1.4" || p.Name = "v4.1.5") && not pending.IsEmpty then stop $"""decide {String.Join(", ", pending)} first (owner-freeze.fsx decide {p.Name}); the agent then compiles {p.Name} from your records"""
+    if (p.Name = "v4.1.2" || p.Name = "v4.1.4" || p.Name = "v4.1.5" || p.Name = "v4.1.6") && not pending.IsEmpty then stop $"""decide {String.Join(", ", pending)} first (owner-freeze.fsx decide {p.Name}); the agent then compiles {p.Name} from your records"""
     rule ()
     let change, shown =
         if p.Name = "v4" then
@@ -811,13 +834,61 @@ let ratifyR10 repo dryRun =
             let body = $"{ratifiedCatalogPath} becomes the successor approved in ODR-R10-02 (sha256 {approved}), status ratified. Next (agent): recompile the scope manifest from the frozen v4.1.4 and this catalog; ODR-R10-01 approves it."
             commitFilesAndPropose repo dryRun $"owner/rehearsal-010-ratify-{stamp ()}" title body [ ratifiedCatalogPath, render out ] |> ignore
 
+// ---- ratify v4.1.6-catalog (ODR-V416-CAT) ----------------------------------------------------------------------------
+
+let v416CatalogPath = "docs/rehearsal-010-readiness/proposals/causa-investigation.requirement-catalog.v416.proposed.json"
+
+/// Ratifies the v4.1.6 successor catalog you approved in ODR-V416-CAT (option A): only the exact file you approved (its
+/// sha256 at origin/main equals the recorded pin); exactly the ratified requirements the decision names in
+/// amendsRequirements changed (INV-028, INV-030), none dropped, and exactly those it names in addsRequirements added.
+let ratifyV416Catalog repo dryRun =
+    prepare repo
+    let p = packages |> List.find (fun x -> x.Name = "v4.1.6")
+    requireSignedApprovals repo p
+    let request =
+        requestsOf repo p |> List.tryFind (fun r -> str r "id" = "ODR-V416-CAT")
+        |> Option.defaultWith (fun () -> stop "ODR-V416-CAT is not among the v4.1.6 requests on origin/main")
+    match recordedChanges (approvalsAtMain repo) |> List.filter (fun c -> str c "decision_id" = "ODR-V416-CAT") |> List.tryLast with
+    | None -> stop "ODR-V416-CAT is not recorded: run decide v4.1.6 first"
+    | Some c when str c "option" <> "A" -> stop $"""ODR-V416-CAT is recorded as option {str c "option"}, not A: there is nothing to ratify"""
+    | Some c ->
+        // The lists recorded with the decision win; a record without them falls back to the request at origin/main.
+        let names (key: string) = (match c[key] with null -> items request key | _ -> items c key) |> List.map string |> Set.ofList
+        let amends, adds = names "amendsRequirements", names "addsRequirements"
+        let bytes = atMain repo v416CatalogPath
+        let approved = items c "pins" |> List.tryFind (fun x -> str x "path" = v416CatalogPath) |> Option.map (fun x -> str x "sha256") |> Option.defaultValue ""
+        if approved <> sha256Hex bytes then
+            stop $"the successor at origin/main has sha256 {sha256Hex bytes}, but ODR-V416-CAT approved {approved}; nothing was written"
+        let successor = parse bytes
+        let ratified = atMain repo ratifiedCatalogPath |> parse
+        let byId (n: JsonNode) = items n "requirements" |> List.map (fun r -> str r "id", r.ToJsonString()) |> Map.ofList
+        let before, after = byId ratified, byId successor
+        let dropped = before |> Map.toList |> List.map fst |> List.filter (after.ContainsKey >> not)
+        let changed = before |> Map.toList |> List.filter (fun (id, text) -> after.ContainsKey id && after[id] <> text) |> List.map fst |> Set.ofList
+        let added = after |> Map.toList |> List.map fst |> List.filter (before.ContainsKey >> not) |> Set.ofList
+        if not dropped.IsEmpty then stop $"""the successor drops ratified requirement(s) {String.Join(", ", dropped)}; nothing was written"""
+        let unexpected = Set.difference changed amends
+        if not unexpected.IsEmpty then stop $"""the successor changes ratified requirement(s) {String.Join(", ", unexpected)} that ODR-V416-CAT does not name; nothing was written"""
+        let unchanged = Set.difference amends changed
+        if not unchanged.IsEmpty then stop $"""ODR-V416-CAT names {String.Join(", ", unchanged)} as amended, but the successor leaves it unchanged; nothing was written"""
+        if added <> adds then stop $"""the successor adds {String.Join(", ", added)}, but ODR-V416-CAT names {String.Join(", ", adds)}; nothing was written"""
+        rule ()
+        say $"""Ratify: changed {String.Join(", ", changed)}; added {String.Join(", ", added)}; every other ratified requirement unchanged."""
+        let out = successor.DeepClone()
+        out.AsObject()["status"] <- jstr "ratified"
+        if not dryRun && choose "Type 'ratify' to write the ratified catalog as yours, or 'abort'" [ "ratify"; "abort" ] = "abort" then say "Aborted; nothing was written."
+        else
+            let title = "Owner ratification of the v4.1.6 CAT-CAUSA-INVESTIGATION successor (ODR-V416-CAT)"
+            let body = $"{ratifiedCatalogPath} becomes the successor approved in ODR-V416-CAT (sha256 {approved}), status ratified. Next (agent): recompile the Rehearsal 010 scope against v4.1.6 and this catalog; ODR-R10-01 approves it."
+            commitFilesAndPropose repo dryRun $"owner/v4.1.6-catalog-ratify-{stamp ()}" title body [ ratifiedCatalogPath, render out ] |> ignore
+
 // ---- main --------------------------------------------------------------------------------------------------------------
 
 let argv = fsi.CommandLineArgs |> Array.toList |> List.tail
 let flag name = List.contains name argv
 let option name = argv |> List.pairwise |> List.tryFind (fst >> (=) name) |> Option.map snd
 let repo = option "--repo" |> Option.defaultValue (Directory.GetCurrentDirectory()) |> Path.GetFullPath
-let packageNamed name = packages |> List.tryFind (fun p -> p.Name = name) |> Option.defaultWith (fun () -> stop "the package must be v4, v4.1, v4.1.1, v4.1.2, v4.1.4, v4.1.5, rehearsal-010, historical-compatibility, contract-first-ui, implementation-conventions or contract-readiness (historical-compatibility needs PR #120 and implementation-conventions PR #141 merged, and your clone on the new main)")
+let packageNamed name = packages |> List.tryFind (fun p -> p.Name = name) |> Option.defaultWith (fun () -> stop "the package must be v4, v4.1, v4.1.1, v4.1.2, v4.1.4, v4.1.5, v4.1.6, rehearsal-010, historical-compatibility, contract-first-ui, implementation-conventions, contract-readiness or competition (historical-compatibility needs PR #120 and implementation-conventions PR #141 merged, and your clone on the new main)")
 
 /// RDP-003: a record or tag is the owner's own act. Refuses to write when an agent runs the script or nobody can type.
 let ownerAtTerminal () =
@@ -835,11 +906,12 @@ let exitCode =
         | [ "status" ] -> status repo; 0
         | [ "acceptance" ] -> acceptance repo (flag "--dry-run") |> ignore; 0
         | [ "ratify"; "rehearsal-010" ] -> ratifyR10 repo (flag "--dry-run"); 0
+        | [ "ratify"; "v4.1.6-catalog" ] -> ratifyV416Catalog repo (flag "--dry-run"); 0
         | [ "decide"; name ] -> decide repo (flag "--dry-run") (packageNamed name) |> ignore; 0
         | [ "approve"; name ] -> approve repo (flag "--dry-run") (packageNamed name) |> ignore; 0
         | [ "freeze"; name ] -> freeze repo (flag "--dry-run") (packageNamed name); 0
         | [ "tag"; name ] -> tag repo (flag "--dry-run") (packageNamed name) (option "--commit"); 0
-        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5|rehearsal-010|historical-compatibility|contract-first-ui|implementation-conventions|contract-readiness | approve v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5 | tag v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5 [--commit SHA] | freeze v4.1.1 | ratify rehearsal-010 | acceptance [--repo DIR] [--dry-run]"; 2
+        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5|v4.1.6|rehearsal-010|historical-compatibility|contract-first-ui|implementation-conventions|contract-readiness|competition | approve v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5|v4.1.6 | tag v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5|v4.1.6 [--commit SHA] | freeze v4.1.1 | ratify rehearsal-010|v4.1.6-catalog | acceptance [--repo DIR] [--dry-run]"; 2
     with Stop message -> eprintfn "stopped: %s" message; 1
 
 exit exitCode

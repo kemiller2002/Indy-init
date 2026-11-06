@@ -1068,6 +1068,231 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-V416-OWNER-1",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "ODR-V416-01",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-RC1",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-S1",
+          "action": "decide",
+          "option": "B"
+        },
+        {
+          "decision_id": "ODR-V416-S8",
+          "action": "decide",
+          "option": "B"
+        },
+        {
+          "decision_id": "ODR-V416-RC3",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-RC4",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-RC5",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-RC6",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-RC7",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-S2",
+          "action": "decide",
+          "option": "B"
+        },
+        {
+          "decision_id": "ODR-V416-S3",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-S4",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-S5",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-S6",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-S7",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-S9",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-CAT",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/rehearsal-010-readiness/proposals/causa-investigation.requirement-catalog.v416.proposed.json",
+              "sha256": "cf3c99c20d3cd4762da55e1bcb15b7c56f8e3b453d7ac9b9a71bcd29ebd57ba3"
+            }
+          ],
+          "amendsRequirements": [
+            "INV-028",
+            "INV-030"
+          ],
+          "addsRequirements": [
+            "INV-045",
+            "INV-046",
+            "INV-047"
+          ]
+        },
+        {
+          "decision_id": "ODR-V416-WDL013",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-SCOPE-SELECTORS",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V416-FSCORE",
+          "action": "decide",
+          "option": "A",
+          "packages": [
+            "FSharp.Core@10.1.402"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "APR-COMP-OWNER-1",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "ODR-COMP-P01",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P02",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P03",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P04",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P05",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P06",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P07",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P08",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P09",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P10",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P11",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P12",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-COMP-P13",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/v416-competition-decisions/TEST-DEPLOY-KEY.md",
+              "sha256": "5c9a94fe638f612c267d599ff826b7792d423582448ac593228f992d006652f6"
+            }
+          ],
+          "amendsRequirements": [
+            "EXT-DATA-004-O1",
+            "EXT-DATA-004-O3",
+            "EXT-DATA-002-O1",
+            "PF-015-O4",
+            "DF-CON-2026-A002 (bootstrap criterion)",
+            "DF-CON-2026-A002 (persistence authentication criterion)"
+          ],
+          "addsRequirements": [
+            "EXT-DATA-004-O5"
+          ]
+        },
+        {
+          "decision_id": "ODR-COMP-P14",
+          "action": "decide",
+          "option": "A"
+        }
+      ]
     }
   ]
 }

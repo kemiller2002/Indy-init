@@ -281,6 +281,47 @@ jobs:
           dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered415"
           dotnet build "$RUNNER_TEMP/layered415/Causa.slnx" -c Release
           dotnet build "$RUNNER_TEMP/layered415/App.slnx" -c Release
+      - name: Candidate package v4.1.6 is reproduced byte for byte; X17 is its only failing check, failing only for the three contract changes awaiting the owner's approval ids (FREEZE.md step 2); its contracts equal v4.1.5's except the three it declares changed, and its layout tests equal v4.1.5's
+        run: |
+          # Without --check the compiler writes the package; any difference from the committed files is a failure.
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.6 --base requirements-compiled/v4 --forma-tarball "$RUNNER_TEMP/forma.tgz" > "$RUNNER_TEMP/v416-compile.txt" || true
+          git diff --exit-code -- requirements-compiled/v4.1.6 || { echo "::error::v4.1.6 is not reproduced byte for byte"; exit 1; }
+          test -z "$(git status --porcelain -- requirements-compiled/v4.1.6)" || { git status --porcelain -- requirements-compiled/v4.1.6; echo "::error::the v4.1.6 compile wrote files that are not committed"; exit 1; }
+          # With --check: exit 3 (validation failed), X17 the only FAIL, and its problems exactly the pending approvals.
+          code=0
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.6 --base requirements-compiled/v4 --forma-tarball "$RUNNER_TEMP/forma.tgz" --check > "$RUNNER_TEMP/v416-check.txt" || code=$?
+          cat "$RUNNER_TEMP/v416-check.txt"
+          test "$code" = 3 || { echo "::error::v4.1.6 --check exited $code, expected 3 (X17 pending approvals only)"; exit 1; }
+          test "$(grep -c '^PASS X' "$RUNNER_TEMP/v416-check.txt")" = 20 || { echo "::error::v4.1.6: X01-X16 and X18-X21 must all pass"; exit 1; }
+          test "$(grep '^FAIL ' "$RUNNER_TEMP/v416-check.txt" | cut -d' ' -f2)" = X17 || { echo "::error::v4.1.6: a check other than X17 fails"; exit 1; }
+          sed -n '/^FAIL X17/,/^\(PASS\|FAIL\) /p' "$RUNNER_TEMP/v416-check.txt" | grep '^      - ' | sed 's/^      - //' | sort > "$RUNNER_TEMP/x17-actual.txt"
+          printf '%s\n' \
+            "the change of contracts/00-DOMAIN-STUBS.fs names no operator approval" \
+            "the change of contracts/02-IF41-STORAGE.fs names no operator approval" \
+            "the change of contracts/07-IF41-VIEW.fs names no operator approval" | sort > "$RUNNER_TEMP/x17-expected.txt"
+          diff "$RUNNER_TEMP/x17-expected.txt" "$RUNNER_TEMP/x17-actual.txt" || { echo "::error::X17 fails for something other than the three pending owner approvals"; exit 1; }
+          echo "v4.1.6: X17 fails only for the pending approvals of 00, 02 and 07 (expected until the owner records ODR-V416-01 and ODR-V416-RC6)"
+          diff -r requirements-compiled/v4.1.5/layout-tests requirements-compiled/v4.1.6/layout-tests
+          for f in requirements-compiled/v4.1.5/contracts/*.fs requirements-compiled/v4.1.5/contracts/negative/*.fs requirements-compiled/v4.1.5/contracts/ContractCheck.fsproj; do
+            rel=${f#requirements-compiled/v4.1.5/}
+            case "$rel" in
+              contracts/00-DOMAIN-STUBS.fs|contracts/02-IF41-STORAGE.fs|contracts/07-IF41-VIEW.fs) ;;
+              *) diff "$f" "requirements-compiled/v4.1.6/$rel" ;;
+            esac
+          done
+      - name: The v4.1.6 interface contracts typecheck, and each negative control (forged Confirmation, credential read) is refused (built outside the checkout)
+        run: |
+          cp -r requirements-compiled/v4.1.6/contracts "$RUNNER_TEMP/contracts416"
+          cp global.json "$RUNNER_TEMP/contracts416/"
+          dotnet build "$RUNNER_TEMP/contracts416/ContractCheck.fsproj" -c Release
+          for negative in "$RUNNER_TEMP"/contracts416/negative/*.fs; do
+            name=$(basename "$negative")
+            cp "$RUNNER_TEMP/contracts416/ContractCheck.fsproj" "$RUNNER_TEMP/contracts416/Negative.fsproj"
+            sed -i "s|</ItemGroup>|  <Compile Include=\"negative/$name\" />\n  </ItemGroup>|" "$RUNNER_TEMP/contracts416/Negative.fsproj"
+            if dotnet build "$RUNNER_TEMP/contracts416/Negative.fsproj" -c Release > "$RUNNER_TEMP/negative416.log" 2>&1; then echo "$name compiled but must not"; exit 1; fi
+            grep -q FS1093 "$RUNNER_TEMP/negative416.log" || { echo "$name failed for another reason"; cat "$RUNNER_TEMP/negative416.log"; exit 1; }
+            rm "$RUNNER_TEMP/contracts416/Negative.fsproj"
+          done
       - name: Restore pinned Playwright browser cache
         id: playwright-browser-cache
         uses: actions/cache@v4

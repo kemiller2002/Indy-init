@@ -638,6 +638,41 @@
         "A",
         "B"
       ]
+    },
+    {
+      "id": "ODR-R10-36",
+      "kind": "decision",
+      "title": "Test deploy key for Rehearsal 010 (counterpart of ODR-COMP-P13)",
+      "question": "Apply to Rehearsal 010 (kemiller2002/indy-init-rehearsal-010, which already holds the four secrets) the same exception to EXT-DATA-004-O1 and DF-CON-2026-A002 that ODR-COMP-P13 requests for the competition, exactly as docs/v416-competition-decisions/TEST-DEPLOY-KEY.md states it (pinned), so the held branch setup/test-deploy-key (deploy-time connection from the four secrets, credential scan of the deploy artifact, tests) may merge?",
+      "options": [
+        "A: approve the exception for Rehearsal 010; the held branch may be merged through the rehearsal's normal pull request and gate",
+        "B: keep the prohibition for Rehearsal 010; the held branch is not merged"
+      ],
+      "recommendation": "A, with ODR-COMP-P13 A: the owner's direction, and it proves the competition change on a real deployment first.",
+      "rationale": "Rehearsal 010's lock and approved scope pin v4.1.4/v4.1.5, which forbid it; only the owner amends a requirement for a running rehearsal.",
+      "impact": "A: the rehearsal's public Pages site carries the test key (readable by anyone until revoked). B: none; the rehearsal keeps the per-session Connect form.",
+      "exception": "Only the one key of the secret DATA_ACCESS_KEY_CAUSA; only for the designated test data repository REPO_OWNER/DATA_SOURCE on branch CAUSA_BRANCH; only in the deployed test build (the build step of .github/workflows/deploy-pages.yml, CAUSA_DEPLOY_CONNECTION=1); only in dist/deploy-connection.json of the deploy artifact. Never committed, never logged, never in events, reports, Praxis state, URLs, error text, localStorage or any browser store. Least privilege: a fine-grained token on that one repository with Contents read and write (Metadata read, added by GitHub) and nothing else, short expiry, revocable. The deployed site is public: anyone can extract the key and read and write that repository until it is revoked; this is the accepted risk.",
+      "amendsRequirements": [
+        "EXT-DATA-004-O1",
+        "EXT-DATA-004-O3",
+        "EXT-DATA-002-O1",
+        "PF-015-O4",
+        "DF-CON-2026-A002 (bootstrap criterion)",
+        "DF-CON-2026-A002 (persistence authentication criterion)"
+      ],
+      "addsRequirements": [
+        "EXT-DATA-004-O5"
+      ],
+      "ciCheck": "The DF-CON-2026-A002 CI check changes from 'fails when a credential appears' to: fails on any credential except exactly the injected DATA_ACCESS_KEY_CAUSA value in the deploy artifact's deploy-connection.json, and on that value anywhere else (source scan EXT-DATA-004-O1 unchanged; build scan in every build; an independent scan step in deploy-pages.yml before upload). Findings name the file, never the value.",
+      "pins": [
+        {
+          "path": "docs/v416-competition-decisions/TEST-DEPLOY-KEY.md"
+        }
+      ],
+      "launchable": [
+        "A",
+        "B"
+      ]
     }
   ]
 }
