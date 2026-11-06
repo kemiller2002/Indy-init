@@ -35,7 +35,7 @@ Build to what they check. The names they look for are listed in `SRC/verificatio
 
 ## 2. T0 (the bootstrap)
 
-1. **Bootstrap** exactly as `SRC/requirements-compiled/v4.1.4/AGENT-RULES.md` duty 1 says, up to but not including its commit and its publish (`conditor repo create`): those come at step 4. Then:
+1. **Bootstrap** exactly as `SRC/requirements-compiled/v4.1.5/AGENT-RULES.md` duty 1 says, up to but not including its commit and its publish (`conditor repo create`): those come at step 4. Then:
    ```
    dotnet fsi SRC/tools/r9/r9.fsx -- govern --indy-init SRC --target . --lock kickoff/rehearsal-010/toolchain.lock.json
    ```
@@ -55,7 +55,7 @@ Main is protected (the Conditor scaffold requires pull requests). Each record be
 
 1. **Suite preflight.** Compile the obligations, then run the preflight:
    ```
-   dokimos verification compile --indy-execution-plan SRC/requirements-compiled/v4.1.4/verification-execution-plan.json \
+   dokimos verification compile --indy-execution-plan SRC/requirements-compiled/v4.1.5/verification-execution-plan.json \
      --indy-verification-plan SRC/requirements-compiled/v4/verification-plan.json --out .echelon/obligations.json
    dotnet fsi SRC/tools/r9/r9.fsx -- suite-preflight --obligations .echelon/obligations.json --root . --out evidence/t0/suite-preflight.json
    ```
@@ -70,7 +70,7 @@ Main is protected (the Conditor scaffold requires pull requests). Each record be
    - `requirements-compiler scope preflight --praxis-queue .ros/work/queue.json --praxis-context .ros/context/current.json` prints each missing one.
 3. **Scope checkpoint:**
    ```
-   requirements-compiler scope checkpoint --source SRC --package requirements-compiled/v4.1.4 \
+   requirements-compiler scope checkpoint --source SRC --package requirements-compiled/v4.1.5 \
      --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --praxis-queue .ros/work/queue.json \
      --praxis-context .ros/context/current.json --at NOW --commit SRC-COMMIT --out .echelon/scope-checkpoint.json
    ```

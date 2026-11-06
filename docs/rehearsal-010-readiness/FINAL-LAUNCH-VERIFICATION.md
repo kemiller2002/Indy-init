@@ -1,5 +1,7 @@
 # Rehearsal 010 final launch verification
 
+> **Superseded in part (2026-11-06).** Rehearsal 010 is now pinned to the frozen v4.1.5 (tag `indy-init-requirements-v4.1.5` on b2b3022; APR-V415-OWNER-1..3). The scope is `26e6ff3c…` (#155), and ODR-R10-01 and ODR-R10-19 are re-asked for it (#156). The v4.1.4 rows in §1 (package, scope digest, suite commands) are kept as they were recorded; v4.1.5 is checked by LP-02, LP-04 and LP-05, and its suite commands run in CI `suite-commands`.
+
 **Verdict: READY FOR OWNER ACTION.**
 - Engineering is complete and verified at `7e6dca7`.
 - The launch preflight refuses today, and only for owner actions that have not happened yet: [`evidence/launch-preflight/launch-preflight-now.log`](evidence/launch-preflight/launch-preflight-now.log).

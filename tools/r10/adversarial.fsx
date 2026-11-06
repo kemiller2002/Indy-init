@@ -255,7 +255,7 @@ let completion (t: Tools) (events: string) (withGate: bool) (coverage: string) =
 // The slice manifest, and slice-gate evidence for SL-T10 (no dependencies).
 let slicesPath = Path.Combine(work, "slices.json")
 let slices () =
-    let r = rc pristine [ "slice-manifest"; "--manifest"; manifestPath; "--dag"; Path.Combine(src, "requirements-compiled", "v4.1.4", "execution-dag.json"); "--journeys"; Path.Combine(src, "verification", "journeys", "bindings.json"); "--out"; slicesPath ]
+    let r = rc pristine [ "slice-manifest"; "--manifest"; manifestPath; "--dag"; Path.Combine(src, "requirements-compiled", "v4.1.5", "execution-dag.json"); "--journeys"; Path.Combine(src, "verification", "journeys", "bindings.json"); "--out"; slicesPath ]
     if r.Exit <> 0 then failwithf "slice-manifest: %s" r.Output
 let t10Item : JsonNode = manifest["workItems"].AsArray() |> Seq.find (fun w -> w["id"].GetValue<string>() = "T10")
 let t10 = t10Item["requirements"].AsArray() |> Seq.map (fun x -> x.GetValue<string>()) |> List.ofSeq
@@ -394,14 +394,15 @@ let suiteFixture (name: string) (extra: string list) =
     if r.Exit <> 0 then failwithf "suite-fixture: %s" r.Output
     Directory.CreateSymbolicLink(Path.Combine(dir, "node_modules"), nodeModules.Value) |> ignore
     dir
-let obligations414 =
+// v4.1.5, the package the lock pins; its suite commands equal v4.1.4's.
+let obligations415 =
     lazy (
-        let out = Path.Combine(work, "obligations-v4.1.4.json")
-        let r = run "dokimos" [ "verification"; "compile"; "--indy-execution-plan"; Path.Combine(src, "requirements-compiled", "v4.1.4", "verification-execution-plan.json"); "--indy-verification-plan"; Path.Combine(src, "requirements-compiled", "v4", "verification-plan.json"); "--out"; out ] work []
+        let out = Path.Combine(work, "obligations-v4.1.5.json")
+        let r = run "dokimos" [ "verification"; "compile"; "--indy-execution-plan"; Path.Combine(src, "requirements-compiled", "v4.1.5", "verification-execution-plan.json"); "--indy-verification-plan"; Path.Combine(src, "requirements-compiled", "v4", "verification-plan.json"); "--out"; out ] work []
         if r.Exit <> 0 then failwithf "dokimos compile: %s" r.Output
         out)
 let runSuites (t: Tools) (root: string) (name: string) =
-    r9 t [ "run-suites"; "--obligations"; obligations414.Force(); "--root"; root; "--out"; Path.Combine(work, "runs-" + name); "--suites"; "SU-DOTNET-DETERMINISTIC"; "--require-tests"; "true" ] root
+    r9 t [ "run-suites"; "--obligations"; obligations415.Force(); "--root"; root; "--out"; Path.Combine(work, "runs-" + name); "--suites"; "SU-DOTNET-DETERMINISTIC"; "--require-tests"; "true" ] root
 
 let designStatic (t: Tools) (root: string) =
     // One passing rendered stub per engine: this case judges the static half only.

@@ -36,7 +36,7 @@
 
 | ID | Decision | Proposed | How | Blocks |
 |---|---|---|---|---|
-| ODR-R10-01 (replaces ODR-RG-01) | Approve the scope manifest `docs/rehearsal-010-readiness/scope-manifest.json` **as recompiled after v4.1.4 is frozen and ODR-R10-02 is applied**: 205 requirements, 890 obligations and 37 work items (scopeSha256 `59bfef5a…`: the frozen v4.1.4 and the ratified successor, step 10). Zero exclusions | approve the recompiled digest | `owner-freeze.fsx decide rehearsal-010` (asked only once the scope is current) | the lock |
+| ODR-R10-01 (replaces ODR-RG-01) | Approve the scope manifest `docs/rehearsal-010-readiness/scope-manifest.json` **as recompiled from the frozen v4.1.5 with ODR-R10-02 applied**: 205 requirements, 890 obligations and 37 work items (scopeSha256 `26e6ff3c…`: the frozen v4.1.5 and the ratified successor; #155). Zero exclusions. *2026-11-06: APR-R10-OWNER-2 recorded `59bfef5a…` (v4.1.4); the re-pin to v4.1.5 re-asks it (#156), so it is re-recorded together with ODR-R10-19* | approve the recompiled digest | `owner-freeze.fsx decide rehearsal-010` (asked only once the scope is current) | the lock |
 
 ## C. Governed verification contracts (new)
 

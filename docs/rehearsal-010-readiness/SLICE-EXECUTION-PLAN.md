@@ -7,7 +7,7 @@
 
 ```
 requirements-compiler slice-manifest --manifest docs/rehearsal-010-readiness/scope-manifest.json \
-  --dag requirements-compiled/v4.1.4/execution-dag.json --journeys verification/journeys/bindings.json \
+  --dag requirements-compiled/v4.1.5/execution-dag.json --journeys verification/journeys/bindings.json \
   --out docs/rehearsal-010-readiness/slice-execution-manifest.json
 ```
 
