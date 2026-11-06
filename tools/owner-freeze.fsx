@@ -418,6 +418,10 @@ let decideR10 repo (earlier: (JsonNode * Answer) list) (request: JsonNode) =
                 pins |> List.map (fun (path, sha, field, value, _) ->
                     obj ([ "path", jstr path; "sha256", jstr sha ] @ (if field = "" then [] else [ "field", jstr field; "value", jstr value ])))
             change.AsObject().Add("pins", jarr pinNodes)
+            // A request that names the requirements a pinned catalog changes and adds (ODR-V416-CAT) records the lists
+            // with the decision, so ratification checks exactly what was decided, not a later edit of the request.
+            [ "amendsRequirements"; "addsRequirements" ]
+            |> List.iter (fun (k: string) -> match request[k] with null -> () | n -> change.AsObject().Add(k, n.DeepClone()))
             Select change
         | answer -> answer
 
@@ -835,8 +839,8 @@ let ratifyR10 repo dryRun =
 let v416CatalogPath = "docs/rehearsal-010-readiness/proposals/causa-investigation.requirement-catalog.v416.proposed.json"
 
 /// Ratifies the v4.1.6 successor catalog you approved in ODR-V416-CAT (option A): only the exact file you approved (its
-/// sha256 at origin/main equals the recorded pin); every ratified requirement unchanged except the ones the request
-/// names in amendsRequirements, none dropped, and exactly the requirements it names in addsRequirements added.
+/// sha256 at origin/main equals the recorded pin); exactly the ratified requirements the decision names in
+/// amendsRequirements changed (INV-028, INV-030), none dropped, and exactly those it names in addsRequirements added.
 let ratifyV416Catalog repo dryRun =
     prepare repo
     let p = packages |> List.find (fun x -> x.Name = "v4.1.6")
@@ -844,12 +848,13 @@ let ratifyV416Catalog repo dryRun =
     let request =
         requestsOf repo p |> List.tryFind (fun r -> str r "id" = "ODR-V416-CAT")
         |> Option.defaultWith (fun () -> stop "ODR-V416-CAT is not among the v4.1.6 requests on origin/main")
-    let names key = items request key |> List.map string |> Set.ofList
-    let amends, adds = names "amendsRequirements", names "addsRequirements"
     match recordedChanges (approvalsAtMain repo) |> List.filter (fun c -> str c "decision_id" = "ODR-V416-CAT") |> List.tryLast with
     | None -> stop "ODR-V416-CAT is not recorded: run decide v4.1.6 first"
     | Some c when str c "option" <> "A" -> stop $"""ODR-V416-CAT is recorded as option {str c "option"}, not A: there is nothing to ratify"""
     | Some c ->
+        // The lists recorded with the decision win; a record without them falls back to the request at origin/main.
+        let names (key: string) = (match c[key] with null -> items request key | _ -> items c key) |> List.map string |> Set.ofList
+        let amends, adds = names "amendsRequirements", names "addsRequirements"
         let bytes = atMain repo v416CatalogPath
         let approved = items c "pins" |> List.tryFind (fun x -> str x "path" = v416CatalogPath) |> Option.map (fun x -> str x "sha256") |> Option.defaultValue ""
         if approved <> sha256Hex bytes then
@@ -864,6 +869,8 @@ let ratifyV416Catalog repo dryRun =
         if not dropped.IsEmpty then stop $"""the successor drops ratified requirement(s) {String.Join(", ", dropped)}; nothing was written"""
         let unexpected = Set.difference changed amends
         if not unexpected.IsEmpty then stop $"""the successor changes ratified requirement(s) {String.Join(", ", unexpected)} that ODR-V416-CAT does not name; nothing was written"""
+        let unchanged = Set.difference amends changed
+        if not unchanged.IsEmpty then stop $"""ODR-V416-CAT names {String.Join(", ", unchanged)} as amended, but the successor leaves it unchanged; nothing was written"""
         if added <> adds then stop $"""the successor adds {String.Join(", ", added)}, but ODR-V416-CAT names {String.Join(", ", adds)}; nothing was written"""
         rule ()
         say $"""Ratify: changed {String.Join(", ", changed)}; added {String.Join(", ", added)}; every other ratified requirement unchanged."""
