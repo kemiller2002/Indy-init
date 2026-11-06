@@ -546,6 +546,8 @@ jobs:
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
       - name: Governed journeys and the rendered design contract on the positive-control fixture, Chromium and WebKit
         run: |
+          # The double's own answer forms first (REST reads, guarded GraphQL createCommitOnBranch, STALE_DATA, Commit.file).
+          node --test verification/harness/github-double.test.mjs
           node verification/harness/github-double.mjs 4610 & node verification/harness/serve.mjs verification/harness/fixture-app/web 4620 & sleep 1
           ln -sfn "$RUNNER_TEMP/pw/node_modules" verification/journeys/node_modules
           ln -sfn "$RUNNER_TEMP/pw/node_modules" verification/design-contract/node_modules
