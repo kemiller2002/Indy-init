@@ -1,0 +1,174 @@
+{
+  "schema": "indy-init.stack-drift-report/1",
+  "ready": false,
+  "summary": {
+    "PASS": 13,
+    "DRIFT": 0,
+    "BLOCKED": 5,
+    "UNVERIFIED": 0
+  },
+  "findings": [
+    {
+      "system": "echelon-current",
+      "check": "release set",
+      "expected": "1.37.0 bc7d163d7ff4bda0eeafe741b3bc0aedf93427526184fe347862ac69f9abe22f",
+      "actual": "match",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "limen",
+      "check": "release manifest",
+      "expected": "0.9.1 54f088e76880308b2db1f7d447ad946d95d1a7f384893f0da2ae63937f6a1655",
+      "actual": "match",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "limen-fsharp",
+      "check": "release manifest",
+      "expected": "0.9.0 d8aec120fdaff6bb2a9dcd6e4d79b8a92d69f8cc0227de1c6b7166c6c3b8ce3a",
+      "actual": "match",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "forma",
+      "check": "release manifest",
+      "expected": "0.13.0 cc096c903785434ac4f664e709819a2599765c16b66ebd9825db87930b0fc2d5",
+      "actual": "match",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "folio",
+      "check": "release manifest",
+      "expected": "0.4.1 d453d980ce7f81e3c5bd227e34bd8d287417ea79ca09aa97ae9fdc56a28c6880",
+      "actual": "match",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "praxis",
+      "check": "release manifest",
+      "expected": "3.25.0 b42b9cf7cf2b3a436f7419c03fccc32d123abe0594839889fe8b6372cfb46a41",
+      "actual": "match",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "dokimos",
+      "check": "release manifest",
+      "expected": "0.11.1 c5bf0df99823aaf1f3d2fc0f11f56cc92f266952df4733e32f18719a56f9b285",
+      "actual": "match",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "ordo",
+      "check": "release manifest",
+      "expected": "1.20.0 ac58cf8b42542ad3ad3cb3d5e9e95abaf660e3dcef5b84f85a6b52b7255563c0",
+      "actual": "match",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "percepta-semantic",
+      "check": "release manifest",
+      "expected": "0.4.0 07e4e640816e480b456ad3ce6e3562cc7aae8717a75db5683a2addcac02b1ee8",
+      "actual": "match",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "percepta",
+      "check": "release manifest",
+      "expected": "0.1.0 07b6291c63ff25e6b669edb8c845e48ba76831b6a6133efa4ad3a390439b1b2b",
+      "actual": "match",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "aegis",
+      "check": "release manifest",
+      "expected": "1.0.0 4530cfa3396c1e57d3e1a6500c661cd2d520236e852d1d9e88aa44c385d0bd6b",
+      "actual": "match",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "dotnet-sdk",
+      "check": "global.json",
+      "expected": "10.0.402",
+      "actual": "10.0.402",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "dotnet-sdk",
+      "check": "installed SDK (dotnet --version)",
+      "expected": "10.0.402",
+      "actual": "10.0.402",
+      "status": "PASS",
+      "required": true,
+      "correction": ""
+    },
+    {
+      "system": "praxis",
+      "check": "installed praxis",
+      "expected": "3.25.0",
+      "actual": "not found: $SCRATCH/nonexistent-bin/praxis",
+      "status": "BLOCKED",
+      "required": true,
+      "correction": "install the locked set (r9.fsx workstation --lock <toolchain lock>)"
+    },
+    {
+      "system": "dokimos",
+      "check": "installed dokimos",
+      "expected": "0.11.1",
+      "actual": "not found: $SCRATCH/nonexistent-bin/dokimos",
+      "status": "BLOCKED",
+      "required": true,
+      "correction": "install the locked set (r9.fsx workstation --lock <toolchain lock>)"
+    },
+    {
+      "system": "ordo",
+      "check": "installed ordo",
+      "expected": "1.20.0",
+      "actual": "not found: $SCRATCH/nonexistent-bin/ordo",
+      "status": "BLOCKED",
+      "required": true,
+      "correction": "install the locked set (r9.fsx workstation --lock <toolchain lock>)"
+    },
+    {
+      "system": "percepta-semantic",
+      "check": "installed percepta",
+      "expected": "0.4.0",
+      "actual": "not found: $SCRATCH/nonexistent-bin/percepta",
+      "status": "BLOCKED",
+      "required": true,
+      "correction": "install the locked set (r9.fsx workstation --lock <toolchain lock>)"
+    },
+    {
+      "system": "percepta",
+      "check": "installed percepta-repo",
+      "expected": "0.1.0",
+      "actual": "not found: $SCRATCH/nonexistent-bin/percepta-repo",
+      "status": "BLOCKED",
+      "required": true,
+      "correction": "install the locked set (r9.fsx workstation --lock <toolchain lock>)"
+    }
+  ]
+}

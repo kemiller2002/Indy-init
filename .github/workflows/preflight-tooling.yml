@@ -1,7 +1,11 @@
 name: Preflight tooling
-# Browser installs (playwright --with-deps pulls apt packages) are bounded to 10 minutes and retried once: on
-# 2026-11-05 three adversarial shards stalled for the whole 45-minute job timeout inside apt before any test ran
-# (PR #139 shard 1, PR #140 shard 0, PR #145 shard 0). Two failures still fail the job; nothing is skipped.
+# Playwright browsers (docs/ci-playwright-mitigation/FINAL-REPORT.md): the adversarial jobs run in Microsoft's
+# mcr.microsoft.com/playwright:v1.63.0-noble image, which carries Chromium, WebKit and their OS libraries, so they install
+# no browser (on 2026-11-05 `playwright install --with-deps` on the runner used the whole 45-minute budget three times
+# before any case ran). The other browser steps install on the runner with a step time limit: a stall fails that step,
+# named, rather than consuming the job; there is no in-script kill or retry (killing apt mid-install is not safe).
+# The remaining runner browser steps restore a Playwright 1.63.0 Chromium/WebKit cache keyed to ubuntu-24.04: on a hit they install
+# without apt and launch both browsers; on a miss or a failed launch they install --with-deps under the same step time limit.
 # Directive workstream C: a PR commit ran this workflow twice (push and pull_request events, same commit, every job),
 # doubling runner load while three sessions had PRs open. Push now runs only on main; PRs run on pull_request (the
 # merge result), and a newer commit on the same PR cancels the older run (its checks are on the old commit, so the new
@@ -49,7 +53,7 @@ jobs:
             exit 1
           fi
           git worktree add --quiet --detach "$RUNNER_TEMP/v4-frozen" indy-init-requirements-v4.0.0
-      - name: Compiled packages v4.1, v4.1.1, v4.1.2 and v4.1.4 on this commit are the frozen ones (tags indy-init-requirements-v4.1.0 at 183bbb4, indy-init-requirements-v4.1.1 at f85081f indy-init-requirements-v4.1.2 at 485b8a9 and indy-init-requirements-v4.1.4 at 208ec9f)
+      - name: Compiled packages v4.1, v4.1.1, v4.1.2, v4.1.4 and v4.1.5 on this commit are the frozen ones (tags indy-init-requirements-v4.1.0 at 183bbb4, indy-init-requirements-v4.1.1 at f85081f indy-init-requirements-v4.1.2 at 485b8a9 and indy-init-requirements-v4.1.4 at 208ec9f and indy-init-requirements-v4.1.5 at b2b3022)
         run: |
           frozen() {
             tag=$1 commit=$2 dir=$3
@@ -65,6 +69,7 @@ jobs:
           frozen indy-init-requirements-v4.1.1 f85081f8321e773ee5a564d183930e8fab20ef55 requirements-compiled/v4.1.1
           frozen indy-init-requirements-v4.1.2 485b8a90972f5a996ed3dba3d9db17952fd677f9 requirements-compiled/v4.1.2
           frozen indy-init-requirements-v4.1.4 208ec9f187578c0e9c8b871361e302e58ffb84ba requirements-compiled/v4.1.4
+          frozen indy-init-requirements-v4.1.5 b2b30223f05fd665a8af6c3a87dd134ba6851bec requirements-compiled/v4.1.5
       - name: Install the SDK the tagged compiler pins (the tag's global.json)
         uses: actions/setup-dotnet@v4
         with:
@@ -102,6 +107,11 @@ jobs:
           global-json-file: global.json
       - name: CTP-001 readiness check holds its cases and its EXP-INDY-002 replay (docs/execution/contract-triggered-parallel)
         run: dotnet fsi tools/execution/ctp-check.fsx -- test --indy-init .
+      - name: Echelon stack-drift preflight holds its cases, negative controls and v4 lock equivalence (ODR-ESU-04 A)
+        run: |
+          git init --quiet "$RUNNER_TEMP/echelon-registry"
+          git -C "$RUNNER_TEMP/echelon-registry" fetch --quiet --depth 1 https://github.com/kemiller2002/echelon-registry 575240233d1fc32b57cfa827ea1031b68609fc58 7a2c27a3db7cab4337ea47536f3e1fc22d257f03
+          dotnet fsi tools/stack-drift/stack-drift.fsx -- test --registry "$RUNNER_TEMP/echelon-registry"
       - name: Build the F# requirements compiler and its tests
         run: dotnet build tools/requirements-compiler/tests -c Release
       - name: Check out the five Rehearsal 7 evidence files the v4 lesson analysis quotes (evidence only, never a build input)
@@ -232,30 +242,9 @@ jobs:
           dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered414"
           dotnet build "$RUNNER_TEMP/layered414/Causa.slnx" -c Release
           dotnet build "$RUNNER_TEMP/layered414/App.slnx" -c Release
-      - name: Successor package v4.1.5 is reproduced byte for byte and its checks X01-X21 pass except its pending owner approvals; its contracts equal v4.1.4's except the five it declares changed, and its layout tests equal v4.1.4's
+      - name: Successor package v4.1.5 is reproduced byte for byte and its checks X01-X21 pass; its contracts equal v4.1.4's except the five it declares changed, and its layout tests equal v4.1.4's
         run: |
-          # Until the owner records ODR-V415-01 and ODR-V415-IF-VIEW (FREEZE.md step 1), v4.1.5 must validate except for exactly its seven empty
-          # approvals: the set of problem lines must equal the expected set, so blanking any other approval, or any other
-          # problem, fails. The compiler prints at most 10 problems per check, so 10 lines also fails. A byte difference
-          # (exit 4) fails.
-          pending415() {
-            set +e; "$@" > "$RUNNER_TEMP/v415.log" 2>&1; code=$?; set -e
-            cat "$RUNNER_TEMP/v415.log"
-            if [ "$code" -eq 0 ]; then return 0; fi
-            if [ "$code" -ne 3 ]; then echo "exit $code: more than the pending owner approvals"; exit 1; fi
-            printf '%s\n' \
-              'FAIL X12' 'FAIL X17' \
-              '      - amendment T-L03 names no operator approval' \
-              '      - the accepted SM-SAVE entry names no operator approval' \
-              '      - the change of contracts/00-DOMAIN-STUBS.fs names no operator approval' \
-              '      - the change of contracts/02-IF41-STORAGE.fs names no operator approval' \
-              '      - the change of contracts/05-IF41-SAVE.fs names no operator approval' \
-              '      - the change of contracts/06-IF41-APP.fs names no operator approval' \
-              '      - the change of contracts/07-IF41-VIEW.fs names no operator approval' | sort > "$RUNNER_TEMP/v415.expected"
-            { grep -E '^FAIL ' "$RUNNER_TEMP/v415.log" | cut -c1-8; grep -E '^      - ' "$RUNNER_TEMP/v415.log"; } | sort > "$RUNNER_TEMP/v415.actual"
-            if ! diff "$RUNNER_TEMP/v415.expected" "$RUNNER_TEMP/v415.actual"; then echo "v4.1.5 fails for more than its pending owner approvals"; exit 1; fi
-          }
-          pending415 dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --forma-tarball "$RUNNER_TEMP/forma.tgz" --check
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --forma-tarball "$RUNNER_TEMP/forma.tgz" --check
           diff -r requirements-compiled/v4.1.4/layout-tests requirements-compiled/v4.1.5/layout-tests
           for f in requirements-compiled/v4.1.4/contracts/*.fs requirements-compiled/v4.1.4/contracts/negative/*.fs requirements-compiled/v4.1.4/contracts/ContractCheck.fsproj; do
             rel=${f#requirements-compiled/v4.1.4/}
@@ -281,36 +270,15 @@ jobs:
           done
       - name: The v4.1.5 skeleton bootstraps into an empty repository and onto a recorded Conditor 0.10.18 scaffold, and every solution builds
         run: |
-          # Until the owner records ODR-V415-01 and ODR-V415-IF-VIEW (FREEZE.md step 1), v4.1.5 must validate except for exactly its seven empty
-          # approvals: the set of problem lines must equal the expected set, so blanking any other approval, or any other
-          # problem, fails. The compiler prints at most 10 problems per check, so 10 lines also fails. A byte difference
-          # (exit 4) fails.
-          pending415() {
-            set +e; "$@" > "$RUNNER_TEMP/v415.log" 2>&1; code=$?; set -e
-            cat "$RUNNER_TEMP/v415.log"
-            if [ "$code" -eq 0 ]; then return 0; fi
-            if [ "$code" -ne 3 ]; then echo "exit $code: more than the pending owner approvals"; exit 1; fi
-            printf '%s\n' \
-              'FAIL X12' 'FAIL X17' \
-              '      - amendment T-L03 names no operator approval' \
-              '      - the accepted SM-SAVE entry names no operator approval' \
-              '      - the change of contracts/00-DOMAIN-STUBS.fs names no operator approval' \
-              '      - the change of contracts/02-IF41-STORAGE.fs names no operator approval' \
-              '      - the change of contracts/05-IF41-SAVE.fs names no operator approval' \
-              '      - the change of contracts/06-IF41-APP.fs names no operator approval' \
-              '      - the change of contracts/07-IF41-VIEW.fs names no operator approval' | sort > "$RUNNER_TEMP/v415.expected"
-            { grep -E '^FAIL ' "$RUNNER_TEMP/v415.log" | cut -c1-8; grep -E '^      - ' "$RUNNER_TEMP/v415.log"; } | sort > "$RUNNER_TEMP/v415.actual"
-            if ! diff "$RUNNER_TEMP/v415.expected" "$RUNNER_TEMP/v415.actual"; then echo "v4.1.5 fails for more than its pending owner approvals"; exit 1; fi
-          }
           git init --quiet "$RUNNER_TEMP/app415"
-          pending415 dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --bootstrap "$RUNNER_TEMP/app415"
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --bootstrap "$RUNNER_TEMP/app415"
           dotnet build "$RUNNER_TEMP/app415/Causa.slnx" -c Release
           fixture=tools/requirements-compiler/tests/fixtures/conditor-0.10.18-scaffold
           git init --quiet "$RUNNER_TEMP/layered415"
           cp -r "$fixture"/. "$RUNNER_TEMP/layered415/"
           mv "$RUNNER_TEMP/layered415/gitignore.txt" "$RUNNER_TEMP/layered415/.gitignore"
           rm "$RUNNER_TEMP/layered415/README.md"
-          pending415 dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered415"
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered415"
           dotnet build "$RUNNER_TEMP/layered415/Causa.slnx" -c Release
           dotnet build "$RUNNER_TEMP/layered415/App.slnx" -c Release
       - name: Restore pinned Playwright browser cache
@@ -320,10 +288,14 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
       - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
+        # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget. No retry, so a
+        # cancelled apt leaves no lock behind for a second attempt (the problem 8d58246 removed); nothing is skipped. Trade-off: on a very
+        # slow mirror this can turn a slow green run red. This step (install plus the layout run) took 803 s on run 42138265759, so 25.
+        timeout-minutes: 25
         run: |
           mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
           tar -xzf "$RUNNER_TEMP/forma.tgz" -C "$RUNNER_TEMP/forma"
-          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ]; then timeout 120 npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))" && echo "Cached browsers launched" || { echo "::warning::cache browser launch failed; falling back to dependency installation"; for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; done; }; else for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done; fi) > /dev/null
+          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ] && npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))"; then echo "Cached browsers launched"; else echo "::notice::no usable browser cache; installing with OS dependencies (bounded by this step's time limit)"; npx playwright install --with-deps chromium webkit; fi) > /dev/null
           cd "$GITHUB_WORKSPACE"
           cp -r requirements-compiled/v4.1/layout-tests/. "$RUNNER_TEMP/layout/"
           node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --browsers chromium,webkit
@@ -366,11 +338,11 @@ jobs:
         run: dotnet build tools/requirements-compiler/src -c Release
       - name: Candidate package v4.1.4 is reproduced byte for byte and X01-X21 pass
         run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --check
-      - name: Percepta's specification preflight finds nothing blocking in v4.1.4 (FREEZE.md step 2)
+      - name: Percepta's specification preflight finds nothing blocking in v4.1.5, the package Rehearsal 010 is pinned to (v4.1.5 FREEZE.md)
         run: |
-          percepta spec-preflight --machines requirements-compiled/v4.1.4/state-machine-contracts.json --invariants requirements-compiled/v4/invariants.json \
-            --interfaces requirements-compiled/v4.1.4/analysis/interface-specifications.json --out "$RUNNER_TEMP/spec-preflight-v414.json"
-          jq -e '.blocked == false and (.blockingContradictions | length) == 0 and .analysed.transitions > 0' "$RUNNER_TEMP/spec-preflight-v414.json"
+          percepta spec-preflight --machines requirements-compiled/v4.1.5/state-machine-contracts.json --invariants requirements-compiled/v4/invariants.json \
+            --interfaces requirements-compiled/v4.1.5/analysis/interface-specifications.json --out "$RUNNER_TEMP/spec-preflight-v415.json"
+          jq -e '.blocked == false and (.blockingContradictions | length) == 0 and .analysed.transitions > 0' "$RUNNER_TEMP/spec-preflight-v415.json"
       - name: Playwright test runner (the version the owner locked, ODR-V41-07)
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null && npm install --no-audit --no-fund @playwright/test@1.63.0 > /dev/null
@@ -423,7 +395,7 @@ jobs:
   # Rehearsal 009's release gate failed in run-suites: two `dotnet test` runners named several projects (MSB1008) and
   # SU-BROWSER-WEBKIT named a Playwright project nobody defined. This job proves, on a deterministic fixture tree with
   # the plan's layout (no application code), that the frozen v4.1.2 commands are refused and that every executable
-  # suite of the successor v4.1.4 lists and runs, WebKit included. The release-gate-repair harness lists the same
+  # suite of v4.1.5 (whose commands equal its predecessor v4.1.4's) lists and runs, WebKit included. The release-gate-repair harness lists the same
   # commands; this job also executes them (docs/rehearsal-010-readiness/INTEGRATION-REPORT.md).
   suite-commands:
     runs-on: ubuntu-24.04
@@ -440,10 +412,14 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
       - name: Fixture trees (with and without the webkit project)
+        # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget. No retry, so a
+        # cancelled apt leaves no lock behind for a second attempt (the problem 8d58246 removed); nothing is skipped. Trade-off: on a very
+        # slow mirror (slowest measured success 664 s) this can turn a slow green run red; 15 minutes leaves that margin.
+        timeout-minutes: 15
         run: |
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx"
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx-nowebkit" --without-webkit true
-          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ]; then timeout 120 npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))" && echo "Cached browsers launched" || { echo "::warning::cache browser launch failed; falling back to dependency installation"; for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; done; }; else for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done; fi))
+          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ] && npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))"; then echo "Cached browsers launched"; else echo "::notice::no usable browser cache; installing with OS dependencies (bounded by this step's time limit)"; npx playwright install --with-deps chromium webkit; fi))
           cp -r "$RUNNER_TEMP/fx/node_modules" "$RUNNER_TEMP/fx-nowebkit/"
       - name: The frozen v4.1.2 commands are refused (MSB1008), and a missing webkit project is refused
         run: |
@@ -451,13 +427,13 @@ jobs:
           dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.2/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v412.json" --require-tests true
           test $? -eq 4 || { echo "::error::v4.1.2 was not refused"; exit 1; }
           jq -e '[.suites[] | select(.cause != "") | .id] == ["SU-OWN-DOTNET","SU-DOTNET-LIVE"]' "$RUNNER_TEMP/v412.json" || exit 1
-          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.4/verification-execution-plan.json --root "$RUNNER_TEMP/fx-nowebkit" --out "$RUNNER_TEMP/nowebkit.json" --require-tests true
+          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.5/verification-execution-plan.json --root "$RUNNER_TEMP/fx-nowebkit" --out "$RUNNER_TEMP/nowebkit.json" --require-tests true
           test $? -eq 4 || { echo "::error::a missing webkit project was not refused"; exit 1; }
           jq -e '[.suites[] | select(.cause != "") | .id] == ["SU-BROWSER-WEBKIT"]' "$RUNNER_TEMP/nowebkit.json" || exit 1
-      - name: Every v4.1.4 suite command lists and runs, each test passing (WebKit included)
+      - name: Every v4.1.5 suite command lists and runs, each test passing (WebKit included; the commands equal v4.1.4's)
         run: |
-          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.4/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v414.json" --require-tests true
-          dotnet fsi tools/r9/r9.fsx -- run-suites --plan requirements-compiled/v4.1.4/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/runs" --require-tests true
+          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.5/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v415.json" --require-tests true
+          dotnet fsi tools/r9/r9.fsx -- run-suites --plan requirements-compiled/v4.1.5/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/runs" --require-tests true
           for f in "$RUNNER_TEMP"/runs/*/run.log; do head -2 "$f"; done
           if grep -l 'outcome="Failed"' "$RUNNER_TEMP"/runs/*/*.trx; then echo "::error::a suite test failed"; exit 1; fi
           for s in SU-OWN-BROWSER SU-BROWSER-CHROMIUM SU-BROWSER-WEBKIT SU-BROWSER-LIVE; do
@@ -469,13 +445,29 @@ jobs:
   # always() so a failed or cancelled shard can never leave it "skipped" (which would read as passing), refuses unless
   # every shard succeeded, and proves the shards' union is the whole case list before its own steps run.
   r10-adversarial-cases:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    # Browsers and their OS libraries come preinstalled in Playwright's image (the tag must equal @playwright/test).
+    # Installing them per run with `playwright install --with-deps` pulled ~100 apt packages from the runner mirror and,
+    # on a slow mirror, used the whole 45-minute budget before any case ran (PR #140, runs 42115761982 and 42122833553).
+    container:
+      # Pinned by digest (the index digest docker pulled in run 42134469740), so the image cannot change under the tag.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+    defaults:
+      run:
+        shell: bash -e {0}   # what these steps ran with on the runner; a container defaults to sh
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         shard: [0, 1, 2]
     steps:
+      - name: Tools the image does not carry (git, jq, curl, ICU for .NET)
+        timeout-minutes: 6
+        run: |
+          # Bounded and labelled: an unreachable apt mirror fails here, by name, before any case runs (never as a pass).
+          timeout -k 15 300 sh -c 'apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null' \
+            || { echo "::error::phase=container-tools: apt could not install git, jq, curl and ICU within 5 minutes; no case ran"; exit 1; }
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
@@ -489,17 +481,11 @@ jobs:
           dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
             --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-adv-${{ github.run_id }}"
           echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
-      - name: Restore pinned Playwright browser cache
-        id: playwright-browser-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
       - name: Playwright, Chromium and WebKit; Forma for the harness fixture
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
-          (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ]; then timeout 120 npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))" && echo "Cached browsers launched" || { echo "::warning::cache browser launch failed; falling back to dependency installation"; for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; done; }; else for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done; fi)
+          # Chromium and WebKit are already in the container image (no per-run download or apt install).
           npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
           mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
@@ -517,9 +503,25 @@ jobs:
   r10-adversarial:
     needs: r10-adversarial-cases
     if: always()
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    # Browsers and their OS libraries come preinstalled in Playwright's image (the tag must equal @playwright/test).
+    # Installing them per run with `playwright install --with-deps` pulled ~100 apt packages from the runner mirror and,
+    # on a slow mirror, used the whole 45-minute budget before any case ran (PR #140, runs 42115761982 and 42122833553).
+    container:
+      # Pinned by digest (the index digest docker pulled in run 42134469740), so the image cannot change under the tag.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+    defaults:
+      run:
+        shell: bash -e {0}   # what these steps ran with on the runner; a container defaults to sh
     timeout-minutes: 45
     steps:
+      - name: Tools the image does not carry (git, jq, curl, ICU for .NET)
+        timeout-minutes: 6
+        run: |
+          # Bounded and labelled: an unreachable apt mirror fails here, by name, before any case runs (never as a pass).
+          timeout -k 15 300 sh -c 'apt-get update -qq && apt-get install -y -qq --no-install-recommends git jq curl ca-certificates libicu74 > /dev/null' \
+            || { echo "::error::phase=container-tools: apt could not install git, jq, curl and ICU within 5 minutes; no case ran"; exit 1; }
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Every adversarial shard succeeded
         run: |
           test "${{ needs.r10-adversarial-cases.result }}" = success || { echo "::error::adversarial shards: ${{ needs.r10-adversarial-cases.result }}"; exit 1; }
@@ -553,17 +555,11 @@ jobs:
           dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
             --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-adv-${{ github.run_id }}"
           echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
-      - name: Restore pinned Playwright browser cache
-        id: playwright-browser-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
       - name: Playwright, Chromium and WebKit; Forma for the harness fixture
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
-          (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ]; then timeout 120 npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))" && echo "Cached browsers launched" || { echo "::warning::cache browser launch failed; falling back to dependency installation"; for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; done; }; else for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done; fi)
+          # Chromium and WebKit are already in the container image (no per-run download or apt install).
           npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
           mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
@@ -607,18 +603,20 @@ jobs:
           dotnet build tools/requirements-compiler/src -c Release -v q
           RC=tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll; P=docs/rehearsal-010-optimization/proposals
           for v in successor milestone-aligned; do
-            dotnet $RC slice-manifest --manifest $P/scope-manifest.$v.json --dag requirements-compiled/v4.1.4/execution-dag.json \
+            dotnet $RC slice-manifest --manifest $P/scope-manifest.$v.json --dag requirements-compiled/v4.1.5/execution-dag.json \
               --journeys verification/journeys/bindings.json --out "$RUNNER_TEMP/slices.$v.json"
             dotnet $RC scope work-plan --manifest $P/scope-manifest.$v.json --out "$RUNNER_TEMP/inventory.$v.json"
             diff <(jq -S . "$RUNNER_TEMP/slices.$v.json") <(jq -S . $P/slice-execution-manifest.$v.json) || { echo "::error::$P/slice-execution-manifest.$v.json is stale or edited"; exit 1; }
             diff <(jq -S . "$RUNNER_TEMP/inventory.$v.json") <(jq -S . $P/praxis-work-inventory.$v.json) || { echo "::error::$P/praxis-work-inventory.$v.json is stale or edited"; exit 1; }
           done
+      - name: Gather the evidence under one folder (the artifact keeps the same three top-level folders)
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/r10-evidence"
+          for d in adv-evidence replay-evidence launch-evidence; do [ -d "$RUNNER_TEMP/$d" ] && cp -r "$RUNNER_TEMP/$d" "$RUNNER_TEMP/r10-evidence/"; done; true
       - name: Publish
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: r10-adversarial
-          path: |
-            ${{ runner.temp }}/adv-evidence
-            ${{ runner.temp }}/replay-evidence
-            ${{ runner.temp }}/launch-evidence
+          path: ${{ runner.temp }}/r10-evidence

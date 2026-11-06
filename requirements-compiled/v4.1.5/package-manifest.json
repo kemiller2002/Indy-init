@@ -17,24 +17,25 @@
       "contentDigest": "1d2a6043388dc3ba4ace36195c550ba6e30caaade0b9caa84afda86172822640"
     }
   },
-  "validation": "FAIL",
+  "validation": "PASS",
   "files": {
     "AGENT-RULES.md": "4c7e9d3b1113441c78990051a19c4158a21e995f97b2506a1d82c50d77295fb0",
     "AMENDMENT-4.1.5.md": "cacbd30ca03ee49ebf8212ee9c68e67a7c284c8817ceef015cf402146db18f2e",
-    "FREEZE.md": "015718d6e9d8f5b18baa5ad34dcb78c7a2da9df80af9b98e144d073fd803ad76",
-    "README.md": "3ea65619dde6f13f87dddacafcbd060bf98ed0abe310b757c183c9cf1569b3ed",
+    "FREEZE.md": "8079f6bc49933205a21b7ac151c036cd175d2b412519eb9dbd3dd253d12378a3",
+    "README.md": "e47ae0f4aea55983e82ec67b45223bdb39b2ac1d2f90e9109703f22a116a3205",
     "STARTING-STATE.md": "0e8fb5f18c32d0cb898559309fca45be183789799bab4be18d945a4cbad0113d",
     "agent-file-ownership.json": "7ec1ae67f9063c2c85a3f1395316b7ebe2c90bdc78978b6d6adb3b17c3421d4d",
-    "analysis/amendment.json": "3b2c89765c9dcd1a6b52d56d4d7285b4c33a0badcce38d597afae7026de6744a",
+    "analysis/amendment.json": "b4f17e6e2dd79985794b0242268d4a6f8c74ebe84967e104afff8e0e159ce321",
     "analysis/bootstrap-measurement.json": "6630dcd50df8169128e2601aa30ca435265727c6ea4ccb3762f098c2832255ee",
     "analysis/conflict-telemetry.json": "eda36dad0e2a616ce7bcfc86a4dcc1092f74a0e868ad08edd2134baa06d5ca1a",
     "analysis/forma-0.12.0-inventory.json": "a92311e22c041e0bd710a677eeb23b383e60e6d3e7cb168c52da2547ec76cd4f",
     "analysis/forma-layout-contract.json": "5203744db2669fd7eab37e2af1fab4e66a82c2689ec048d2a4da62111d039522",
     "analysis/github-error-matrix.json": "3b3fb3ac2d9e9d6b7ca218c82757204b56a327e3fab3d16b8679c362a4bf0e67",
     "analysis/guard-partitions.json": "0ef3fec56d718f8794b669dd7c89d0f90dbf6edfa6ffa2303f08204a5524894f",
+    "analysis/independent-review.json": "39bf30aaee5eb3840205d9e6eb916b91e2af3d43f0e36535d3e90dfcc3ac196f",
     "analysis/interface-specifications.json": "b10e13cc64750fc4100bd877f17bbd288d20d8fad573fa73555445b8f8ec403c",
     "analysis/project-structure.json": "b06c6a51de2941a490549df46f6bb190b72ed83311a09f57dbe54d1740a65817",
-    "analysis/state-machine-amendments.json": "b1258f24e4e4d7b3e8079d22e6a8ece6929120ab961b7b375e7bcb23676e60f2",
+    "analysis/state-machine-amendments.json": "f50bc9739795f75b68b07e71f2e9da1e48f30da46066a1e2a1d8f0bbe4c71c05",
     "analysis/task-adjustments.json": "945867d79f0d698ea696b48ad48624733fe52e8e90b2ffd7aa8493ea7629416d",
     "contract-classification.json": "8b01db572a49bb032fec905688d018435cbb9daf2b3eccf1e7d62e708966ae69",
     "contracts/00-DOMAIN-STUBS.fs": "877d18e46bf17fe77eedfcfe8bdc0a85f543773cf7a8a15bec2a3e9b7c4b4e55",
@@ -51,6 +52,7 @@
     "contracts/negative/ForgeConfirmation.fs": "d3be8e8e738e36128a2f4b467c4b041ffd149f662daf80840f44905b2adca0c3",
     "contracts/negative/ReadCredential.fs": "39a283566b2c3fd6d264cfe0bf85b40ddfce07364697e55c7e747209336ae7b2",
     "execution-dag.json": "1aa7ee06721868375c3b46058d765f05b7a8ac4064fbfc6424479950742bde39",
+    "independent-review.md": "0433887cc8ac67eca1ccb7fa8d5ba52735a1b5c57d484a1cda88c9e758bb7cc2",
     "layout-tests/assertions.mjs": "96a5f90a56c5068e61d55f207d044a93b8b9f85b5cf95d9926c604c1d2e64f05",
     "layout-tests/catch-rate.mjs": "9444f2c1f09b75a3d8694f215ff60972599fdbb6e1db547dfaa149c8d63338e3",
     "layout-tests/fixtures.mjs": "e4ee11d91023d121889eb0c2bedb9b183386c91669ac09bc113bbd39ba250122",
@@ -60,7 +62,7 @@
     "proposals/owner-decision-requests.json": "96b3c23b5b11ff76584d541b41cc03bff22bd0061cba01a189d23c8ff5a11269",
     "schedule.json": "ecc0272fc271990ebab288fa86d473168857d47574f48773042f5c21f35ba529",
     "state-machine-contracts.json": "d58d21f9c11b23238402727c39ce6045a960dbf248fe0f58bf3a30a2bc4a8bc2",
-    "validation-report.json": "e4b6bf27e249040eef3bad609ee13b970c9a1107898ad42c6d955e5c6bec74ca",
+    "validation-report.json": "9b490bb1e1ed1aeedd533813b7e716dfeca9c11e77fbac589edf00fcbffd5d1d",
     "verification-execution-plan.json": "2f1c1339e849d12cc6c82ae0a6795ffd565526688425fff9e9f78c5be753ff86"
   }
 }

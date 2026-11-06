@@ -1,0 +1,44 @@
+PASS       echelon-current    release set                                                expected 1.33.0 7b0793e10ee4021f2ae637116ea53018c571b03045bc7d99ca7d1388d83a7822; actual match
+PASS       limen              release manifest                                           expected 0.9.1 54f088e76880308b2db1f7d447ad946d95d1a7f384893f0da2ae63937f6a1655; actual match
+PASS       limen-fsharp       release manifest                                           expected 0.9.0 d8aec120fdaff6bb2a9dcd6e4d79b8a92d69f8cc0227de1c6b7166c6c3b8ce3a; actual match
+PASS       forma              release manifest                                           expected 0.12.0 0175a2879a7ad9cfc4e79eb65d7c89ff916fc65be6458e4615f8fcacc75a2ab2; actual match
+PASS       folio              release manifest                                           expected 0.4.1 d453d980ce7f81e3c5bd227e34bd8d287417ea79ca09aa97ae9fdc56a28c6880; actual match
+PASS       praxis             release manifest                                           expected 3.24.0 40ace1372475eae7bc1abed384b115c29c1bf86f514537d014a517d1c9871a12; actual match
+PASS       dokimos            release manifest                                           expected 0.9.0 76adde4a97c91ac6274b9a3b8aee82ef9580d7b459147e2fa9b5dd37e9348bed; actual match
+PASS       ordo               release manifest                                           expected 1.19.0 b6287549fc6615c89d89b832991924f8b98863391d4112cdc52b166c66506410; actual match
+PASS       percepta-semantic  release manifest                                           expected 0.3.0 ea5acb7296017ee101d55c8f4d6cb80db82d34b86695ec52eec526f40785a278; actual match
+PASS       aegis              release manifest                                           expected 1.0.0 4530cfa3396c1e57d3e1a6500c661cd2d520236e852d1d9e88aa44c385d0bd6b; actual match
+DRIFT      echelon-current    toolchain lock profile version                             expected 1.33.0; actual 1.37.0
+           -> make the toolchain lock and the dependency lock name the same release (owner decision process)
+DRIFT      echelon-current    toolchain lock registry commit                             expected 7a2c27a3db7cab4337ea47536f3e1fc22d257f03; actual 575240233d1fc32b57cfa827ea1031b68609fc58
+           -> make the toolchain lock and the dependency lock name the same release (owner decision process)
+DRIFT      praxis             toolchain lock expected tool                               expected 3.24.0; actual 3.25.0
+           -> make the toolchain lock and the dependency lock name the same release (owner decision process)
+DRIFT      dokimos            toolchain lock expected tool                               expected 0.9.0; actual 0.11.1
+           -> make the toolchain lock and the dependency lock name the same release (owner decision process)
+DRIFT      percepta-semantic  toolchain lock expected tool                               expected 0.3.0; actual 0.4.0
+           -> make the toolchain lock and the dependency lock name the same release (owner decision process)
+DRIFT      ordo               toolchain lock expected tool                               expected 1.19.0; actual 1.20.0
+           -> make the toolchain lock and the dependency lock name the same release (owner decision process)
+DRIFT      conditor           toolchain lock Conditor                                    expected 0.10.18; actual 0.10.20
+           -> make the toolchain lock and the dependency lock name the same release (owner decision process)
+PASS       dotnet-sdk         global.json                                                expected 10.0.402; actual 10.0.402
+PASS       dotnet-sdk         installed SDK (dotnet --version)                           expected 10.0.402; actual 10.0.402
+PASS       conditor           binary digest                                              expected 75849672f326b3f58dfe9e8de3a3a274ef4137a39d4e76bbe62889042ff326bd; actual 75849672f326b3f58dfe9e8de3a3a274ef4137a39d4e76bbe62889042ff326bd
+DRIFT      forma              declared in layered-fixed: package.json                    expected 0.12.0; actual 0.13.0
+           -> pin forma to 0.12.0, the locked version
+PASS       limen              declared in layered-fixed: package.json                    expected 0.9.1; actual 0.9.1
+PASS       folio              declared in layered-fixed: package.json                    expected 0.4.1; actual 0.4.1
+DRIFT      praxis             component in layered-fixed: conditor.json                  expected 3.24.0; actual 3.25.0
+           -> pin praxis to 3.24.0, the locked version
+DRIFT      ordo               component in layered-fixed: conditor.json                  expected 1.19.0; actual 1.20.0
+           -> pin ordo to 1.19.0, the locked version
+PASS       aegis              component in layered-fixed: conditor.json                  expected 1.0.0; actual 1.0.0
+PASS       limen              component in layered-fixed: conditor.json                  expected 0.9.1; actual 0.9.1
+DRIFT      forma              component in layered-fixed: conditor.json                  expected 0.12.0; actual 0.13.0
+           -> pin forma to 0.12.0, the locked version
+PASS       folio              component in layered-fixed: conditor.json                  expected 0.4.1; actual 0.4.1
+PASS       aegis              EchelonFoundry.Aegis.Core in layered-fixed: src/engine/App.Engine.fsproj expected 1.0.0; actual 1.0.0
+PASS       dotnet-sdk         setup-dotnet in layered-fixed: .github/workflows/build-and-test.yml:29 expected global-json-file; actual global-json-file
+PASS       dotnet-sdk         setup-dotnet in layered-fixed: .github/workflows/candidate-acceptance.yml:66 expected global-json-file; actual global-json-file
+stack-drift: PASS 21, DRIFT 11, BLOCKED 0, UNVERIFIED 0; NOT READY (a required system is not PASS)

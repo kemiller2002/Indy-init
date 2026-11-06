@@ -877,6 +877,197 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-V415-OWNER-3",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "ODR-V415-02",
+          "action": "approve-package",
+          "package": "requirements-compiled/v4.1.5",
+          "manifest_sha256": "3c54fffa3eeafb3717e15ed172726c527851a3db1fe696ecf183f7b6b02b9977",
+          "review_sha256": "39bf30aaee5eb3840205d9e6eb916b91e2af3d43f0e36535d3e90dfcc3ac196f"
+        }
+      ]
+    },
+    {
+      "id": "APR-R10-OWNER-4",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "ODR-R10-01",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/rehearsal-010-readiness/scope-manifest.json",
+              "sha256": "c845da6376c53ba70ed48ccf8952364b5bda91f5a0639423bc5b94a512802101",
+              "field": "scopeSha256",
+              "value": "\"26e6ff3cde467ca97ba9c2eda869947a367854a63dbd221db3987790d949f71f\""
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-19",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/rehearsal-010-optimization/proposals/scope-manifest.successor.json",
+              "sha256": "7afbd42880366efa0df847de4eb24188ae50445e1970fe5d236f57477073d412",
+              "field": "scopeSha256",
+              "value": "\"8baf049b4e643f48e33a718eabe709e21b74e740524d284a62a63629a1babfb2\""
+            },
+            {
+              "path": "docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json",
+              "sha256": "bd77f2ffa5141002b9ef974810baa036dfa15990d6972f9c142a861cc6ed5a0f",
+              "field": "scopeSha256",
+              "value": "\"abf544d60cdcfd05c1d54d1e37c60d36d56b24ce0ff2fef3ffe5b6704f6ae576\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "APR-R10-OWNER-5",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "ODR-R10-34",
+          "action": "decide",
+          "option": "B"
+        }
+      ]
+    },
+    {
+      "id": "APR-CR-OWNER-1",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "OD-CR-01",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/contract-readiness/causa-precompetition/DOMAIN-CONTRACT.json",
+              "sha256": "7cc549694cf302dd600222a2edd478de9c49ff8145b68b7a2de86fbcd0a9bad9"
+            },
+            {
+              "path": "docs/contract-readiness/causa-precompetition/COMMAND-EVENT-REGISTRY.json",
+              "sha256": "af086bacb7d835cabe82d60a59f2c33c83946e579eca223155bce9daa728be74"
+            }
+          ]
+        },
+        {
+          "decision_id": "OD-CR-02",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "OD-CR-03",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "OD-CR-04",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "OD-CR-05",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "OD-CR-06",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "OD-CR-08",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/contract-readiness/causa-precompetition/PACKAGE-MANIFEST.json",
+              "sha256": "558dd1242392c46f623c33cc31fe3fd3a00bb7161cf2f2e171bcfe9f98c49ffb"
+            }
+          ]
+        },
+        {
+          "decision_id": "OD-CR-07",
+          "action": "decide",
+          "option": "A"
+        }
+      ]
+    },
+    {
+      "id": "APR-CR-OWNER-2",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "OD-CR-01",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/contract-readiness/causa-precompetition/DOMAIN-CONTRACT.json",
+              "sha256": "8f4deaec62c8053361f261ce4140316f730b1ddda5e6cca981971e7d828599b9"
+            },
+            {
+              "path": "docs/contract-readiness/causa-precompetition/COMMAND-EVENT-REGISTRY.json",
+              "sha256": "5b9e29359387fa88d317a7752bae9a8facb6a5ad043efd0c06cd3ba032cd7de9"
+            }
+          ]
+        },
+        {
+          "decision_id": "OD-CR-08",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/contract-readiness/causa-precompetition/PACKAGE-MANIFEST.json",
+              "sha256": "6ce7ae1ccc033f264e40485b90729f32d35ec4879ac3b01141a35869f7234483"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "APR-R10-OWNER-6",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-06",
+      "changes": [
+        {
+          "decision_id": "ODR-R10-35",
+          "action": "decide",
+          "option": "A"
+        }
+      ]
     }
   ]
 }

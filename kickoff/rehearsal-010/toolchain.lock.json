@@ -1,0 +1,141 @@
+{
+ "schema": "indy-init.r9-toolchain-lock/1",
+ "description": "Proposed toolchain, requirements package and governed contracts for Rehearsal 010: Rehearsal 009's Conditor and process-evidence pins, the successor package v4.1.5, approved and tagged (it carries v4.1.4's corrected suite runners), and the governed catalog, design and deadline contracts of the adversarial-audit remediation. The resolved set is echelon-current 1.37.0, which carries Dokimos 0.11.1 (url-input). Change this file only through the owner decision process.",
+ "conditor": {
+  "version": "0.10.20",
+  "tag": "v0.10.20",
+  "commit": "a4c53cee6f72966ed737362be5daa5d8ddea12d8",
+  "downloadBase": "https://github.com/kemiller2002/conditor/releases/download/v0.10.20",
+  "artifacts": {
+   "linux-x64": {
+    "name": "conditor-linux-x64",
+    "sha256": "75849672f326b3f58dfe9e8de3a3a274ef4137a39d4e76bbe62889042ff326bd"
+   },
+   "linux-arm64": {
+    "name": "conditor-linux-arm64",
+    "sha256": "f9c5e76276a60224467d644b6fbfd01feeb4b62e9206c2be5b2aafe0310cf4c2"
+   },
+   "linux-musl-x64": {
+    "name": "conditor-linux-musl-x64",
+    "sha256": "9fe9e89961f38e78d54ea5d98090220896ac94e33285aca9173e7a3448d84b47"
+   },
+   "linux-musl-arm64": {
+    "name": "conditor-linux-musl-arm64",
+    "sha256": "a1278e119000b41f15ce623ff16dfe8e2683ac42cce984282a916ef9e6aa194a"
+   },
+   "osx-x64": {
+    "name": "conditor-osx-x64",
+    "sha256": "ad9d7ba890961088c0b448fcc90ad9089ea663e044a4e91ab215963a4e568a6f"
+   },
+   "osx-arm64": {
+    "name": "conditor-osx-arm64",
+    "sha256": "791343bb7daee212f481aef9a7ba6432878c3be017bf1f8bed1776e8928be2ec"
+   },
+   "win-x64": {
+    "name": "conditor-win-x64.exe",
+    "sha256": "e0fb24f8a5813fda92ddea9a135048f99d8e76226364b92bc989b80787ae54c9"
+   },
+   "win-arm64": {
+    "name": "conditor-win-arm64.exe",
+    "sha256": "c8f668ca2331dceddc0b7cb8dbcf0373d64a627ecd231f1744dcfc4f37ab6745"
+   }
+  }
+ },
+ "resolvedSet": {
+  "registry": "kemiller2002/echelon-registry",
+  "commit": "575240233d1fc32b57cfa827ea1031b68609fc58",
+  "channel": "echelon-current",
+  "profileVersion": "1.37.0",
+  "platforms": {
+   "linux-x64": {
+    "path": "channels/echelon-current/linux-x64.json",
+    "sha256": "bba3594ad1db8a4cee3550620c4a86dd5cbb5ce2f4bc183ea50951476b29ca91"
+   },
+   "linux-arm64": {
+    "path": "channels/echelon-current/linux-arm64.json",
+    "sha256": "84be0c098b6bdda425e2628fb174e5e85c10f8b87081c00600158fb8caa9072b"
+   },
+   "osx-x64": {
+    "path": "channels/echelon-current/osx-x64.json",
+    "sha256": "ea7682ab0d7937644a1268d14efb87ba3f5a6043ce7d44579f9fd4d1272a5c57"
+   },
+   "osx-arm64": {
+    "path": "channels/echelon-current/osx-arm64.json",
+    "sha256": "b8db37491977d810180d07f429f671adecac0e360d7a9bc3786a87c2f250c566"
+   },
+   "win-x64": {
+    "path": "channels/echelon-current/win-x64.json",
+    "sha256": "d8409d60a4933320e6aeb5af8037cb73e940c37436db002793312d943ed3fb0f"
+   }
+  },
+  "expectedTools": {
+   "praxis": "3.25.0",
+   "dokimos": "0.11.1",
+   "percepta-semantic": "0.4.0",
+   "ordo": "1.20.0"
+  },
+  "approval": "echelon-current 1.37.0 approved by the owner (sets/echelon-current/1.37.0.json, OD-INDY-8; echelon-registry#109 merged as 5752402) after Conditor qualified it (conditor#131)"
+ },
+ "requirementsPackage": {
+  "path": "requirements-compiled/v4.1.5",
+  "base": "requirements-compiled/v4",
+  "packageVersion": "4.1.5",
+  "tag": "indy-init-requirements-v4.1.5",
+  "tagCommit": "b2b30223f05fd665a8af6c3a87dd134ba6851bec",
+  "manifestSha256": "3c54fffa3eeafb3717e15ed172726c527851a3db1fe696ecf183f7b6b02b9977",
+  "verificationPlanSha256": "2f1c1339e849d12cc6c82ae0a6795ffd565526688425fff9e9f78c5be753ff86",
+  "approval": "APR-V415-OWNER-1 (ODR-V415-01, -03, -04), APR-V415-OWNER-2 (ODR-V415-IF-VIEW), APR-V415-OWNER-3 (ODR-V415-02)"
+ },
+ "workstationTargetId": "indy-init-r9-workstation",
+ "processEvidence": {
+  "description": "Record-bound obligations (plan suites with runner evidence-record, identities praxis:<kind>) are judged by requirements-compiler verify-process against this plan and these rules, with attestations the CI run observes itself. rulesSha256 pins the Rehearsal 010 rules the owner recorded (ODR-R10-14, APR-R10-OWNER-1).",
+  "plan": "requirements-compiled/v4/verification-plan.json",
+  "planDigest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d",
+  "rules": "kickoff/rehearsal-010/process-evidence-rules.json",
+  "rulesSha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d",
+  "proposedSha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d",
+  "rulesStatus": "PINNED: the owner recorded ODR-R10-14 = A with this file's digest (APR-R10-OWNER-1)"
+ },
+ "status": "OWNER PIN (ODR-RG-04): kemiller2002 pins this lock for Rehearsal 010 on 2026-11-06 — v4.1.5 (tag indy-init-requirements-v4.1.5), the 37-item scope 26e6ff3c (APR-R10-OWNER-4, ODR-R10-35 A), and the contracts and toolchain below.",
+ "scope": {
+  "manifest": "docs/rehearsal-010-readiness/scope-manifest.json",
+  "scopeSha256": "26e6ff3cde467ca97ba9c2eda869947a367854a63dbd221db3987790d949f71f",
+  "approval": "ODR-R10-01 (APR-R10-OWNER-4: this scopeSha256, compiled from the tagged v4.1.5; it replaces APR-R10-OWNER-2's v4.1.4 approval)",
+  "rule": "scope preflight and the Praxis coverage check must pass and the scope checkpoint must be committed before any application code (STARTUP-INSTRUCTIONS.md)"
+ },
+ "catalogVerification": {
+  "contract": "kickoff/rehearsal-010/catalog-verification-contract.json",
+  "contractSha256": "3d587618abce0c5f3bb470ffde05bab81c38f82f059180d68ba9b70fd8b67317",
+  "approval": "ODR-R10-03 and ODR-R10-04 (APR-R10-OWNER-2, contract 3d587618)"
+ },
+ "designContract": {
+  "contract": "kickoff/rehearsal-010/design-contract.json",
+  "contractSha256": "366ed579446636d31894e77ab63877d5dc5f4ef0e935ae14f089b4360780482a",
+  "approval": "APR-R10-OWNER-1 (ODR-R10-05)"
+ },
+ "deadlinePolicy": {
+  "path": "kickoff/rehearsal-010/deadline-policy.json",
+  "sha256": "9f6ac357b09190074efcc3bdba851ddce0ebd8cca56d3c0fe69fe7ba8499a4e0",
+  "approval": "APR-R10-OWNER-1 (ODR-R10-06)"
+ },
+ "journeys": {
+  "bindings": "verification/journeys/bindings.json",
+  "bindingsSha256": "cd68237205ff8f56503c46bdb6dc925085a3b07c9306ab6f9979f2b17b9754dd",
+  "approval": "APR-R10-OWNER-1 (ODR-R10-07)"
+ },
+ "testRepository": {
+  "owner": "kemiller2002",
+  "repo": "causa-acceptance-r10",
+  "branch": "causa-acceptance",
+  "isolated": true,
+  "visibility": "private",
+  "data": "synthetic only; resettable; evidence lives in the governed CI artifacts",
+  "credential": "a GitHub App installed on this repository alone (Contents: read and write); installation token minted per job by actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 (v3.3.0), scoped to this repository, revoked at job end; secrets CAUSA_ACCEPTANCE_APP_CLIENT_ID and CAUSA_ACCEPTANCE_APP_KEY",
+  "approval": "ODR-R10-09 (pending)"
+ },
+ "ownerDecisionRequests": {
+  "path": "kickoff/rehearsal-010/proposals/owner-decision-requests.json",
+  "sha256": "2f3a7063936ad5c31516f1912ff4ed3c4b117d22589c01f584c5065df4d4d5d3",
+  "rule": "the questions the owner answers are these, pinned by the owner's lock (launch-preflight LP-03)"
+ }
+}

@@ -1,6 +1,8 @@
 # Rehearsal 010 readiness: process corrections
 
 > **Integrated (2026-11-04, #104).** This is #102's record and is kept as written. In the integrated tree, v4.1.3 is replaced by #101's v4.1.4. The scope manifest is recompiled from v4.1.4 with the same 199 requirements, 863 obligations and 35 work items; its scopeSha256 is now `b407b5cc…`. The current readiness state is [FINAL-READINESS.md](FINAL-READINESS.md).
+>
+> **Re-pinned (2026-11-06, #155).** The scope is now compiled from the frozen v4.1.5 (tag `indy-init-requirements-v4.1.5`), with the same 205 requirements and 37 work items; its scopeSha256 is `26e6ff3c…`. The command in §2 names v4.1.5. The rest of this record describes v4.1.4 as it stood then.
 
 **Verdict: NOT READY.**
 - The engineering corrections are built, tested and demonstrated.
@@ -29,7 +31,7 @@ The root-cause analysis is [ROOT-CAUSE.md](ROOT-CAUSE.md). The new startup instr
 `docs/rehearsal-010-readiness/scope-manifest.json`, schema `indy-init.approved-scope/1`, compiled by:
 
 ```
-requirements-compiler scope compile --source . --package requirements-compiled/v4.1.4 --out docs/rehearsal-010-readiness/scope-manifest.json
+requirements-compiler scope compile --source . --package requirements-compiled/v4.1.5 --out docs/rehearsal-010-readiness/scope-manifest.json
 ```
 
 | | |

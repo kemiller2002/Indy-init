@@ -82,7 +82,7 @@ let fixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixture -> string
           "verification/journeys/bindings.json", "{\"journeys\":[\"J1\",\"J2\",\"J3\"]}\n"
           "kickoff/rehearsal-010/process-evidence-rules.json", "{\"repository\":\"indy-init-rehearsal-010\"}\n"
           "kickoff/rehearsal-010/proposals/owner-decision-requests.json", "{\"requests\":[" + String.Join(",", decisions |> List.map (fun d -> $"{{\"id\":\"{d}\"}}")) + "]}\n"
-          "requirements-compiled/v4.1.4/package-manifest.json", "{\"package\":\"4.1.4\"}\n"
+          "requirements-compiled/v4.1.5/package-manifest.json", "{\"package\":\"4.1.5\"}\n"
           "docs/rehearsal-010-readiness/scope-manifest.json", "{\"scopeSha256\":\"scope-final\",\"counts\":{\"requirements\":205}}\n"
           "tools/r10/adversarial.fsx", "// fixture\n    [ { Id = \"C01\"; Title = \"a\" }\n      { Id = \"C02\"; Title = \"b\" } ]\n" ]
     files |> List.iter (fun (rel, text) -> write (Path.Combine(f.Indy, rel)) text)
@@ -98,9 +98,11 @@ let fixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixture -> string
         | _ -> []
     let change (id: string) = $"""{{"decision_id":"{id}","action":"decide","option":"{(if id = "ODR-R10-02" then "B" else "A")}","pins":[{String.Join(',', pinsOf id)}]}}"""
     let changes =
-        [ "{\"decision_id\":\"ODR-V414-01\",\"action\":\"select\",\"option\":\"A\"}"
-          "{\"decision_id\":\"ODR-V414-02\",\"action\":\"select\",\"option\":\"A\"}"
-          "{\"decision_id\":\"ODR-V414-03\",\"action\":\"approve-package\",\"package\":\"requirements-compiled/v4.1.4\"}" ]
+        [ "{\"decision_id\":\"ODR-V415-01\",\"action\":\"select\",\"option\":\"A\"}"
+          "{\"decision_id\":\"ODR-V415-03\",\"action\":\"decide\",\"option\":\"A\"}"
+          "{\"decision_id\":\"ODR-V415-04\",\"action\":\"decide\",\"option\":\"A\"}"
+          "{\"decision_id\":\"ODR-V415-IF-VIEW\",\"action\":\"select\",\"option\":\"A\"}"
+          "{\"decision_id\":\"ODR-V415-02\",\"action\":\"approve-package\",\"package\":\"requirements-compiled/v4.1.5\"}" ]
         @ (decisions |> List.map change)
     write (Path.Combine(f.Indy, "kickoff/rehearsal-007/approvals.causa.json"))
         ("{\"approvals\":[{\"id\":\"APR-R10-OWNER-1\",\"authority\":{\"kind\":\"operator\",\"id\":\"kemiller2002\"},\"changes\":[\n" + String.Join(",\n", changes) + "\n]}]}\n")
@@ -108,12 +110,12 @@ let fixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixture -> string
     git f.Indy [ "init"; "-q"; "-b"; "main" ] |> ignore
     git f.Indy [ "remote"; "add"; "origin"; f.Origin ] |> ignore
     commitPush f "Owner decisions (fixture)"
-    git f.Indy [ "tag"; "indy-init-requirements-v4.1.4" ] |> ignore
-    git f.Indy [ "push"; "-q"; "origin"; "indy-init-requirements-v4.1.4" ] |> ignore
+    git f.Indy [ "tag"; "indy-init-requirements-v4.1.5" ] |> ignore
+    git f.Indy [ "push"; "-q"; "origin"; "indy-init-requirements-v4.1.5" ] |> ignore
     let _, h1 = git f.Indy [ "rev-parse"; "HEAD" ]
     let h1 = h1.Trim()
     write (Path.Combine(f.Indy, "kickoff/rehearsal-010/toolchain.lock.json"))
-        ($"""{{"status":"OWNER-PINNED","requirementsPackage":{{"path":"requirements-compiled/v4.1.4","packageVersion":"4.1.4","tag":"indy-init-requirements-v4.1.4","tagCommit":"{h1}","manifestSha256":"{digest "requirements-compiled/v4.1.4/package-manifest.json"}"}},
+        ($"""{{"status":"OWNER-PINNED","requirementsPackage":{{"path":"requirements-compiled/v4.1.5","packageVersion":"4.1.5","tag":"indy-init-requirements-v4.1.5","tagCommit":"{h1}","manifestSha256":"{digest "requirements-compiled/v4.1.5/package-manifest.json"}"}},
   "scope":{{"manifest":"docs/rehearsal-010-readiness/scope-manifest.json","scopeSha256":"scope-final"}},
   "catalogVerification":{{"contract":"kickoff/rehearsal-010/catalog-verification-contract.json","contractSha256":"{digest "kickoff/rehearsal-010/catalog-verification-contract.json"}"}},
   "designContract":{{"contract":"kickoff/rehearsal-010/design-contract.json","contractSha256":"{digest "kickoff/rehearsal-010/design-contract.json"}"}},
@@ -136,7 +138,9 @@ let fixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixture -> string
     write (Path.Combine(f.Runs, "path-4242")) ".github/workflows/live-provider-preflight.yml\n"
     write (Path.Combine(f.Runs, "path-777")) ".github/workflows/preflight-tooling.yml\n"
     write (Path.Combine(f.Runs, "run-777.json")) $"{{\"workflowName\":\"Preflight tooling\",\"headBranch\":\"main\",\"event\":\"push\",\"conclusion\":\"success\",\"headSha\":\"{h1}\"}}\n"
-    write (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "cases.tsv")) "case\ttitle\tverdict\nC01\tzero tests\tVALIDATED\nC02\tgate\tVALIDATED\n"
+    // The layout CI publishes: one table per adversarial shard, each holding only its own cases.
+    write (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-0", "cases.tsv")) "case\ttitle\tverdict\nC01\tzero tests\tVALIDATED\n"
+    write (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv")) "case\ttitle\tverdict\nC02\tgate\tVALIDATED\n"
     let stub =
         [ @"#!/bin/sh"
           @"# gh stand-in (fixture). api: GitHub's verdict on a commit (valid, committer = git's committer name, unless marked"
@@ -287,7 +291,7 @@ let cases =
       case "checkout-is-not-the-published-main" "LP-00" (fun f -> write (Path.Combine(f.Indy, "NOTE.md")) "local\n"; git f.Indy [ "add"; "-A" ] |> ignore; git f.Indy [ "commit"; "-qm"; "local only" ] |> ignore)
       case "lock-still-proposed" "LP-01" (fun f -> replaceIn (lockFile f) "OWNER-PINNED" "PROPOSED: not an owner pin"; commitPush f "lock")
       case "lock-changed-by-an-agent" "LP-01" (fun f -> replaceIn (lockFile f) "\"status\":\"OWNER-PINNED\"" "\"status\":\"OWNER-PINNED \""; agentCommitPush f "lock")
-      case "v4.1.4-not-tagged-on-origin" "LP-02" (fun f -> git f.Indy [ "push"; "-q"; "origin"; ":refs/tags/indy-init-requirements-v4.1.4" ] |> ignore)
+      case "v4.1.5-not-tagged-on-origin" "LP-02" (fun f -> git f.Indy [ "push"; "-q"; "origin"; ":refs/tags/indy-init-requirements-v4.1.5" ] |> ignore)
       case "dokimos-0.11.0" "LP-06" (fun f -> replaceIn (lockFile f) "\"dokimos\":\"0.11.1\"" "\"dokimos\":\"0.11.0\""; commitPush f "lock")
       case "test-repository-not-isolated" "LP-07" (fun f -> replaceIn (lockFile f) "\"isolated\":true" "\"isolated\":false"; commitPush f "lock")
       case "test-repository-not-the-approved-one" "LP-07" (fun f -> replaceIn (lockFile f) "\"repo\":\"causa-acceptance-r10\"" "\"repo\":\"causa-acceptance-other\""; commitPush f "lock")
@@ -307,8 +311,15 @@ let cases =
       case "adversarial-run-of-another-workflow-file" "LP-09" (fun f -> write (Path.Combine(f.Runs, "path-777")) ".github/workflows/lookalike.yml\n")
       case "adversarial-run-on-a-branch" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "run-777.json")) "\"headBranch\":\"main\"" "\"headBranch\":\"agent-branch\"")
       case "adversarial-run-failed" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "run-777.json")) "\"conclusion\":\"success\"" "\"conclusion\":\"failure\"")
-      case "adversarial-case-not-validated" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "cases.tsv")) "C02\tgate\tVALIDATED" "C02\tgate\tFAILED")
-      case "adversarial-case-missing" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "cases.tsv")) "C02\tgate\tVALIDATED\n" "")
+      case "adversarial-case-not-validated" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv")) "C02\tgate\tVALIDATED" "C02\tgate\tFAILED")
+      case "adversarial-case-missing" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv")) "C02\tgate\tVALIDATED\n" "")
+      case "adversarial-shard-table-missing" "LP-09" (fun f -> File.Delete(Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv")))
+      case "adversarial-no-shard-tables" "LP-09" (fun f -> Directory.Delete(Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence"), true))
+      case "adversarial-duplicate-row-hides-a-failure" "LP-09" (fun f ->
+          write (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-2", "cases.tsv")) "case\ttitle\tverdict\nC02\tgate\tFAILED\n")
+      case "adversarial-table-outside-the-shards" "LP-09" (fun f ->
+          File.Delete(Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "adversarial-shard-1", "cases.tsv"))
+          write (Path.Combine(f.Runs, "777", "r10-adversarial", "launch-evidence", "cases.tsv")) "case\ttitle\tverdict\nC02\tgate\tVALIDATED\n")
       case "adversarial-run-of-older-tools" "LP-09" (fun f -> write (Path.Combine(f.Indy, "tools/r10/new-tool.fsx")) "// new\n"; commitPush f "tools")
       // LP-10: the competition repository, as published
       case "clock-already-started" "LP-10" (fun f ->

@@ -1,0 +1,6507 @@
+{
+  "schema": "causa.contract-readiness.field-registry/1",
+  "generatedBy": "tools/contract-readiness (dotnet run -- generate); do not edit by hand",
+  "source": {
+    "causaDataRepository": "https://github.com/kemiller2002/causa-data",
+    "causaDataCommitPinned": "e8259df74add723765c57a5b1a5888d9c3f707af",
+    "schemaBundleSha256": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
+    "storageContract": "causa-storage v1.0.0 (contract/v1.0.0)",
+    "successorCandidate": "requirements-compiled/v4.1.5 (CANDIDATE)",
+    "successorContractsSha256": "90a1b34cfbdc0fa17437e293344d5ab27f446b218bc8ec08fb712e8d0ffd829c",
+    "frozenBaseline": "requirements-compiled/v4.1.4 (tag indy-init-requirements-v4.1.4)",
+    "frozenContractsSha256": "861a5651073d05840632649f61bc97f53a39261f5b31619b128df4e3dedab266",
+    "catalogSha256": "7e5e8a400b52d79218e2fb42927d5cb122cc0e6c8ab002f146b33198647ce53c",
+    "screenManifestSha256": "49a155be72d3d550b9f7ca3aca69ec8a4bd24efda961a513270fb346e19ed534",
+    "dotnetSdk": "10.0.402"
+  },
+  "schemaBundleSha256": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
+  "fieldMappingSha256": "acbe00970f4ee7a73ce0955cc8339ea6cca644d0f6033299376b26b68c1d1099",
+  "fieldIdConvention": "F.<objectTypeId>.<wireName>. objectTypeId: Envelope | Manifest | Snapshot | State | Payload.<eventType> | Entity.<entity> | Def.<definition>; proposed causa-storage 1.1.0 types use the same scheme with status proposed-causa-storage-1.1.0.",
+  "counts": {
+    "objectTypes": 62,
+    "fields": 296,
+    "wireFields": 277,
+    "proposedFields": 19,
+    "rules": 72,
+    "enumerations": 33
+  },
+  "enumerations": {
+    "actionKind": ["test", "inspection", "query", "comparison", "experiment"],
+    "actionState": ["proposed", "approved", "inProgress", "completed", "interpreted", "rejected", "cancelled"],
+    "actionTarget": ["approved", "rejected", "inProgress", "completed", "cancelled"],
+    "assumptionState": ["explicitUnverified", "provisionallyAccepted", "verified", "rejected", "expired"],
+    "assumptionTarget": ["provisionallyAccepted", "verified", "rejected"],
+    "causeRole": ["rootCause", "contributingFactor", "trigger", "enablingCondition"],
+    "causeState": ["proposed", "confirmed", "reopened", "superseded"],
+    "conclusionStrength": ["plausibleExplanation", "leadingExplanation", "supportedCause", "confirmedCause", "acceptedWithResidualUncertainty"],
+    "contentKind": ["text", "artifact"],
+    "contradictionState": ["detected", "triaged", "investigating", "resolved", "acceptedResidual", "superseded"],
+    "contradictionTarget": ["triaged", "resolved", "acceptedResidual"],
+    "correctiveActionKind": ["mitigation", "workaround", "correction", "prevention"],
+    "correctiveActionState": ["proposed", "approved", "inProgress", "implemented", "awaitingVerificationOfEffect", "verifiedEffective", "verificationFailed", "reworkRequired", "cancelled"],
+    "correctiveActionTarget": ["approved", "cancelled", "inProgress", "implemented", "awaitingVerificationOfEffect", "verificationFailed", "verifiedEffective", "reworkRequired"],
+    "eventType": [
+      "InvestigationStarted",
+      "LifecycleChanged",
+      "ObservationRecorded",
+      "HypothesisRecorded",
+      "HypothesisTransitioned",
+      "EvidenceAdmitted",
+      "EvidenceSuperseded",
+      "EvidenceVerificationAssessed",
+      "EvidenceRelated",
+      "UnknownIdentified",
+      "UnknownTransitioned",
+      "AssumptionRecorded",
+      "AssumptionTransitioned",
+      "ContradictionRecorded",
+      "ContradictionTransitioned",
+      "PredictionRecorded",
+      "ActionRecorded",
+      "ActionTransitioned",
+      "FindingRecorded",
+      "NegativeKnowledgeEstablished",
+      "CausalAssertionRecorded",
+      "CausalAssertionConfirmed",
+      "CausalAssertionReopened",
+      "CorrectiveActionRecorded",
+      "CorrectiveActionTransitioned",
+      "CriterionRecorded",
+      "VerificationRecorded",
+      "ConclusionRecorded",
+      "ProposalRecorded",
+      "ProposalWasAccepted",
+      "ProposalWasRejected"
+    ],
+    "evidenceCategory": ["directObservation", "measurement", "log", "document", "experimentResult", "testimony", "externalReference"],
+    "hypothesisCommand": ["markPlausible", "markSupported", "markWeakened", "falsify", "supersede", "reopen"],
+    "hypothesisState": ["proposed", "plausible", "supported", "weakened", "falsified", "superseded"],
+    "hypothesisTarget": ["plausible", "supported", "weakened", "falsified", "superseded"],
+    "kind": ["human", "system", "agent"],
+    "lifecycle": ["draft", "active", "awaitingEvidence", "awaitingVerification", "resolved", "closed", "archived"],
+    "lifecycleCommand": ["activateInvestigation", "markAwaitingEvidence", "markAwaitingVerification", "resolveInvestigation", "closeInvestigation", "reopenInvestigation", "verificationFailed"],
+    "lifecycleTarget": ["active", "awaitingEvidence", "awaitingVerification", "resolved", "closed"],
+    "materiality": ["blocking", "material", "nonMaterial", "informational"],
+    "predictionStrength": ["necessary", "expected", "discriminating", "nonDiscriminating"],
+    "predictionTiming": ["prospective", "retrospective"],
+    "proposalKind": ["hypothesis", "unknown", "action"],
+    "proposalState": ["active", "accepted", "rejected"],
+    "relationshipKind": ["supports", "contradicts", "discriminates", "insufficient"],
+    "unknownState": ["identified", "investigating", "resolved", "acceptedResidual", "superseded"],
+    "unknownTarget": ["investigating", "resolved", "acceptedResidual"],
+    "verificationOutcome": ["satisfied", "failed", "inconclusive"],
+    "verificationStatus": ["unverified", "partiallyVerified", "verified", "invalidated"]
+  },
+  "objectTypes": [
+    {
+      "typeId": "Def.actor",
+      "schemaFile": "actor.schema.json",
+      "schemaSha256": "67446d851703fd3a3af135230d6fc3af70c0a337a65eda0684f053b1fa685ebe",
+      "description": ""
+    },
+    {
+      "typeId": "Def.provenance",
+      "schemaFile": "actor.schema.json",
+      "schemaSha256": "67446d851703fd3a3af135230d6fc3af70c0a337a65eda0684f053b1fa685ebe",
+      "description": "Who created the entity and the occurredAt of the event that created it."
+    },
+    {
+      "typeId": "Entity.action",
+      "schemaFile": "entities/action.schema.json",
+      "schemaSha256": "7b4ff6bca06164726f0b21ca2e730f1d45299a91b7803d2ae54f07ea20161a94",
+      "description": "Investigative action projection."
+    },
+    {
+      "typeId": "Entity.assumption",
+      "schemaFile": "entities/assumption.schema.json",
+      "schemaSha256": "4817eb5e24d4ac8a121d753ebaf8f5c86de35d6599dd036e47a160f9b9d2f197",
+      "description": "Assumption projection."
+    },
+    {
+      "typeId": "Entity.causal-member",
+      "schemaFile": "entities/causal-member.schema.json",
+      "schemaSha256": "2ab8a614d50abbb6fd2e97821c7b54d8e26d16afbbf8c81ac58776706b36d798",
+      "description": "A member of a causal assertion."
+    },
+    {
+      "typeId": "Entity.cause",
+      "schemaFile": "entities/cause.schema.json",
+      "schemaSha256": "8e0b024551705034583a21671ff5977b00dde24f50444febaae46dce7aba96ab",
+      "description": "Causal assertion projection."
+    },
+    {
+      "typeId": "Entity.conclusion",
+      "schemaFile": "entities/conclusion.schema.json",
+      "schemaSha256": "ff24ad20fd50a4a35c13db02f9d83e5d58bbc11ca2878ed0d420017276986273",
+      "description": "Conclusion projection; the current conclusion is the one with the highest recordedAtVersion."
+    },
+    {
+      "typeId": "Entity.contradiction",
+      "schemaFile": "entities/contradiction.schema.json",
+      "schemaSha256": "e7242d4570b3801ba67e9a26b81c117402e80b65791403d3949aaa6d8797130f",
+      "description": "Contradiction projection; basis is the latest transition basis."
+    },
+    {
+      "typeId": "Entity.corrective-action",
+      "schemaFile": "entities/corrective-action.schema.json",
+      "schemaSha256": "8c6f5422e9d5bd32e2b9ba9784523a95eec45e7c2a1f85b3322ef6503f91c81c",
+      "description": "Corrective action projection. awaitingSinceVersion is the aggregateVersion at which the current verification round began (0 = never)."
+    },
+    {
+      "typeId": "Entity.criterion",
+      "schemaFile": "entities/criterion.schema.json",
+      "schemaSha256": "7aa63050d1a52341928112afc460410128033dd6b9e08d1c5958121a1eca663b",
+      "description": "Verification criterion projection."
+    },
+    {
+      "typeId": "Entity.evidence",
+      "schemaFile": "entities/evidence.schema.json",
+      "schemaSha256": "243a19376157e97c3696bf0f99d23fcd6d9cd134347ef95107b8ebf0cabad78b",
+      "description": "Evidence projection. admittedAtVersion is the aggregateVersion that admitted it."
+    },
+    {
+      "typeId": "Entity.finding",
+      "schemaFile": "entities/finding.schema.json",
+      "schemaSha256": "23b9c2d53bed6824b1a6399db98da7ad70241171ed4d163bb825b4deb512434c",
+      "description": "Finding projection."
+    },
+    {
+      "typeId": "Entity.hypothesis",
+      "schemaFile": "entities/hypothesis.schema.json",
+      "schemaSha256": "b8c8f8a5ccad2a0bc64f4e75739f14793e3092f25d3a3b318e45c12c7f30f004",
+      "description": "Hypothesis projection with its full change history."
+    },
+    {
+      "typeId": "Entity.hypothesis-change",
+      "schemaFile": "entities/hypothesis-change.schema.json",
+      "schemaSha256": "a48371cbc6ceb5484e1f0e0777b23efbf847682b8af5a2d8a3594d9c11768030",
+      "description": "One entry of a hypothesis's change history, in history order."
+    },
+    {
+      "typeId": "Entity.negative-knowledge",
+      "schemaFile": "entities/negative-knowledge.schema.json",
+      "schemaSha256": "1b8b99ccedc192afd23dc117dd2a899fb7c324589949ca7019e01780a9c87b25",
+      "description": "Negative knowledge projection."
+    },
+    {
+      "typeId": "Entity.observation",
+      "schemaFile": "entities/observation.schema.json",
+      "schemaSha256": "aaa697a9d18da7ba653e3e17132e3dffdd25159fa632b8af205d67dccee47054",
+      "description": "Observation projection."
+    },
+    {
+      "typeId": "Entity.prediction",
+      "schemaFile": "entities/prediction.schema.json",
+      "schemaSha256": "2e5a85c1860921e74df94b7c8ad830aca835d2637de0d9c4cc48195e68b29f4e",
+      "description": "Prediction projection."
+    },
+    {
+      "typeId": "Entity.proposal",
+      "schemaFile": "entities/proposal.schema.json",
+      "schemaSha256": "a38987dcbe7edbacb6764c22f143d714f15158428414e325daf0687221831579",
+      "description": "Proposal projection; decision is the rejection reason when rejected."
+    },
+    {
+      "typeId": "Entity.relationship",
+      "schemaFile": "entities/relationship.schema.json",
+      "schemaSha256": "cbd822c064e94ad3d15994d2c830ead2746aad44cb3c7b94a7eb296d10f60174",
+      "description": "Evidence-hypothesis relationship projection."
+    },
+    {
+      "typeId": "Entity.unknown",
+      "schemaFile": "entities/unknown.schema.json",
+      "schemaSha256": "8a90578eab8cc22e58f018856aa0d026b102331d7791955ebb17e24c45af3247",
+      "description": "Unknown projection; basis is the latest transition basis."
+    },
+    {
+      "typeId": "Entity.verification",
+      "schemaFile": "entities/verification.schema.json",
+      "schemaSha256": "f5319468067c611b02ef14935aab6f36ac36afc7d644a180e7e800ac71323290",
+      "description": "Verification projection."
+    },
+    {
+      "typeId": "Envelope",
+      "schemaFile": "event-envelope.schema.json",
+      "schemaSha256": "d5027fbbbcfbee821fac2ee6147480664997e2adbda79ed8f4f6a2a0a02af31d",
+      "description": "One line of events.ndjson. eventId = UUIDv5(eventNamespace, investigationId/aggregateVersion/correlationId) (CONTRACT §5.2)."
+    },
+    {
+      "typeId": "Manifest",
+      "schemaFile": "investigation-manifest.schema.json",
+      "schemaSha256": "54aa4cb0e6aac1d372dbc9b1b0a290bff7746a2cae9c4a5d338a68e1ad52f58c",
+      "description": "Per-investigation manifest. Contains no provider metadata (no Git SHA, branch, path or token)."
+    },
+    {
+      "typeId": "Payload.ActionRecorded",
+      "schemaFile": "payloads/ActionRecorded.schema.json",
+      "schemaSha256": "9eb1da75216b45d9f368ea1f848621896116c725cb13be46674ea01725f180bb",
+      "description": "Proposes an investigative action; starts 'proposed'."
+    },
+    {
+      "typeId": "Payload.ActionTransitioned",
+      "schemaFile": "payloads/ActionTransitioned.schema.json",
+      "schemaSha256": "4a3d4ac2fd5e17ebeb2184325e391969d3c541f3233ef50941809f756c1ec959",
+      "description": "Investigative action state change."
+    },
+    {
+      "typeId": "Payload.AssumptionRecorded",
+      "schemaFile": "payloads/AssumptionRecorded.schema.json",
+      "schemaSha256": "c0abcc419db68c70863d7c7f05315a45158a7e404bd8aec6e50c775934bbcc69",
+      "description": "Records an explicit assumption; starts 'explicitUnverified'."
+    },
+    {
+      "typeId": "Payload.AssumptionTransitioned",
+      "schemaFile": "payloads/AssumptionTransitioned.schema.json",
+      "schemaSha256": "594fa0c46104acd43c52e951fa5be3c2ed2a1d0224976be3dd3b2696c3f52032",
+      "description": "Assumption state change."
+    },
+    {
+      "typeId": "Payload.CausalAssertionConfirmed",
+      "schemaFile": "payloads/CausalAssertionConfirmed.schema.json",
+      "schemaSha256": "0593f1772157135acdb2d049521d5737acd2934e61aa2ad8a22b05a211ac2676",
+      "description": "Confirms a cause after the cause gate passed; 'policy' identifies the policy version applied (engine Policy.id)."
+    },
+    {
+      "typeId": "Payload.CausalAssertionRecorded",
+      "schemaFile": "payloads/CausalAssertionRecorded.schema.json",
+      "schemaSha256": "a5ed4ec07d6fd8de56a89109e5dd7569349d591d1763c4e00663911767edb1e8",
+      "description": "Proposes a causal explanation composed of hypotheses with roles; starts 'proposed'."
+    },
+    {
+      "typeId": "Payload.CausalAssertionReopened",
+      "schemaFile": "payloads/CausalAssertionReopened.schema.json",
+      "schemaSha256": "54ddceee107ddff40ad431c992e95fcb37eadb1dfc3a36fe25229b70d2764131",
+      "description": "Reopens a confirmed cause."
+    },
+    {
+      "typeId": "Payload.ConclusionRecorded",
+      "schemaFile": "payloads/ConclusionRecorded.schema.json",
+      "schemaSha256": "6dbbe1c7872bd854c3968edb3d117fadbb1572fb7bc95194e6eb25fe4ff0d55a",
+      "description": "A conclusion with explicit residual uncertainty (R6.4)."
+    },
+    {
+      "typeId": "Payload.ContradictionRecorded",
+      "schemaFile": "payloads/ContradictionRecorded.schema.json",
+      "schemaSha256": "6d9c19561e20d073c8a6547378bd621ab1e58a472450a08b352e3c3106743fc3",
+      "description": "Records a contradiction among evidence; starts 'detected'."
+    },
+    {
+      "typeId": "Payload.ContradictionTransitioned",
+      "schemaFile": "payloads/ContradictionTransitioned.schema.json",
+      "schemaSha256": "257ac57a451def5e818abf8e0570288bf46591dbfe3d713ccf7880470d0b1e83",
+      "description": "Contradiction state change with its basis."
+    },
+    {
+      "typeId": "Payload.CorrectiveActionRecorded",
+      "schemaFile": "payloads/CorrectiveActionRecorded.schema.json",
+      "schemaSha256": "5cc3d20e9da1d77440c04adc284489e3dc0aacfabc10774d65d0b1adfc25aea9",
+      "description": "Proposes a corrective action; mitigation is distinct from correction (R7.2)."
+    },
+    {
+      "typeId": "Payload.CorrectiveActionTransitioned",
+      "schemaFile": "payloads/CorrectiveActionTransitioned.schema.json",
+      "schemaSha256": "a62b47b0a4ef82461c9a812d20759017b8dd9ed46a710ca52b5abd7b992a1c87",
+      "description": "Corrective action state change."
+    },
+    {
+      "typeId": "Payload.CriterionRecorded",
+      "schemaFile": "payloads/CriterionRecorded.schema.json",
+      "schemaSha256": "2f7316b35d9e95277a4c5cff53d4fd9222a1e55c163fd3fee62f85afa88ae657",
+      "description": "A verification success criterion for a corrective action (R7.3)."
+    },
+    {
+      "typeId": "Payload.EvidenceAdmitted",
+      "schemaFile": "payloads/EvidenceAdmitted.schema.json",
+      "schemaSha256": "07300078077e147ee2bfc63659f256a4f6f694fa584e5cc7e848489d4a2170ba",
+      "description": "Admits evidence. Text content is verbatim; artifacts are referenced by absolute http(s) URL, never embedded (R3.5). Verification starts 'unverified'."
+    },
+    {
+      "typeId": "Payload.EvidenceRelated",
+      "schemaFile": "payloads/EvidenceRelated.schema.json",
+      "schemaSha256": "a4fd1335e00855b74bd40c201424d3b1f87f7876b7946e37d44eec62ce705f03",
+      "description": "Relates evidence to a hypothesis."
+    },
+    {
+      "typeId": "Payload.EvidenceSuperseded",
+      "schemaFile": "payloads/EvidenceSuperseded.schema.json",
+      "schemaSha256": "b723c8f6207703633f1ed65b8f47febcc22a28de828cf662134175679cf4de89",
+      "description": "Marks evidence as superseded by a replacement; the original remains in history."
+    },
+    {
+      "typeId": "Payload.EvidenceVerificationAssessed",
+      "schemaFile": "payloads/EvidenceVerificationAssessed.schema.json",
+      "schemaSha256": "400cbf3fbe233912e4f4b3a7690f2625e9593740385e703b61a752334354a568",
+      "description": "Records an assessment of the evidence's verification status."
+    },
+    {
+      "typeId": "Payload.FindingRecorded",
+      "schemaFile": "payloads/FindingRecorded.schema.json",
+      "schemaSha256": "84d423b791e4df737b79ad8433cf2b175963598dab8c6b7e03b863301e4a4e87",
+      "description": "The actual result of an action exactly as entered (R4.4)."
+    },
+    {
+      "typeId": "Payload.HypothesisRecorded",
+      "schemaFile": "payloads/HypothesisRecorded.schema.json",
+      "schemaSha256": "49ecea8fed1bda3265f4c3eee29bcaac72a32c1678098e17f5d1db635c6cb362",
+      "description": "A new hypothesis in state 'proposed'."
+    },
+    {
+      "typeId": "Payload.HypothesisTransitioned",
+      "schemaFile": "payloads/HypothesisTransitioned.schema.json",
+      "schemaSha256": "07a95b9c38c3aac0f52d8025fbf83a933005529ca3ac715f2db357fe6adf982e",
+      "description": "Hypothesis state change with its reason and cited evidence (R2.3). The change time and version are the envelope's occurredAt and aggregateVersion."
+    },
+    {
+      "typeId": "Payload.InvestigationStarted",
+      "schemaFile": "payloads/InvestigationStarted.schema.json",
+      "schemaSha256": "7cea82ce2b1e1d00145b89e264f97dc55ddbc16ad160b725960b6c04d043e090",
+      "description": "Starts the investigation and records its initial observation verbatim. Always aggregateVersion 1."
+    },
+    {
+      "typeId": "Payload.LifecycleChanged",
+      "schemaFile": "payloads/LifecycleChanged.schema.json",
+      "schemaSha256": "9c50d42710d6941edb032b93185ab78a085ecbe644bdb3020ccf1e9d51f0d118",
+      "description": "Investigation lifecycle transition, discriminated by the command that caused it."
+    },
+    {
+      "typeId": "Payload.NegativeKnowledgeEstablished",
+      "schemaFile": "payloads/NegativeKnowledgeEstablished.schema.json",
+      "schemaSha256": "aefd6ef64af74168fb037f93bcb69a951a30227ccc30ed37de020ba74286f426",
+      "description": "Records something established NOT to be the case, citing evidence (R5.3)."
+    },
+    {
+      "typeId": "Payload.ObservationRecorded",
+      "schemaFile": "payloads/ObservationRecorded.schema.json",
+      "schemaSha256": "4672537f66adb3c10d05a5b6943ad6e7e74985b6fcc7155ea46a08fbe856ace1",
+      "description": "An observation, preserved verbatim (R1.2)."
+    },
+    {
+      "typeId": "Payload.PredictionRecorded",
+      "schemaFile": "payloads/PredictionRecorded.schema.json",
+      "schemaSha256": "434fa08dcb0326a94e77471fa86fc210544515546e539be7e3cfe5e6affbf5b9",
+      "description": "A prediction derived from a hypothesis. Timing is as decided by the engine (A11), not as requested."
+    },
+    {
+      "typeId": "Payload.ProposalRecorded",
+      "schemaFile": "payloads/ProposalRecorded.schema.json",
+      "schemaSha256": "7a656d3064a477e70ca30a32013f56c4ec2263db4a8bf487f7de5bfd3a668578",
+      "description": "A proposal (typically from an AI agent); never evidence or authoritative state (D-004, R15.2)."
+    },
+    {
+      "typeId": "Payload.ProposalWasAccepted",
+      "schemaFile": "payloads/ProposalWasAccepted.schema.json",
+      "schemaSha256": "9b5b8902be2910546b879035c89d9acbbde5085e891502fb75f41e84e12f512b",
+      "description": "A human accepted a proposal; targetId is the id of the entity the acceptance created (preceding event of the same correlationId)."
+    },
+    {
+      "typeId": "Payload.ProposalWasRejected",
+      "schemaFile": "payloads/ProposalWasRejected.schema.json",
+      "schemaSha256": "2fe62c79365d7d19cc4e7257354c4b05c20eceee9e402e1fbb56b983065a6194",
+      "description": "A proposal was rejected with a reason."
+    },
+    {
+      "typeId": "Payload.UnknownIdentified",
+      "schemaFile": "payloads/UnknownIdentified.schema.json",
+      "schemaSha256": "0508de1c9c3bda485896147f8e7ab428e118883c0a84c616c6fb4b77ec140f01",
+      "description": "Identifies an open question; starts 'identified'."
+    },
+    {
+      "typeId": "Payload.UnknownTransitioned",
+      "schemaFile": "payloads/UnknownTransitioned.schema.json",
+      "schemaSha256": "e37a3bcd7fb2b393c7145db503d1b98f6c9f876f346a37f773fa2d1d18f60cf5",
+      "description": "Unknown state change with its basis."
+    },
+    {
+      "typeId": "Payload.VerificationRecorded",
+      "schemaFile": "payloads/VerificationRecorded.schema.json",
+      "schemaSha256": "6b2ea3f8a450755dd076d3f26b71653f2f683c03842b1f6613ebacee854f835e",
+      "description": "A verification of a criterion; a satisfied outcome must cite evidence (R7.4)."
+    },
+    {
+      "typeId": "Snapshot",
+      "schemaFile": "snapshot.schema.json",
+      "schemaSha256": "244567c0ff5f66e0e9f06456ec9aefd9178fe0bde18c77b786e618e265b419b0",
+      "description": "Derived, never authoritative. generatedAt equals occurredAt of event aggregateVersion."
+    },
+    {
+      "typeId": "State",
+      "schemaFile": "state.schema.json",
+      "schemaSha256": "097a590e029706e8f268329c957b123691a77e16a5c6d47f0dcbb865175227a5",
+      "description": "Deterministic projection of replayed events. Also the shape of golden expected projections."
+    },
+    {
+      "typeId": "Payload.InvestigationDetailsRevised",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/InvestigationDetailsRevised.schema.json",
+      "schemaSha256": "",
+      "description": "Investigation title, problem statement and primary question as revised. INV-023, INV-034, INV-035."
+    },
+    {
+      "typeId": "Payload.ObservationRevised",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/ObservationRevised.schema.json",
+      "schemaSha256": "",
+      "description": "Observation text and source reference as revised. INV-024, INV-025, INV-035."
+    },
+    {
+      "typeId": "Payload.HypothesisRevised",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/HypothesisRevised.schema.json",
+      "schemaSha256": "",
+      "description": "Hypothesis statement and mechanism as revised. INV-026, INV-011, INV-035."
+    },
+    {
+      "typeId": "Payload.EvidenceRevised",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRevised.schema.json",
+      "schemaSha256": "",
+      "description": "Descriptive metadata of evidence: label, source reference, source URL. The admitted content is not revisable. INV-027, INV-028, INV-029, INV-035."
+    },
+    {
+      "typeId": "Payload.EvidenceRelationshipRevised",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRelationshipRevised.schema.json",
+      "schemaSha256": "",
+      "description": "Reassessment of a current relationship (OD-INDY-23 (3))."
+    },
+    {
+      "typeId": "Payload.EvidenceRelationshipWithdrawn",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRelationshipWithdrawn.schema.json",
+      "schemaSha256": "",
+      "description": "Withdrawal of a current relationship (OD-INDY-23 (3))."
+    }
+  ],
+  "fields": [
+    {
+      "fieldId": "F.Envelope.formatVersion",
+      "objectType": "Envelope",
+      "name": "formatVersion",
+      "kind": {
+        "type": "const",
+        "value": "1.0.0"
+      },
+      "kindLabel": "const \"1.0.0\"",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "(none)",
+      "fsharpType": "constant",
+      "meaning": "Unspecified field in engine; constant added by contract.",
+      "schemaFile": "event-envelope.schema.json"
+    },
+    {
+      "fieldId": "F.Envelope.eventId",
+      "objectType": "Envelope",
+      "name": "eventId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "(none)",
+      "fsharpType": "derived UUIDv5",
+      "meaning": "Engine has no event id; derived (CD-ENV-02).",
+      "schemaFile": "event-envelope.schema.json"
+    },
+    {
+      "fieldId": "F.Envelope.investigationId",
+      "objectType": "Envelope",
+      "name": "investigationId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Event.Investigation",
+      "fsharpType": "InvestigationId",
+      "meaning": "Direct.",
+      "schemaFile": "event-envelope.schema.json"
+    },
+    {
+      "fieldId": "F.Envelope.aggregateVersion",
+      "objectType": "Envelope",
+      "name": "aggregateVersion",
+      "kind": {
+        "type": "integer",
+        "min": 1,
+        "max": 9007199254740991
+      },
+      "kindLabel": "integer",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Event.Sequence",
+      "fsharpType": "int64",
+      "meaning": "Direct.",
+      "schemaFile": "event-envelope.schema.json"
+    },
+    {
+      "fieldId": "F.Envelope.eventType",
+      "objectType": "Envelope",
+      "name": "eventType",
+      "kind": {
+        "type": "enum",
+        "enum": "eventType",
+        "values": [
+          "InvestigationStarted",
+          "LifecycleChanged",
+          "ObservationRecorded",
+          "HypothesisRecorded",
+          "HypothesisTransitioned",
+          "EvidenceAdmitted",
+          "EvidenceSuperseded",
+          "EvidenceVerificationAssessed",
+          "EvidenceRelated",
+          "UnknownIdentified",
+          "UnknownTransitioned",
+          "AssumptionRecorded",
+          "AssumptionTransitioned",
+          "ContradictionRecorded",
+          "ContradictionTransitioned",
+          "PredictionRecorded",
+          "ActionRecorded",
+          "ActionTransitioned",
+          "FindingRecorded",
+          "NegativeKnowledgeEstablished",
+          "CausalAssertionRecorded",
+          "CausalAssertionConfirmed",
+          "CausalAssertionReopened",
+          "CorrectiveActionRecorded",
+          "CorrectiveActionTransitioned",
+          "CriterionRecorded",
+          "VerificationRecorded",
+          "ConclusionRecorded",
+          "ProposalRecorded",
+          "ProposalWasAccepted",
+          "ProposalWasRejected"
+        ]
+      },
+      "kindLabel": "enum eventType",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "EventBody case",
+      "fsharpType": "union case name",
+      "meaning": "CaseNames.eventType (engine names).",
+      "schemaFile": "event-envelope.schema.json"
+    },
+    {
+      "fieldId": "F.Envelope.occurredAt",
+      "objectType": "Envelope",
+      "name": "occurredAt",
+      "kind": {
+        "type": "timestamp"
+      },
+      "kindLabel": "timestamp",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Event.At",
+      "fsharpType": "DateTimeOffset",
+      "meaning": "Millisecond UTC (CD-WIRE-03).",
+      "schemaFile": "event-envelope.schema.json"
+    },
+    {
+      "fieldId": "F.Def.actor.actorId",
+      "objectType": "Def.actor",
+      "name": "actorId",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "actor.schema.json"
+    },
+    {
+      "fieldId": "F.Def.actor.kind",
+      "objectType": "Def.actor",
+      "name": "kind",
+      "kind": {
+        "type": "enum",
+        "enum": "kind",
+        "values": ["human", "system", "agent"]
+      },
+      "kindLabel": "enum kind",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "actor.schema.json"
+    },
+    {
+      "fieldId": "F.Def.actor.provider",
+      "objectType": "Def.actor",
+      "name": "provider",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": {
+        "when": "kind",
+        "in": ["agent"]
+      },
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "actor.schema.json"
+    },
+    {
+      "fieldId": "F.Def.actor.model",
+      "objectType": "Def.actor",
+      "name": "model",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": {
+        "when": "kind",
+        "in": ["agent"]
+      },
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "actor.schema.json"
+    },
+    {
+      "fieldId": "F.Envelope.actor",
+      "objectType": "Envelope",
+      "name": "actor",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.actor"
+      },
+      "kindLabel": "Def.actor",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Event.Actor",
+      "fsharpType": "Actor {Id; Kind}",
+      "meaning": "Agent carries provider/model (CD-ENV-04).",
+      "schemaFile": "event-envelope.schema.json"
+    },
+    {
+      "fieldId": "F.Envelope.semanticVersion",
+      "objectType": "Envelope",
+      "name": "semanticVersion",
+      "kind": {
+        "type": "const",
+        "value": "1.0.0"
+      },
+      "kindLabel": "const \"1.0.0\"",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "(none)",
+      "fsharpType": "constant",
+      "meaning": "Constant added by contract.",
+      "schemaFile": "event-envelope.schema.json"
+    },
+    {
+      "fieldId": "F.Envelope.correlationId",
+      "objectType": "Envelope",
+      "name": "correlationId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Event.CommandId",
+      "fsharpType": "Guid",
+      "meaning": "Renamed (CD-ENV-03).",
+      "schemaFile": "event-envelope.schema.json"
+    },
+    {
+      "fieldId": "F.Envelope.payload",
+      "objectType": "Envelope",
+      "name": "payload",
+      "kind": {
+        "type": "object-bound-by-rule"
+      },
+      "kindLabel": "object",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Event.Body",
+      "fsharpType": "EventBody",
+      "meaning": "Per-type, section 7.",
+      "schemaFile": "event-envelope.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.InvestigationStarted.title",
+      "objectType": "Payload.InvestigationStarted",
+      "name": "title",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "title",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Investigation title (decide falls back to the original text when the title is blank).",
+      "schemaFile": "payloads/InvestigationStarted.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.InvestigationStarted.observationId",
+      "objectType": "Payload.InvestigationStarted",
+      "name": "observationId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "observation",
+      "fsharpType": "ObservationId",
+      "meaning": "Id of the initial observation created with the investigation.",
+      "schemaFile": "payloads/InvestigationStarted.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.InvestigationStarted.original",
+      "objectType": "Payload.InvestigationStarted",
+      "name": "original",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "original",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Initial observation, verbatim.",
+      "schemaFile": "payloads/InvestigationStarted.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.LifecycleChanged.from",
+      "objectType": "Payload.LifecycleChanged",
+      "name": "from",
+      "kind": {
+        "type": "enum",
+        "enum": "lifecycle",
+        "values": ["draft", "active", "awaitingEvidence", "awaitingVerification", "resolved", "closed", "archived"]
+      },
+      "kindLabel": "enum lifecycle",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "from",
+      "fsharpType": "InvestigationLifecycle",
+      "meaning": "active \\",
+      "schemaFile": "payloads/LifecycleChanged.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.LifecycleChanged.to",
+      "objectType": "Payload.LifecycleChanged",
+      "name": "to",
+      "kind": {
+        "type": "enum",
+        "enum": "lifecycleTarget",
+        "values": ["active", "awaitingEvidence", "awaitingVerification", "resolved", "closed"]
+      },
+      "kindLabel": "enum lifecycleTarget",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "to",
+      "fsharpType": "InvestigationLifecycle",
+      "meaning": "awaitingEvidence \\",
+      "schemaFile": "payloads/LifecycleChanged.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.LifecycleChanged.command",
+      "objectType": "Payload.LifecycleChanged",
+      "name": "command",
+      "kind": {
+        "type": "enum",
+        "enum": "lifecycleCommand",
+        "values": ["activateInvestigation", "markAwaitingEvidence", "markAwaitingVerification", "resolveInvestigation", "closeInvestigation", "reopenInvestigation", "verificationFailed"]
+      },
+      "kindLabel": "enum lifecycleCommand",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "command",
+      "fsharpType": "string (engine command name)",
+      "meaning": "markAwaitingEvidence \\",
+      "schemaFile": "payloads/LifecycleChanged.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.LifecycleChanged.reason",
+      "objectType": "Payload.LifecycleChanged",
+      "name": "reason",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "reason",
+      "fsharpType": "string option",
+      "meaning": "Reason or basis; present for markAwaitingEvidence, reopenInvestigation, verificationFailed.",
+      "schemaFile": "payloads/LifecycleChanged.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ObservationRecorded.observationId",
+      "objectType": "Payload.ObservationRecorded",
+      "name": "observationId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "ObservationId",
+      "meaning": "Observation id.",
+      "schemaFile": "payloads/ObservationRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ObservationRecorded.original",
+      "objectType": "Payload.ObservationRecorded",
+      "name": "original",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Observation, verbatim (R1.2).",
+      "schemaFile": "payloads/ObservationRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ObservationRecorded.observedAt",
+      "objectType": "Payload.ObservationRecorded",
+      "name": "observedAt",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "timestamp"
+        }
+      },
+      "kindLabel": "timestamp?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "DateTimeOffset option",
+      "meaning": "When it was observed, if known.",
+      "schemaFile": "payloads/ObservationRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisRecorded.hypothesisId",
+      "objectType": "Payload.HypothesisRecorded",
+      "name": "hypothesisId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "HypothesisId",
+      "meaning": "Hypothesis id.",
+      "schemaFile": "payloads/HypothesisRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisRecorded.statement",
+      "objectType": "Payload.HypothesisRecorded",
+      "name": "statement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Hypothesis statement.",
+      "schemaFile": "payloads/HypothesisRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisRecorded.mechanism",
+      "objectType": "Payload.HypothesisRecorded",
+      "name": "mechanism",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "NonEmptyText option",
+      "meaning": "Proposed mechanism, if stated.",
+      "schemaFile": "payloads/HypothesisRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisTransitioned.hypothesisId",
+      "objectType": "Payload.HypothesisTransitioned",
+      "name": "hypothesisId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "HypothesisId",
+      "meaning": "Hypothesis id.",
+      "schemaFile": "payloads/HypothesisTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisTransitioned.from",
+      "objectType": "Payload.HypothesisTransitioned",
+      "name": "from",
+      "kind": {
+        "type": "enum",
+        "enum": "hypothesisState",
+        "values": ["proposed", "plausible", "supported", "weakened", "falsified", "superseded"]
+      },
+      "kindLabel": "enum hypothesisState",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2.From",
+      "fsharpType": "HypothesisState",
+      "meaning": "plausible \\",
+      "schemaFile": "payloads/HypothesisTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisTransitioned.to",
+      "objectType": "Payload.HypothesisTransitioned",
+      "name": "to",
+      "kind": {
+        "type": "enum",
+        "enum": "hypothesisTarget",
+        "values": ["plausible", "supported", "weakened", "falsified", "superseded"]
+      },
+      "kindLabel": "enum hypothesisTarget",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2.To",
+      "fsharpType": "HypothesisState",
+      "meaning": "supported \\",
+      "schemaFile": "payloads/HypothesisTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisTransitioned.command",
+      "objectType": "Payload.HypothesisTransitioned",
+      "name": "command",
+      "kind": {
+        "type": "enum",
+        "enum": "hypothesisCommand",
+        "values": ["markPlausible", "markSupported", "markWeakened", "falsify", "supersede", "reopen"]
+      },
+      "kindLabel": "enum hypothesisCommand",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2.Command",
+      "fsharpType": "string (HypothesisCommand name)",
+      "meaning": "markSupported \\",
+      "schemaFile": "payloads/HypothesisTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisTransitioned.reason",
+      "objectType": "Payload.HypothesisTransitioned",
+      "name": "reason",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2.Reason",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Why (R2.3).",
+      "schemaFile": "payloads/HypothesisTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisTransitioned.evidenceIds",
+      "objectType": "Payload.HypothesisTransitioned",
+      "name": "evidenceIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2.Evidence",
+      "fsharpType": "EvidenceId list",
+      "meaning": "Cited evidence, in citation order.",
+      "schemaFile": "payloads/HypothesisTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceAdmitted.evidenceId",
+      "objectType": "Payload.EvidenceAdmitted",
+      "name": "evidenceId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "EvidenceId",
+      "meaning": "Evidence id.",
+      "schemaFile": "payloads/EvidenceAdmitted.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceAdmitted.contentKind",
+      "objectType": "Payload.EvidenceAdmitted",
+      "name": "contentKind",
+      "kind": {
+        "type": "enum",
+        "enum": "contentKind",
+        "values": ["text", "artifact"]
+      },
+      "kindLabel": "enum contentKind",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2 (case)",
+      "fsharpType": "EvidenceContent",
+      "meaning": "artifact",
+      "schemaFile": "payloads/EvidenceAdmitted.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceAdmitted.content",
+      "objectType": "Payload.EvidenceAdmitted",
+      "name": "content",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2 (payload)",
+      "fsharpType": "NonEmptyText (text) or string (artifact URL)",
+      "meaning": "Text verbatim, or the absolute http(s) artifact URL.",
+      "schemaFile": "payloads/EvidenceAdmitted.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceAdmitted.category",
+      "objectType": "Payload.EvidenceAdmitted",
+      "name": "category",
+      "kind": {
+        "type": "enum",
+        "enum": "evidenceCategory",
+        "values": ["directObservation", "measurement", "log", "document", "experimentResult", "testimony", "externalReference"]
+      },
+      "kindLabel": "enum evidenceCategory",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "EvidenceCategory",
+      "meaning": "measurement \\",
+      "schemaFile": "payloads/EvidenceAdmitted.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceAdmitted.source",
+      "objectType": "Payload.EvidenceAdmitted",
+      "name": "source",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "source",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Provenance: where it came from (R3.2).",
+      "schemaFile": "payloads/EvidenceAdmitted.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceAdmitted.capturedAt",
+      "objectType": "Payload.EvidenceAdmitted",
+      "name": "capturedAt",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "timestamp"
+        }
+      },
+      "kindLabel": "timestamp?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item5",
+      "fsharpType": "DateTimeOffset option",
+      "meaning": "When it was captured, if known.",
+      "schemaFile": "payloads/EvidenceAdmitted.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceSuperseded.evidenceId",
+      "objectType": "Payload.EvidenceSuperseded",
+      "name": "evidenceId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "old",
+      "fsharpType": "EvidenceId",
+      "meaning": "Superseded evidence.",
+      "schemaFile": "payloads/EvidenceSuperseded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceSuperseded.replacementEvidenceId",
+      "objectType": "Payload.EvidenceSuperseded",
+      "name": "replacementEvidenceId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "replacement",
+      "fsharpType": "EvidenceId",
+      "meaning": "Replacement evidence.",
+      "schemaFile": "payloads/EvidenceSuperseded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceSuperseded.reason",
+      "objectType": "Payload.EvidenceSuperseded",
+      "name": "reason",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "reason",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Why it was superseded.",
+      "schemaFile": "payloads/EvidenceSuperseded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceVerificationAssessed.evidenceId",
+      "objectType": "Payload.EvidenceVerificationAssessed",
+      "name": "evidenceId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "EvidenceId",
+      "meaning": "Evidence id.",
+      "schemaFile": "payloads/EvidenceVerificationAssessed.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceVerificationAssessed.verification",
+      "objectType": "Payload.EvidenceVerificationAssessed",
+      "name": "verification",
+      "kind": {
+        "type": "enum",
+        "enum": "verificationStatus",
+        "values": ["unverified", "partiallyVerified", "verified", "invalidated"]
+      },
+      "kindLabel": "enum verificationStatus",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "VerificationStatus",
+      "meaning": "partiallyVerified \\",
+      "schemaFile": "payloads/EvidenceVerificationAssessed.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRelated.relationshipId",
+      "objectType": "Payload.EvidenceRelated",
+      "name": "relationshipId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "RelationshipId",
+      "meaning": "Relationship id.",
+      "schemaFile": "payloads/EvidenceRelated.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRelated.evidenceId",
+      "objectType": "Payload.EvidenceRelated",
+      "name": "evidenceId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "EvidenceId",
+      "meaning": "Evidence.",
+      "schemaFile": "payloads/EvidenceRelated.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRelated.hypothesisId",
+      "objectType": "Payload.EvidenceRelated",
+      "name": "hypothesisId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "HypothesisId",
+      "meaning": "Hypothesis.",
+      "schemaFile": "payloads/EvidenceRelated.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRelated.kind",
+      "objectType": "Payload.EvidenceRelated",
+      "name": "kind",
+      "kind": {
+        "type": "enum",
+        "enum": "relationshipKind",
+        "values": ["supports", "contradicts", "discriminates", "insufficient"]
+      },
+      "kindLabel": "enum relationshipKind",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "RelationshipKind",
+      "meaning": "contradicts \\",
+      "schemaFile": "payloads/EvidenceRelated.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRelated.rationale",
+      "objectType": "Payload.EvidenceRelated",
+      "name": "rationale",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item5",
+      "fsharpType": "NonEmptyText option",
+      "meaning": "Why, if stated.",
+      "schemaFile": "payloads/EvidenceRelated.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.UnknownIdentified.unknownId",
+      "objectType": "Payload.UnknownIdentified",
+      "name": "unknownId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "UnknownId",
+      "meaning": "Unknown id.",
+      "schemaFile": "payloads/UnknownIdentified.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.UnknownIdentified.question",
+      "objectType": "Payload.UnknownIdentified",
+      "name": "question",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Open question.",
+      "schemaFile": "payloads/UnknownIdentified.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.UnknownIdentified.materiality",
+      "objectType": "Payload.UnknownIdentified",
+      "name": "materiality",
+      "kind": {
+        "type": "enum",
+        "enum": "materiality",
+        "values": ["blocking", "material", "nonMaterial", "informational"]
+      },
+      "kindLabel": "enum materiality",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "Materiality",
+      "meaning": "material \\",
+      "schemaFile": "payloads/UnknownIdentified.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.UnknownTransitioned.unknownId",
+      "objectType": "Payload.UnknownTransitioned",
+      "name": "unknownId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "UnknownId",
+      "meaning": "Unknown id.",
+      "schemaFile": "payloads/UnknownTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.UnknownTransitioned.state",
+      "objectType": "Payload.UnknownTransitioned",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "unknownTarget",
+        "values": ["investigating", "resolved", "acceptedResidual"]
+      },
+      "kindLabel": "enum unknownTarget",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "UnknownState",
+      "meaning": "resolved \\",
+      "schemaFile": "payloads/UnknownTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.UnknownTransitioned.basis",
+      "objectType": "Payload.UnknownTransitioned",
+      "name": "basis",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Basis for the change.",
+      "schemaFile": "payloads/UnknownTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.AssumptionRecorded.assumptionId",
+      "objectType": "Payload.AssumptionRecorded",
+      "name": "assumptionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "AssumptionId",
+      "meaning": "Assumption id.",
+      "schemaFile": "payloads/AssumptionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.AssumptionRecorded.proposition",
+      "objectType": "Payload.AssumptionRecorded",
+      "name": "proposition",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Assumed proposition.",
+      "schemaFile": "payloads/AssumptionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.AssumptionRecorded.materiality",
+      "objectType": "Payload.AssumptionRecorded",
+      "name": "materiality",
+      "kind": {
+        "type": "enum",
+        "enum": "materiality",
+        "values": ["blocking", "material", "nonMaterial", "informational"]
+      },
+      "kindLabel": "enum materiality",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "Materiality",
+      "meaning": "material \\",
+      "schemaFile": "payloads/AssumptionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.AssumptionTransitioned.assumptionId",
+      "objectType": "Payload.AssumptionTransitioned",
+      "name": "assumptionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "AssumptionId",
+      "meaning": "Assumption id.",
+      "schemaFile": "payloads/AssumptionTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.AssumptionTransitioned.state",
+      "objectType": "Payload.AssumptionTransitioned",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "assumptionTarget",
+        "values": ["provisionallyAccepted", "verified", "rejected"]
+      },
+      "kindLabel": "enum assumptionTarget",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "AssumptionState",
+      "meaning": "verified \\",
+      "schemaFile": "payloads/AssumptionTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ContradictionRecorded.contradictionId",
+      "objectType": "Payload.ContradictionRecorded",
+      "name": "contradictionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "ContradictionId",
+      "meaning": "Contradiction id.",
+      "schemaFile": "payloads/ContradictionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ContradictionRecorded.statement",
+      "objectType": "Payload.ContradictionRecorded",
+      "name": "statement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "NonEmptyText",
+      "meaning": "What contradicts what.",
+      "schemaFile": "payloads/ContradictionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ContradictionRecorded.evidenceIds",
+      "objectType": "Payload.ContradictionRecorded",
+      "name": "evidenceIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "EvidenceId list",
+      "meaning": "Evidence in contradiction.",
+      "schemaFile": "payloads/ContradictionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ContradictionRecorded.materiality",
+      "objectType": "Payload.ContradictionRecorded",
+      "name": "materiality",
+      "kind": {
+        "type": "enum",
+        "enum": "materiality",
+        "values": ["blocking", "material", "nonMaterial", "informational"]
+      },
+      "kindLabel": "enum materiality",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "Materiality",
+      "meaning": "material \\",
+      "schemaFile": "payloads/ContradictionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ContradictionTransitioned.contradictionId",
+      "objectType": "Payload.ContradictionTransitioned",
+      "name": "contradictionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "ContradictionId",
+      "meaning": "Contradiction id.",
+      "schemaFile": "payloads/ContradictionTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ContradictionTransitioned.state",
+      "objectType": "Payload.ContradictionTransitioned",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "contradictionTarget",
+        "values": ["triaged", "resolved", "acceptedResidual"]
+      },
+      "kindLabel": "enum contradictionTarget",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "ContradictionState",
+      "meaning": "resolved \\",
+      "schemaFile": "payloads/ContradictionTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ContradictionTransitioned.basis",
+      "objectType": "Payload.ContradictionTransitioned",
+      "name": "basis",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Resolution basis.",
+      "schemaFile": "payloads/ContradictionTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.PredictionRecorded.predictionId",
+      "objectType": "Payload.PredictionRecorded",
+      "name": "predictionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "PredictionId",
+      "meaning": "Prediction id.",
+      "schemaFile": "payloads/PredictionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.PredictionRecorded.hypothesisId",
+      "objectType": "Payload.PredictionRecorded",
+      "name": "hypothesisId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "HypothesisId",
+      "meaning": "Hypothesis it derives from.",
+      "schemaFile": "payloads/PredictionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.PredictionRecorded.statement",
+      "objectType": "Payload.PredictionRecorded",
+      "name": "statement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Predicted observation.",
+      "schemaFile": "payloads/PredictionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.PredictionRecorded.strength",
+      "objectType": "Payload.PredictionRecorded",
+      "name": "strength",
+      "kind": {
+        "type": "enum",
+        "enum": "predictionStrength",
+        "values": ["necessary", "expected", "discriminating", "nonDiscriminating"]
+      },
+      "kindLabel": "enum predictionStrength",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "PredictionStrength",
+      "meaning": "expected \\",
+      "schemaFile": "payloads/PredictionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.PredictionRecorded.timing",
+      "objectType": "Payload.PredictionRecorded",
+      "name": "timing",
+      "kind": {
+        "type": "enum",
+        "enum": "predictionTiming",
+        "values": ["prospective", "retrospective"]
+      },
+      "kindLabel": "enum predictionTiming",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item5",
+      "fsharpType": "PredictionTiming",
+      "meaning": "retrospective",
+      "schemaFile": "payloads/PredictionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ActionRecorded.actionId",
+      "objectType": "Payload.ActionRecorded",
+      "name": "actionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "ActionId",
+      "meaning": "Action id.",
+      "schemaFile": "payloads/ActionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ActionRecorded.kind",
+      "objectType": "Payload.ActionRecorded",
+      "name": "kind",
+      "kind": {
+        "type": "enum",
+        "enum": "actionKind",
+        "values": ["test", "inspection", "query", "comparison", "experiment"]
+      },
+      "kindLabel": "enum actionKind",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "ActionKind",
+      "meaning": "inspection \\",
+      "schemaFile": "payloads/ActionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ActionRecorded.purpose",
+      "objectType": "Payload.ActionRecorded",
+      "name": "purpose",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Purpose.",
+      "schemaFile": "payloads/ActionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ActionRecorded.targetHypothesisIds",
+      "objectType": "Payload.ActionRecorded",
+      "name": "targetHypothesisIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "HypothesisId list",
+      "meaning": "Hypotheses it tests.",
+      "schemaFile": "payloads/ActionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ActionTransitioned.actionId",
+      "objectType": "Payload.ActionTransitioned",
+      "name": "actionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "ActionId",
+      "meaning": "Action id.",
+      "schemaFile": "payloads/ActionTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ActionTransitioned.state",
+      "objectType": "Payload.ActionTransitioned",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "actionTarget",
+        "values": ["approved", "rejected", "inProgress", "completed", "cancelled"]
+      },
+      "kindLabel": "enum actionTarget",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "ActionState",
+      "meaning": "rejected \\",
+      "schemaFile": "payloads/ActionTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.FindingRecorded.findingId",
+      "objectType": "Payload.FindingRecorded",
+      "name": "findingId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "FindingId",
+      "meaning": "Finding id.",
+      "schemaFile": "payloads/FindingRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.FindingRecorded.actionId",
+      "objectType": "Payload.FindingRecorded",
+      "name": "actionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "ActionId",
+      "meaning": "Action that produced it.",
+      "schemaFile": "payloads/FindingRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.FindingRecorded.originalResult",
+      "objectType": "Payload.FindingRecorded",
+      "name": "originalResult",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Result exactly as entered (R4.4).",
+      "schemaFile": "payloads/FindingRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.FindingRecorded.interpretation",
+      "objectType": "Payload.FindingRecorded",
+      "name": "interpretation",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "NonEmptyText option",
+      "meaning": "Interpretation, if stated.",
+      "schemaFile": "payloads/FindingRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.NegativeKnowledgeEstablished.negativeKnowledgeId",
+      "objectType": "Payload.NegativeKnowledgeEstablished",
+      "name": "negativeKnowledgeId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "NegativeKnowledgeId",
+      "meaning": "Negative knowledge id.",
+      "schemaFile": "payloads/NegativeKnowledgeEstablished.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.NegativeKnowledgeEstablished.statement",
+      "objectType": "Payload.NegativeKnowledgeEstablished",
+      "name": "statement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "NonEmptyText",
+      "meaning": "What is established not to be the case.",
+      "schemaFile": "payloads/NegativeKnowledgeEstablished.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.NegativeKnowledgeEstablished.scope",
+      "objectType": "Payload.NegativeKnowledgeEstablished",
+      "name": "scope",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Where it holds.",
+      "schemaFile": "payloads/NegativeKnowledgeEstablished.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.NegativeKnowledgeEstablished.basisEvidenceIds",
+      "objectType": "Payload.NegativeKnowledgeEstablished",
+      "name": "basisEvidenceIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "EvidenceId list (non-empty)",
+      "meaning": "Evidence that established it (R5.3).",
+      "schemaFile": "payloads/NegativeKnowledgeEstablished.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CausalAssertionRecorded.causeId",
+      "objectType": "Payload.CausalAssertionRecorded",
+      "name": "causeId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "CausalAssertionId",
+      "meaning": "Cause id.",
+      "schemaFile": "payloads/CausalAssertionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CausalAssertionRecorded.outcome",
+      "objectType": "Payload.CausalAssertionRecorded",
+      "name": "outcome",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Outcome explained.",
+      "schemaFile": "payloads/CausalAssertionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.causal-member.hypothesisId",
+      "objectType": "Entity.causal-member",
+      "name": "hypothesisId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/causal-member.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.causal-member.role",
+      "objectType": "Entity.causal-member",
+      "name": "role",
+      "kind": {
+        "type": "enum",
+        "enum": "causeRole",
+        "values": ["rootCause", "contributingFactor", "trigger", "enablingCondition"]
+      },
+      "kindLabel": "enum causeRole",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/causal-member.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CausalAssertionRecorded.members",
+      "objectType": "Payload.CausalAssertionRecorded",
+      "name": "members",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.causal-member"
+        },
+        "unique": true,
+        "minItems": 1
+      },
+      "kindLabel": "Entity.causal-member[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "CausalMember list",
+      "meaning": "Hypotheses with roles {hypothesisId, role}.",
+      "schemaFile": "payloads/CausalAssertionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CausalAssertionRecorded.mechanism",
+      "objectType": "Payload.CausalAssertionRecorded",
+      "name": "mechanism",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "NonEmptyText option",
+      "meaning": "Causal mechanism, if stated.",
+      "schemaFile": "payloads/CausalAssertionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CausalAssertionConfirmed.causeId",
+      "objectType": "Payload.CausalAssertionConfirmed",
+      "name": "causeId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "CausalAssertionId",
+      "meaning": "Cause id.",
+      "schemaFile": "payloads/CausalAssertionConfirmed.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CausalAssertionConfirmed.policy",
+      "objectType": "Payload.CausalAssertionConfirmed",
+      "name": "policy",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "policy",
+      "fsharpType": "string",
+      "meaning": "Policy id applied by the cause gate (engine Policy.id = core-default/1).",
+      "schemaFile": "payloads/CausalAssertionConfirmed.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CausalAssertionReopened.causeId",
+      "objectType": "Payload.CausalAssertionReopened",
+      "name": "causeId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "CausalAssertionId",
+      "meaning": "Cause id.",
+      "schemaFile": "payloads/CausalAssertionReopened.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CausalAssertionReopened.reason",
+      "objectType": "Payload.CausalAssertionReopened",
+      "name": "reason",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Why it was reopened.",
+      "schemaFile": "payloads/CausalAssertionReopened.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CorrectiveActionRecorded.correctiveActionId",
+      "objectType": "Payload.CorrectiveActionRecorded",
+      "name": "correctiveActionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "CorrectiveActionId",
+      "meaning": "Corrective action id.",
+      "schemaFile": "payloads/CorrectiveActionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CorrectiveActionRecorded.kind",
+      "objectType": "Payload.CorrectiveActionRecorded",
+      "name": "kind",
+      "kind": {
+        "type": "enum",
+        "enum": "correctiveActionKind",
+        "values": ["mitigation", "workaround", "correction", "prevention"]
+      },
+      "kindLabel": "enum correctiveActionKind",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "CorrectiveActionKind",
+      "meaning": "workaround \\",
+      "schemaFile": "payloads/CorrectiveActionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CorrectiveActionRecorded.description",
+      "objectType": "Payload.CorrectiveActionRecorded",
+      "name": "description",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "NonEmptyText",
+      "meaning": "What will be done.",
+      "schemaFile": "payloads/CorrectiveActionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CorrectiveActionRecorded.targetCauseIds",
+      "objectType": "Payload.CorrectiveActionRecorded",
+      "name": "targetCauseIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "CausalAssertionId list",
+      "meaning": "Causes it addresses.",
+      "schemaFile": "payloads/CorrectiveActionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CorrectiveActionTransitioned.correctiveActionId",
+      "objectType": "Payload.CorrectiveActionTransitioned",
+      "name": "correctiveActionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "CorrectiveActionId",
+      "meaning": "Corrective action id.",
+      "schemaFile": "payloads/CorrectiveActionTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CorrectiveActionTransitioned.state",
+      "objectType": "Payload.CorrectiveActionTransitioned",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "correctiveActionTarget",
+        "values": ["approved", "cancelled", "inProgress", "implemented", "awaitingVerificationOfEffect", "verificationFailed", "verifiedEffective", "reworkRequired"]
+      },
+      "kindLabel": "enum correctiveActionTarget",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "CorrectiveActionState",
+      "meaning": "cancelled \\",
+      "schemaFile": "payloads/CorrectiveActionTransitioned.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CriterionRecorded.criterionId",
+      "objectType": "Payload.CriterionRecorded",
+      "name": "criterionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "CriterionId",
+      "meaning": "Criterion id.",
+      "schemaFile": "payloads/CriterionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CriterionRecorded.correctiveActionId",
+      "objectType": "Payload.CriterionRecorded",
+      "name": "correctiveActionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "CorrectiveActionId",
+      "meaning": "Corrective action it verifies.",
+      "schemaFile": "payloads/CriterionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CriterionRecorded.expectedOutcome",
+      "objectType": "Payload.CriterionRecorded",
+      "name": "expectedOutcome",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Success criterion (R7.3).",
+      "schemaFile": "payloads/CriterionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.CriterionRecorded.method",
+      "objectType": "Payload.CriterionRecorded",
+      "name": "method",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "NonEmptyText option",
+      "meaning": "Verification method, if stated.",
+      "schemaFile": "payloads/CriterionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.VerificationRecorded.verificationId",
+      "objectType": "Payload.VerificationRecorded",
+      "name": "verificationId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "VerificationId",
+      "meaning": "Verification id.",
+      "schemaFile": "payloads/VerificationRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.VerificationRecorded.criterionId",
+      "objectType": "Payload.VerificationRecorded",
+      "name": "criterionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "CriterionId",
+      "meaning": "Criterion verified.",
+      "schemaFile": "payloads/VerificationRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.VerificationRecorded.outcome",
+      "objectType": "Payload.VerificationRecorded",
+      "name": "outcome",
+      "kind": {
+        "type": "enum",
+        "enum": "verificationOutcome",
+        "values": ["satisfied", "failed", "inconclusive"]
+      },
+      "kindLabel": "enum verificationOutcome",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "VerificationOutcome",
+      "meaning": "failed \\",
+      "schemaFile": "payloads/VerificationRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.VerificationRecorded.evidenceIds",
+      "objectType": "Payload.VerificationRecorded",
+      "name": "evidenceIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "EvidenceId list",
+      "meaning": "Evidence cited (required when satisfied, R7.4).",
+      "schemaFile": "payloads/VerificationRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ConclusionRecorded.conclusionId",
+      "objectType": "Payload.ConclusionRecorded",
+      "name": "conclusionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "ConclusionId",
+      "meaning": "Conclusion id.",
+      "schemaFile": "payloads/ConclusionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ConclusionRecorded.statement",
+      "objectType": "Payload.ConclusionRecorded",
+      "name": "statement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Conclusion.",
+      "schemaFile": "payloads/ConclusionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ConclusionRecorded.strength",
+      "objectType": "Payload.ConclusionRecorded",
+      "name": "strength",
+      "kind": {
+        "type": "enum",
+        "enum": "conclusionStrength",
+        "values": ["plausibleExplanation", "leadingExplanation", "supportedCause", "confirmedCause", "acceptedWithResidualUncertainty"]
+      },
+      "kindLabel": "enum conclusionStrength",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "ConclusionStrength",
+      "meaning": "leadingExplanation \\",
+      "schemaFile": "payloads/ConclusionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ConclusionRecorded.causeIds",
+      "objectType": "Payload.ConclusionRecorded",
+      "name": "causeIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "CausalAssertionId list",
+      "meaning": "Causes it rests on.",
+      "schemaFile": "payloads/ConclusionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ConclusionRecorded.residualUncertainty",
+      "objectType": "Payload.ConclusionRecorded",
+      "name": "residualUncertainty",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item5",
+      "fsharpType": "NonEmptyText option",
+      "meaning": "Residual uncertainty (R6.4).",
+      "schemaFile": "payloads/ConclusionRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ProposalRecorded.proposalId",
+      "objectType": "Payload.ProposalRecorded",
+      "name": "proposalId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "ProposalId",
+      "meaning": "Proposal id.",
+      "schemaFile": "payloads/ProposalRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ProposalRecorded.kind",
+      "objectType": "Payload.ProposalRecorded",
+      "name": "kind",
+      "kind": {
+        "type": "enum",
+        "enum": "proposalKind",
+        "values": ["hypothesis", "unknown", "action"]
+      },
+      "kindLabel": "enum proposalKind",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "ProposalKind",
+      "meaning": "unknown \\",
+      "schemaFile": "payloads/ProposalRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ProposalRecorded.text",
+      "objectType": "Payload.ProposalRecorded",
+      "name": "text",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item3",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Proposed statement/question/purpose; never evidence (R15.2).",
+      "schemaFile": "payloads/ProposalRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ProposalRecorded.rationale",
+      "objectType": "Payload.ProposalRecorded",
+      "name": "rationale",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item4",
+      "fsharpType": "NonEmptyText option",
+      "meaning": "Rationale, if stated.",
+      "schemaFile": "payloads/ProposalRecorded.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ProposalWasAccepted.proposalId",
+      "objectType": "Payload.ProposalWasAccepted",
+      "name": "proposalId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "ProposalId",
+      "meaning": "Proposal id.",
+      "schemaFile": "payloads/ProposalWasAccepted.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ProposalWasAccepted.targetId",
+      "objectType": "Payload.ProposalWasAccepted",
+      "name": "targetId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "targetId",
+      "fsharpType": "Guid",
+      "meaning": "Id of the entity the acceptance created.",
+      "schemaFile": "payloads/ProposalWasAccepted.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ProposalWasRejected.proposalId",
+      "objectType": "Payload.ProposalWasRejected",
+      "name": "proposalId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item1",
+      "fsharpType": "ProposalId",
+      "meaning": "Proposal id.",
+      "schemaFile": "payloads/ProposalWasRejected.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ProposalWasRejected.reason",
+      "objectType": "Payload.ProposalWasRejected",
+      "name": "reason",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": "Item2",
+      "fsharpType": "NonEmptyText",
+      "meaning": "Why it was rejected.",
+      "schemaFile": "payloads/ProposalWasRejected.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.formatVersion",
+      "objectType": "Manifest",
+      "name": "formatVersion",
+      "kind": {
+        "type": "const",
+        "value": "1.0.0"
+      },
+      "kindLabel": "const \"1.0.0\"",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.investigationId",
+      "objectType": "Manifest",
+      "name": "investigationId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.schemaVersion",
+      "objectType": "Manifest",
+      "name": "schemaVersion",
+      "kind": {
+        "type": "const",
+        "value": "1.0.0"
+      },
+      "kindLabel": "const \"1.0.0\"",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.semanticVersion",
+      "objectType": "Manifest",
+      "name": "semanticVersion",
+      "kind": {
+        "type": "const",
+        "value": "1.0.0"
+      },
+      "kindLabel": "const \"1.0.0\"",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.aggregateVersion",
+      "objectType": "Manifest",
+      "name": "aggregateVersion",
+      "kind": {
+        "type": "integer",
+        "min": 1,
+        "max": 9007199254740991
+      },
+      "kindLabel": "integer",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.eventCount",
+      "objectType": "Manifest",
+      "name": "eventCount",
+      "kind": {
+        "type": "integer",
+        "min": 1,
+        "max": 9007199254740991
+      },
+      "kindLabel": "integer",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.eventsSha256",
+      "objectType": "Manifest",
+      "name": "eventsSha256",
+      "kind": {
+        "type": "sha256"
+      },
+      "kindLabel": "sha256",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.snapshotVersion",
+      "objectType": "Manifest",
+      "name": "snapshotVersion",
+      "kind": {
+        "type": "const",
+        "value": 1
+      },
+      "kindLabel": "const 1",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.snapshotSha256",
+      "objectType": "Manifest",
+      "name": "snapshotSha256",
+      "kind": {
+        "type": "sha256"
+      },
+      "kindLabel": "sha256",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.domainPacks",
+      "objectType": "Manifest",
+      "name": "domainPacks",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object-bound-by-rule"
+        },
+        "unique": false,
+        "minItems": 0,
+        "maxItems": 0
+      },
+      "kindLabel": "object[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.createdAt",
+      "objectType": "Manifest",
+      "name": "createdAt",
+      "kind": {
+        "type": "timestamp"
+      },
+      "kindLabel": "timestamp",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Manifest.updatedAt",
+      "objectType": "Manifest",
+      "name": "updatedAt",
+      "kind": {
+        "type": "timestamp"
+      },
+      "kindLabel": "timestamp",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "investigation-manifest.schema.json"
+    },
+    {
+      "fieldId": "F.Snapshot.formatVersion",
+      "objectType": "Snapshot",
+      "name": "formatVersion",
+      "kind": {
+        "type": "const",
+        "value": "1.0.0"
+      },
+      "kindLabel": "const \"1.0.0\"",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "snapshot.schema.json"
+    },
+    {
+      "fieldId": "F.Snapshot.investigationId",
+      "objectType": "Snapshot",
+      "name": "investigationId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "snapshot.schema.json"
+    },
+    {
+      "fieldId": "F.Snapshot.aggregateVersion",
+      "objectType": "Snapshot",
+      "name": "aggregateVersion",
+      "kind": {
+        "type": "integer",
+        "min": 1,
+        "max": 9007199254740991
+      },
+      "kindLabel": "integer",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "snapshot.schema.json"
+    },
+    {
+      "fieldId": "F.Snapshot.projectionVersion",
+      "objectType": "Snapshot",
+      "name": "projectionVersion",
+      "kind": {
+        "type": "const",
+        "value": 1
+      },
+      "kindLabel": "const 1",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "snapshot.schema.json"
+    },
+    {
+      "fieldId": "F.Snapshot.semanticVersion",
+      "objectType": "Snapshot",
+      "name": "semanticVersion",
+      "kind": {
+        "type": "const",
+        "value": "1.0.0"
+      },
+      "kindLabel": "const \"1.0.0\"",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "snapshot.schema.json"
+    },
+    {
+      "fieldId": "F.Snapshot.generatedAt",
+      "objectType": "Snapshot",
+      "name": "generatedAt",
+      "kind": {
+        "type": "timestamp"
+      },
+      "kindLabel": "timestamp",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "snapshot.schema.json"
+    },
+    {
+      "fieldId": "F.State.investigationId",
+      "objectType": "State",
+      "name": "investigationId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.State.title",
+      "objectType": "State",
+      "name": "title",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.State.lifecycle",
+      "objectType": "State",
+      "name": "lifecycle",
+      "kind": {
+        "type": "enum",
+        "enum": "lifecycle",
+        "values": ["draft", "active", "awaitingEvidence", "awaitingVerification", "resolved", "closed", "archived"]
+      },
+      "kindLabel": "enum lifecycle",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.State.version",
+      "objectType": "State",
+      "name": "version",
+      "kind": {
+        "type": "integer",
+        "min": 1,
+        "max": 9007199254740991
+      },
+      "kindLabel": "integer",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.State.createdAt",
+      "objectType": "State",
+      "name": "createdAt",
+      "kind": {
+        "type": "timestamp"
+      },
+      "kindLabel": "timestamp",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.observation.id",
+      "objectType": "Entity.observation",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/observation.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.observation.original",
+      "objectType": "Entity.observation",
+      "name": "original",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/observation.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.observation.observedAt",
+      "objectType": "Entity.observation",
+      "name": "observedAt",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "timestamp"
+        }
+      },
+      "kindLabel": "timestamp?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/observation.schema.json"
+    },
+    {
+      "fieldId": "F.Def.provenance.actor",
+      "objectType": "Def.provenance",
+      "name": "actor",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.actor"
+      },
+      "kindLabel": "Def.actor",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "actor.schema.json"
+    },
+    {
+      "fieldId": "F.Def.provenance.recordedAt",
+      "objectType": "Def.provenance",
+      "name": "recordedAt",
+      "kind": {
+        "type": "timestamp"
+      },
+      "kindLabel": "timestamp",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "actor.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.observation.provenance",
+      "objectType": "Entity.observation",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/observation.schema.json"
+    },
+    {
+      "fieldId": "F.State.observations",
+      "objectType": "State",
+      "name": "observations",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.observation"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.observation[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis.id",
+      "objectType": "Entity.hypothesis",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis.statement",
+      "objectType": "Entity.hypothesis",
+      "name": "statement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis.mechanism",
+      "objectType": "Entity.hypothesis",
+      "name": "mechanism",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis.state",
+      "objectType": "Entity.hypothesis",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "hypothesisState",
+        "values": ["proposed", "plausible", "supported", "weakened", "falsified", "superseded"]
+      },
+      "kindLabel": "enum hypothesisState",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis-change.from",
+      "objectType": "Entity.hypothesis-change",
+      "name": "from",
+      "kind": {
+        "type": "enum",
+        "enum": "hypothesisState",
+        "values": ["proposed", "plausible", "supported", "weakened", "falsified", "superseded"]
+      },
+      "kindLabel": "enum hypothesisState",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis-change.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis-change.to",
+      "objectType": "Entity.hypothesis-change",
+      "name": "to",
+      "kind": {
+        "type": "enum",
+        "enum": "hypothesisTarget",
+        "values": ["plausible", "supported", "weakened", "falsified", "superseded"]
+      },
+      "kindLabel": "enum hypothesisTarget",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis-change.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis-change.command",
+      "objectType": "Entity.hypothesis-change",
+      "name": "command",
+      "kind": {
+        "type": "enum",
+        "enum": "hypothesisCommand",
+        "values": ["markPlausible", "markSupported", "markWeakened", "falsify", "supersede", "reopen"]
+      },
+      "kindLabel": "enum hypothesisCommand",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis-change.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis-change.reason",
+      "objectType": "Entity.hypothesis-change",
+      "name": "reason",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis-change.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis-change.evidenceIds",
+      "objectType": "Entity.hypothesis-change",
+      "name": "evidenceIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis-change.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis-change.at",
+      "objectType": "Entity.hypothesis-change",
+      "name": "at",
+      "kind": {
+        "type": "timestamp"
+      },
+      "kindLabel": "timestamp",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis-change.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis-change.aggregateVersion",
+      "objectType": "Entity.hypothesis-change",
+      "name": "aggregateVersion",
+      "kind": {
+        "type": "integer",
+        "min": 1,
+        "max": 9007199254740991
+      },
+      "kindLabel": "integer",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis-change.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis.history",
+      "objectType": "Entity.hypothesis",
+      "name": "history",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.hypothesis-change"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.hypothesis-change[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.hypothesis.provenance",
+      "objectType": "Entity.hypothesis",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/hypothesis.schema.json"
+    },
+    {
+      "fieldId": "F.State.hypotheses",
+      "objectType": "State",
+      "name": "hypotheses",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.hypothesis"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.hypothesis[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.evidence.id",
+      "objectType": "Entity.evidence",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/evidence.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.evidence.contentKind",
+      "objectType": "Entity.evidence",
+      "name": "contentKind",
+      "kind": {
+        "type": "enum",
+        "enum": "contentKind",
+        "values": ["text", "artifact"]
+      },
+      "kindLabel": "enum contentKind",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/evidence.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.evidence.content",
+      "objectType": "Entity.evidence",
+      "name": "content",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/evidence.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.evidence.category",
+      "objectType": "Entity.evidence",
+      "name": "category",
+      "kind": {
+        "type": "enum",
+        "enum": "evidenceCategory",
+        "values": ["directObservation", "measurement", "log", "document", "experimentResult", "testimony", "externalReference"]
+      },
+      "kindLabel": "enum evidenceCategory",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/evidence.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.evidence.source",
+      "objectType": "Entity.evidence",
+      "name": "source",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/evidence.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.evidence.capturedAt",
+      "objectType": "Entity.evidence",
+      "name": "capturedAt",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "timestamp"
+        }
+      },
+      "kindLabel": "timestamp?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/evidence.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.evidence.verification",
+      "objectType": "Entity.evidence",
+      "name": "verification",
+      "kind": {
+        "type": "enum",
+        "enum": "verificationStatus",
+        "values": ["unverified", "partiallyVerified", "verified", "invalidated"]
+      },
+      "kindLabel": "enum verificationStatus",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/evidence.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.evidence.supersededBy",
+      "objectType": "Entity.evidence",
+      "name": "supersededBy",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "uuid"
+        }
+      },
+      "kindLabel": "uuid?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/evidence.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.evidence.admittedAtVersion",
+      "objectType": "Entity.evidence",
+      "name": "admittedAtVersion",
+      "kind": {
+        "type": "integer",
+        "min": 1,
+        "max": 9007199254740991
+      },
+      "kindLabel": "integer",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/evidence.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.evidence.provenance",
+      "objectType": "Entity.evidence",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/evidence.schema.json"
+    },
+    {
+      "fieldId": "F.State.evidence",
+      "objectType": "State",
+      "name": "evidence",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.evidence"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.evidence[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.relationship.id",
+      "objectType": "Entity.relationship",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/relationship.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.relationship.evidenceId",
+      "objectType": "Entity.relationship",
+      "name": "evidenceId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/relationship.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.relationship.hypothesisId",
+      "objectType": "Entity.relationship",
+      "name": "hypothesisId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/relationship.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.relationship.kind",
+      "objectType": "Entity.relationship",
+      "name": "kind",
+      "kind": {
+        "type": "enum",
+        "enum": "relationshipKind",
+        "values": ["supports", "contradicts", "discriminates", "insufficient"]
+      },
+      "kindLabel": "enum relationshipKind",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/relationship.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.relationship.rationale",
+      "objectType": "Entity.relationship",
+      "name": "rationale",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/relationship.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.relationship.provenance",
+      "objectType": "Entity.relationship",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/relationship.schema.json"
+    },
+    {
+      "fieldId": "F.State.relationships",
+      "objectType": "State",
+      "name": "relationships",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.relationship"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.relationship[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.unknown.id",
+      "objectType": "Entity.unknown",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/unknown.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.unknown.question",
+      "objectType": "Entity.unknown",
+      "name": "question",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/unknown.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.unknown.materiality",
+      "objectType": "Entity.unknown",
+      "name": "materiality",
+      "kind": {
+        "type": "enum",
+        "enum": "materiality",
+        "values": ["blocking", "material", "nonMaterial", "informational"]
+      },
+      "kindLabel": "enum materiality",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/unknown.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.unknown.state",
+      "objectType": "Entity.unknown",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "unknownState",
+        "values": ["identified", "investigating", "resolved", "acceptedResidual", "superseded"]
+      },
+      "kindLabel": "enum unknownState",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/unknown.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.unknown.basis",
+      "objectType": "Entity.unknown",
+      "name": "basis",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/unknown.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.unknown.provenance",
+      "objectType": "Entity.unknown",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/unknown.schema.json"
+    },
+    {
+      "fieldId": "F.State.unknowns",
+      "objectType": "State",
+      "name": "unknowns",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.unknown"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.unknown[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.assumption.id",
+      "objectType": "Entity.assumption",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/assumption.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.assumption.proposition",
+      "objectType": "Entity.assumption",
+      "name": "proposition",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/assumption.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.assumption.materiality",
+      "objectType": "Entity.assumption",
+      "name": "materiality",
+      "kind": {
+        "type": "enum",
+        "enum": "materiality",
+        "values": ["blocking", "material", "nonMaterial", "informational"]
+      },
+      "kindLabel": "enum materiality",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/assumption.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.assumption.state",
+      "objectType": "Entity.assumption",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "assumptionState",
+        "values": ["explicitUnverified", "provisionallyAccepted", "verified", "rejected", "expired"]
+      },
+      "kindLabel": "enum assumptionState",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/assumption.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.assumption.provenance",
+      "objectType": "Entity.assumption",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/assumption.schema.json"
+    },
+    {
+      "fieldId": "F.State.assumptions",
+      "objectType": "State",
+      "name": "assumptions",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.assumption"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.assumption[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.contradiction.id",
+      "objectType": "Entity.contradiction",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/contradiction.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.contradiction.statement",
+      "objectType": "Entity.contradiction",
+      "name": "statement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/contradiction.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.contradiction.evidenceIds",
+      "objectType": "Entity.contradiction",
+      "name": "evidenceIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/contradiction.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.contradiction.materiality",
+      "objectType": "Entity.contradiction",
+      "name": "materiality",
+      "kind": {
+        "type": "enum",
+        "enum": "materiality",
+        "values": ["blocking", "material", "nonMaterial", "informational"]
+      },
+      "kindLabel": "enum materiality",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/contradiction.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.contradiction.state",
+      "objectType": "Entity.contradiction",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "contradictionState",
+        "values": ["detected", "triaged", "investigating", "resolved", "acceptedResidual", "superseded"]
+      },
+      "kindLabel": "enum contradictionState",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/contradiction.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.contradiction.basis",
+      "objectType": "Entity.contradiction",
+      "name": "basis",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/contradiction.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.contradiction.provenance",
+      "objectType": "Entity.contradiction",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/contradiction.schema.json"
+    },
+    {
+      "fieldId": "F.State.contradictions",
+      "objectType": "State",
+      "name": "contradictions",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.contradiction"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.contradiction[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.prediction.id",
+      "objectType": "Entity.prediction",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/prediction.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.prediction.hypothesisId",
+      "objectType": "Entity.prediction",
+      "name": "hypothesisId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/prediction.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.prediction.statement",
+      "objectType": "Entity.prediction",
+      "name": "statement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/prediction.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.prediction.strength",
+      "objectType": "Entity.prediction",
+      "name": "strength",
+      "kind": {
+        "type": "enum",
+        "enum": "predictionStrength",
+        "values": ["necessary", "expected", "discriminating", "nonDiscriminating"]
+      },
+      "kindLabel": "enum predictionStrength",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/prediction.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.prediction.timing",
+      "objectType": "Entity.prediction",
+      "name": "timing",
+      "kind": {
+        "type": "enum",
+        "enum": "predictionTiming",
+        "values": ["prospective", "retrospective"]
+      },
+      "kindLabel": "enum predictionTiming",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/prediction.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.prediction.provenance",
+      "objectType": "Entity.prediction",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/prediction.schema.json"
+    },
+    {
+      "fieldId": "F.State.predictions",
+      "objectType": "State",
+      "name": "predictions",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.prediction"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.prediction[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.action.id",
+      "objectType": "Entity.action",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/action.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.action.kind",
+      "objectType": "Entity.action",
+      "name": "kind",
+      "kind": {
+        "type": "enum",
+        "enum": "actionKind",
+        "values": ["test", "inspection", "query", "comparison", "experiment"]
+      },
+      "kindLabel": "enum actionKind",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/action.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.action.purpose",
+      "objectType": "Entity.action",
+      "name": "purpose",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/action.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.action.targetHypothesisIds",
+      "objectType": "Entity.action",
+      "name": "targetHypothesisIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/action.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.action.state",
+      "objectType": "Entity.action",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "actionState",
+        "values": ["proposed", "approved", "inProgress", "completed", "interpreted", "rejected", "cancelled"]
+      },
+      "kindLabel": "enum actionState",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/action.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.action.provenance",
+      "objectType": "Entity.action",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/action.schema.json"
+    },
+    {
+      "fieldId": "F.State.actions",
+      "objectType": "State",
+      "name": "actions",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.action"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.action[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.finding.id",
+      "objectType": "Entity.finding",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/finding.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.finding.actionId",
+      "objectType": "Entity.finding",
+      "name": "actionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/finding.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.finding.originalResult",
+      "objectType": "Entity.finding",
+      "name": "originalResult",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/finding.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.finding.interpretation",
+      "objectType": "Entity.finding",
+      "name": "interpretation",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/finding.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.finding.provenance",
+      "objectType": "Entity.finding",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/finding.schema.json"
+    },
+    {
+      "fieldId": "F.State.findings",
+      "objectType": "State",
+      "name": "findings",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.finding"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.finding[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.negative-knowledge.id",
+      "objectType": "Entity.negative-knowledge",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/negative-knowledge.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.negative-knowledge.statement",
+      "objectType": "Entity.negative-knowledge",
+      "name": "statement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/negative-knowledge.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.negative-knowledge.scope",
+      "objectType": "Entity.negative-knowledge",
+      "name": "scope",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/negative-knowledge.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.negative-knowledge.basisEvidenceIds",
+      "objectType": "Entity.negative-knowledge",
+      "name": "basisEvidenceIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/negative-knowledge.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.negative-knowledge.provenance",
+      "objectType": "Entity.negative-knowledge",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/negative-knowledge.schema.json"
+    },
+    {
+      "fieldId": "F.State.negativeKnowledge",
+      "objectType": "State",
+      "name": "negativeKnowledge",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.negative-knowledge"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.negative-knowledge[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.cause.id",
+      "objectType": "Entity.cause",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/cause.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.cause.outcome",
+      "objectType": "Entity.cause",
+      "name": "outcome",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/cause.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.cause.members",
+      "objectType": "Entity.cause",
+      "name": "members",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.causal-member"
+        },
+        "unique": true,
+        "minItems": 1
+      },
+      "kindLabel": "Entity.causal-member[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/cause.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.cause.mechanism",
+      "objectType": "Entity.cause",
+      "name": "mechanism",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/cause.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.cause.state",
+      "objectType": "Entity.cause",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "causeState",
+        "values": ["proposed", "confirmed", "reopened", "superseded"]
+      },
+      "kindLabel": "enum causeState",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/cause.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.cause.provenance",
+      "objectType": "Entity.cause",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/cause.schema.json"
+    },
+    {
+      "fieldId": "F.State.causes",
+      "objectType": "State",
+      "name": "causes",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.cause"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.cause[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.corrective-action.id",
+      "objectType": "Entity.corrective-action",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/corrective-action.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.corrective-action.kind",
+      "objectType": "Entity.corrective-action",
+      "name": "kind",
+      "kind": {
+        "type": "enum",
+        "enum": "correctiveActionKind",
+        "values": ["mitigation", "workaround", "correction", "prevention"]
+      },
+      "kindLabel": "enum correctiveActionKind",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/corrective-action.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.corrective-action.description",
+      "objectType": "Entity.corrective-action",
+      "name": "description",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/corrective-action.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.corrective-action.targetCauseIds",
+      "objectType": "Entity.corrective-action",
+      "name": "targetCauseIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/corrective-action.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.corrective-action.state",
+      "objectType": "Entity.corrective-action",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "correctiveActionState",
+        "values": ["proposed", "approved", "inProgress", "implemented", "awaitingVerificationOfEffect", "verifiedEffective", "verificationFailed", "reworkRequired", "cancelled"]
+      },
+      "kindLabel": "enum correctiveActionState",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/corrective-action.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.corrective-action.awaitingSinceVersion",
+      "objectType": "Entity.corrective-action",
+      "name": "awaitingSinceVersion",
+      "kind": {
+        "type": "integer",
+        "min": 0,
+        "max": 9007199254740991
+      },
+      "kindLabel": "integer",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/corrective-action.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.corrective-action.provenance",
+      "objectType": "Entity.corrective-action",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/corrective-action.schema.json"
+    },
+    {
+      "fieldId": "F.State.correctiveActions",
+      "objectType": "State",
+      "name": "correctiveActions",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.corrective-action"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.corrective-action[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.criterion.id",
+      "objectType": "Entity.criterion",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/criterion.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.criterion.correctiveActionId",
+      "objectType": "Entity.criterion",
+      "name": "correctiveActionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/criterion.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.criterion.expectedOutcome",
+      "objectType": "Entity.criterion",
+      "name": "expectedOutcome",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/criterion.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.criterion.method",
+      "objectType": "Entity.criterion",
+      "name": "method",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/criterion.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.criterion.provenance",
+      "objectType": "Entity.criterion",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/criterion.schema.json"
+    },
+    {
+      "fieldId": "F.State.criteria",
+      "objectType": "State",
+      "name": "criteria",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.criterion"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.criterion[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.verification.id",
+      "objectType": "Entity.verification",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/verification.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.verification.criterionId",
+      "objectType": "Entity.verification",
+      "name": "criterionId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/verification.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.verification.outcome",
+      "objectType": "Entity.verification",
+      "name": "outcome",
+      "kind": {
+        "type": "enum",
+        "enum": "verificationOutcome",
+        "values": ["satisfied", "failed", "inconclusive"]
+      },
+      "kindLabel": "enum verificationOutcome",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/verification.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.verification.evidenceIds",
+      "objectType": "Entity.verification",
+      "name": "evidenceIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/verification.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.verification.recordedAtVersion",
+      "objectType": "Entity.verification",
+      "name": "recordedAtVersion",
+      "kind": {
+        "type": "integer",
+        "min": 1,
+        "max": 9007199254740991
+      },
+      "kindLabel": "integer",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/verification.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.verification.provenance",
+      "objectType": "Entity.verification",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/verification.schema.json"
+    },
+    {
+      "fieldId": "F.State.verifications",
+      "objectType": "State",
+      "name": "verifications",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.verification"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.verification[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.conclusion.id",
+      "objectType": "Entity.conclusion",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/conclusion.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.conclusion.statement",
+      "objectType": "Entity.conclusion",
+      "name": "statement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/conclusion.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.conclusion.strength",
+      "objectType": "Entity.conclusion",
+      "name": "strength",
+      "kind": {
+        "type": "enum",
+        "enum": "conclusionStrength",
+        "values": ["plausibleExplanation", "leadingExplanation", "supportedCause", "confirmedCause", "acceptedWithResidualUncertainty"]
+      },
+      "kindLabel": "enum conclusionStrength",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/conclusion.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.conclusion.causeIds",
+      "objectType": "Entity.conclusion",
+      "name": "causeIds",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 0
+      },
+      "kindLabel": "uuid[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/conclusion.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.conclusion.residualUncertainty",
+      "objectType": "Entity.conclusion",
+      "name": "residualUncertainty",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/conclusion.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.conclusion.recordedAtVersion",
+      "objectType": "Entity.conclusion",
+      "name": "recordedAtVersion",
+      "kind": {
+        "type": "integer",
+        "min": 1,
+        "max": 9007199254740991
+      },
+      "kindLabel": "integer",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/conclusion.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.conclusion.provenance",
+      "objectType": "Entity.conclusion",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/conclusion.schema.json"
+    },
+    {
+      "fieldId": "F.State.conclusions",
+      "objectType": "State",
+      "name": "conclusions",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.conclusion"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.conclusion[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.proposal.id",
+      "objectType": "Entity.proposal",
+      "name": "id",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/proposal.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.proposal.kind",
+      "objectType": "Entity.proposal",
+      "name": "kind",
+      "kind": {
+        "type": "enum",
+        "enum": "proposalKind",
+        "values": ["hypothesis", "unknown", "action"]
+      },
+      "kindLabel": "enum proposalKind",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/proposal.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.proposal.text",
+      "objectType": "Entity.proposal",
+      "name": "text",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/proposal.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.proposal.rationale",
+      "objectType": "Entity.proposal",
+      "name": "rationale",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/proposal.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.proposal.state",
+      "objectType": "Entity.proposal",
+      "name": "state",
+      "kind": {
+        "type": "enum",
+        "enum": "proposalState",
+        "values": ["active", "accepted", "rejected"]
+      },
+      "kindLabel": "enum proposalState",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/proposal.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.proposal.decision",
+      "objectType": "Entity.proposal",
+      "name": "decision",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/proposal.schema.json"
+    },
+    {
+      "fieldId": "F.Entity.proposal.provenance",
+      "objectType": "Entity.proposal",
+      "name": "provenance",
+      "kind": {
+        "type": "object",
+        "objectType": "Def.provenance"
+      },
+      "kindLabel": "Def.provenance",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "entities/proposal.schema.json"
+    },
+    {
+      "fieldId": "F.State.proposals",
+      "objectType": "State",
+      "name": "proposals",
+      "kind": {
+        "type": "list",
+        "of": {
+          "type": "object",
+          "objectType": "Entity.proposal"
+        },
+        "unique": false,
+        "minItems": 0
+      },
+      "kindLabel": "Entity.proposal[]",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "state.schema.json"
+    },
+    {
+      "fieldId": "F.Snapshot.state",
+      "objectType": "Snapshot",
+      "name": "state",
+      "kind": {
+        "type": "object",
+        "objectType": "State"
+      },
+      "kindLabel": "State",
+      "presence": "always",
+      "nullable": false,
+      "status": "wire-v1.0.0",
+      "fsharpElement": null,
+      "fsharpType": null,
+      "meaning": null,
+      "schemaFile": "snapshot.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.InvestigationDetailsRevised.title",
+      "objectType": "Payload.InvestigationDetailsRevised",
+      "name": "title",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText",
+      "meaning": "Title after the revision (INV-002).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/InvestigationDetailsRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.InvestigationDetailsRevised.problemStatement",
+      "objectType": "Payload.InvestigationDetailsRevised",
+      "name": "problemStatement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText",
+      "meaning": "Problem statement after the revision (INV-001); InvestigationStarted.original is kept as the original (INV-008).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/InvestigationDetailsRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.InvestigationDetailsRevised.question",
+      "objectType": "Payload.InvestigationDetailsRevised",
+      "name": "question",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText option",
+      "meaning": "Primary investigative question (INV-023).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/InvestigationDetailsRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.InvestigationDetailsRevised.reason",
+      "objectType": "Payload.InvestigationDetailsRevised",
+      "name": "reason",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText option",
+      "meaning": "Why it was revised, if stated.",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/InvestigationDetailsRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ObservationRevised.observationId",
+      "objectType": "Payload.ObservationRevised",
+      "name": "observationId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "ObservationId",
+      "meaning": "Observation id (unchanged).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/ObservationRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ObservationRevised.original",
+      "objectType": "Payload.ObservationRevised",
+      "name": "original",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText",
+      "meaning": "Observation text after the revision, verbatim.",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/ObservationRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.ObservationRevised.source",
+      "objectType": "Payload.ObservationRevised",
+      "name": "source",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText option",
+      "meaning": "Observation source reference (INV-025).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/ObservationRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisRevised.hypothesisId",
+      "objectType": "Payload.HypothesisRevised",
+      "name": "hypothesisId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "HypothesisId",
+      "meaning": "Hypothesis id (unchanged).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/HypothesisRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisRevised.statement",
+      "objectType": "Payload.HypothesisRevised",
+      "name": "statement",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText",
+      "meaning": "Statement after the revision.",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/HypothesisRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.HypothesisRevised.mechanism",
+      "objectType": "Payload.HypothesisRevised",
+      "name": "mechanism",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "text"
+        }
+      },
+      "kindLabel": "text?",
+      "presence": "always",
+      "nullable": true,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText option",
+      "meaning": "Mechanism/explanation after the revision (INV-011, subject to OD-CR-05).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/HypothesisRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRevised.evidenceId",
+      "objectType": "Payload.EvidenceRevised",
+      "name": "evidenceId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "EvidenceId",
+      "meaning": "Evidence id (unchanged).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRevised.label",
+      "objectType": "Payload.EvidenceRevised",
+      "name": "label",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText",
+      "meaning": "Short label, at most 200 characters (INV-027).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRevised.source",
+      "objectType": "Payload.EvidenceRevised",
+      "name": "source",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText",
+      "meaning": "Source reference (INV-028; required as in EvidenceAdmitted, subject to OD-CR-03).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRevised.sourceUrl",
+      "objectType": "Payload.EvidenceRevised",
+      "name": "sourceUrl",
+      "kind": {
+        "type": "nullable",
+        "of": {
+          "type": "httpUrl"
+        }
+      },
+      "kindLabel": "httpUrl?",
+      "presence": "always",
+      "nullable": true,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "SafeUrl option",
+      "meaning": "Absolute http(s) URL (INV-029, SafeUrl).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRelationshipRevised.relationshipId",
+      "objectType": "Payload.EvidenceRelationshipRevised",
+      "name": "relationshipId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "RelationshipId",
+      "meaning": "Relationship id (unchanged).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRelationshipRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRelationshipRevised.kind",
+      "objectType": "Payload.EvidenceRelationshipRevised",
+      "name": "kind",
+      "kind": {
+        "type": "enum",
+        "enum": "relationshipKind-1.1.0",
+        "values": ["supports", "contradicts", "discriminates", "insufficient", "consistentWith", "inconclusive"]
+      },
+      "kindLabel": "enum relationshipKind-1.1.0",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "RelationshipKind",
+      "meaning": "New assessment (INV-031).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRelationshipRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRelationshipRevised.rationale",
+      "objectType": "Payload.EvidenceRelationshipRevised",
+      "name": "rationale",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText",
+      "meaning": "Rationale, required (INV-038).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRelationshipRevised.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRelationshipWithdrawn.relationshipId",
+      "objectType": "Payload.EvidenceRelationshipWithdrawn",
+      "name": "relationshipId",
+      "kind": {
+        "type": "uuid"
+      },
+      "kindLabel": "uuid",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "RelationshipId",
+      "meaning": "Relationship id.",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRelationshipWithdrawn.schema.json"
+    },
+    {
+      "fieldId": "F.Payload.EvidenceRelationshipWithdrawn.reason",
+      "objectType": "Payload.EvidenceRelationshipWithdrawn",
+      "name": "reason",
+      "kind": {
+        "type": "text"
+      },
+      "kindLabel": "text",
+      "presence": "always",
+      "nullable": false,
+      "status": "proposed-causa-storage-1.1.0",
+      "fsharpElement": null,
+      "fsharpType": "NonEmptyText",
+      "meaning": "Why it was withdrawn (INV-038 note).",
+      "schemaFile": "(proposed) contract/1.1.0/schemas/payloads/EvidenceRelationshipWithdrawn.schema.json"
+    }
+  ],
+  "rules": [
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "activateInvestigation"
+      },
+      "field": "to",
+      "mustEqual": "active"
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "activateInvestigation"
+      },
+      "field": "reason",
+      "mustEqual": null
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "markAwaitingEvidence"
+      },
+      "field": "to",
+      "mustEqual": "awaitingEvidence"
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "markAwaitingEvidence"
+      },
+      "field": "reason",
+      "mustBeKind": {
+        "type": "text"
+      }
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "markAwaitingVerification"
+      },
+      "field": "to",
+      "mustEqual": "awaitingVerification"
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "markAwaitingVerification"
+      },
+      "field": "reason",
+      "mustEqual": null
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "resolveInvestigation"
+      },
+      "field": "to",
+      "mustEqual": "resolved"
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "resolveInvestigation"
+      },
+      "field": "reason",
+      "mustEqual": null
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "closeInvestigation"
+      },
+      "field": "to",
+      "mustEqual": "closed"
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "closeInvestigation"
+      },
+      "field": "reason",
+      "mustEqual": null
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "reopenInvestigation"
+      },
+      "field": "to",
+      "mustEqual": "active"
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "reopenInvestigation"
+      },
+      "field": "reason",
+      "mustBeKind": {
+        "type": "text"
+      }
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "verificationFailed"
+      },
+      "field": "to",
+      "mustEqual": "active"
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "verificationFailed"
+      },
+      "field": "reason",
+      "mustBeKind": {
+        "type": "text"
+      }
+    },
+    {
+      "objectType": "Payload.LifecycleChanged",
+      "when": {
+        "path": "command",
+        "equals": "verificationFailed"
+      },
+      "field": "from",
+      "mustEqual": "awaitingVerification"
+    },
+    {
+      "objectType": "Payload.HypothesisTransitioned",
+      "when": {
+        "path": "command",
+        "equals": "markPlausible"
+      },
+      "field": "to",
+      "mustEqual": "plausible"
+    },
+    {
+      "objectType": "Payload.HypothesisTransitioned",
+      "when": {
+        "path": "command",
+        "equals": "markSupported"
+      },
+      "field": "to",
+      "mustEqual": "supported"
+    },
+    {
+      "objectType": "Payload.HypothesisTransitioned",
+      "when": {
+        "path": "command",
+        "equals": "markWeakened"
+      },
+      "field": "to",
+      "mustEqual": "weakened"
+    },
+    {
+      "objectType": "Payload.HypothesisTransitioned",
+      "when": {
+        "path": "command",
+        "equals": "falsify"
+      },
+      "field": "to",
+      "mustEqual": "falsified"
+    },
+    {
+      "objectType": "Payload.HypothesisTransitioned",
+      "when": {
+        "path": "command",
+        "equals": "supersede"
+      },
+      "field": "to",
+      "mustEqual": "superseded"
+    },
+    {
+      "objectType": "Payload.HypothesisTransitioned",
+      "when": {
+        "path": "command",
+        "equals": "reopen"
+      },
+      "field": "to",
+      "mustEqual": "plausible"
+    },
+    {
+      "objectType": "Payload.HypothesisTransitioned",
+      "when": {
+        "path": "command",
+        "equals": "markSupported"
+      },
+      "field": "evidenceIds",
+      "mustBeKind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      }
+    },
+    {
+      "objectType": "Payload.HypothesisTransitioned",
+      "when": {
+        "path": "command",
+        "equals": "markWeakened"
+      },
+      "field": "evidenceIds",
+      "mustBeKind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      }
+    },
+    {
+      "objectType": "Payload.HypothesisTransitioned",
+      "when": {
+        "path": "command",
+        "equals": "falsify"
+      },
+      "field": "evidenceIds",
+      "mustBeKind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      }
+    },
+    {
+      "objectType": "Payload.HypothesisTransitioned",
+      "when": {
+        "path": "command",
+        "equals": "reopen"
+      },
+      "field": "evidenceIds",
+      "mustBeKind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      }
+    },
+    {
+      "objectType": "Payload.EvidenceAdmitted",
+      "when": {
+        "path": "contentKind",
+        "equals": "artifact"
+      },
+      "field": "content",
+      "mustBeKind": {
+        "type": "httpUrl"
+      }
+    },
+    {
+      "objectType": "Payload.VerificationRecorded",
+      "when": {
+        "path": "outcome",
+        "equals": "satisfied"
+      },
+      "field": "evidenceIds",
+      "mustBeKind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "InvestigationStarted"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.InvestigationStarted"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "LifecycleChanged"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.LifecycleChanged"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "ObservationRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.ObservationRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "HypothesisRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.HypothesisRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "HypothesisTransitioned"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.HypothesisTransitioned"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "EvidenceAdmitted"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.EvidenceAdmitted"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "EvidenceSuperseded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.EvidenceSuperseded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "EvidenceVerificationAssessed"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.EvidenceVerificationAssessed"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "EvidenceRelated"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.EvidenceRelated"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "UnknownIdentified"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.UnknownIdentified"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "UnknownTransitioned"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.UnknownTransitioned"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "AssumptionRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.AssumptionRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "AssumptionTransitioned"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.AssumptionTransitioned"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "ContradictionRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.ContradictionRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "ContradictionTransitioned"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.ContradictionTransitioned"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "PredictionRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.PredictionRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "ActionRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.ActionRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "ActionTransitioned"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.ActionTransitioned"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "FindingRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.FindingRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "NegativeKnowledgeEstablished"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.NegativeKnowledgeEstablished"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "CausalAssertionRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.CausalAssertionRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "CausalAssertionConfirmed"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.CausalAssertionConfirmed"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "CausalAssertionReopened"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.CausalAssertionReopened"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "CorrectiveActionRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.CorrectiveActionRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "CorrectiveActionTransitioned"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.CorrectiveActionTransitioned"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "CriterionRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.CriterionRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "VerificationRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.VerificationRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "ConclusionRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.ConclusionRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "ProposalRecorded"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.ProposalRecorded"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "ProposalWasAccepted"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.ProposalWasAccepted"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "ProposalWasRejected"
+      },
+      "field": "payload",
+      "mustBeKind": {
+        "type": "object",
+        "objectType": "Payload.ProposalWasRejected"
+      }
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "actor.kind",
+        "equals": "agent"
+      },
+      "field": "eventType",
+      "mustEqual": "ProposalRecorded"
+    },
+    {
+      "objectType": "Envelope",
+      "when": {
+        "path": "eventType",
+        "equals": "InvestigationStarted"
+      },
+      "field": "aggregateVersion",
+      "mustEqual": 1
+    },
+    {
+      "objectType": "Entity.hypothesis-change",
+      "when": {
+        "path": "command",
+        "equals": "markPlausible"
+      },
+      "field": "to",
+      "mustEqual": "plausible"
+    },
+    {
+      "objectType": "Entity.hypothesis-change",
+      "when": {
+        "path": "command",
+        "equals": "markSupported"
+      },
+      "field": "to",
+      "mustEqual": "supported"
+    },
+    {
+      "objectType": "Entity.hypothesis-change",
+      "when": {
+        "path": "command",
+        "equals": "markWeakened"
+      },
+      "field": "to",
+      "mustEqual": "weakened"
+    },
+    {
+      "objectType": "Entity.hypothesis-change",
+      "when": {
+        "path": "command",
+        "equals": "falsify"
+      },
+      "field": "to",
+      "mustEqual": "falsified"
+    },
+    {
+      "objectType": "Entity.hypothesis-change",
+      "when": {
+        "path": "command",
+        "equals": "supersede"
+      },
+      "field": "to",
+      "mustEqual": "superseded"
+    },
+    {
+      "objectType": "Entity.hypothesis-change",
+      "when": {
+        "path": "command",
+        "equals": "reopen"
+      },
+      "field": "to",
+      "mustEqual": "plausible"
+    },
+    {
+      "objectType": "Entity.hypothesis-change",
+      "when": {
+        "path": "command",
+        "equals": "markSupported"
+      },
+      "field": "evidenceIds",
+      "mustBeKind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      }
+    },
+    {
+      "objectType": "Entity.hypothesis-change",
+      "when": {
+        "path": "command",
+        "equals": "markWeakened"
+      },
+      "field": "evidenceIds",
+      "mustBeKind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      }
+    },
+    {
+      "objectType": "Entity.hypothesis-change",
+      "when": {
+        "path": "command",
+        "equals": "falsify"
+      },
+      "field": "evidenceIds",
+      "mustBeKind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      }
+    },
+    {
+      "objectType": "Entity.hypothesis-change",
+      "when": {
+        "path": "command",
+        "equals": "reopen"
+      },
+      "field": "evidenceIds",
+      "mustBeKind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      }
+    },
+    {
+      "objectType": "Entity.evidence",
+      "when": {
+        "path": "contentKind",
+        "equals": "artifact"
+      },
+      "field": "content",
+      "mustBeKind": {
+        "type": "httpUrl"
+      }
+    },
+    {
+      "objectType": "Entity.verification",
+      "when": {
+        "path": "outcome",
+        "equals": "satisfied"
+      },
+      "field": "evidenceIds",
+      "mustBeKind": {
+        "type": "list",
+        "of": {
+          "type": "uuid"
+        },
+        "unique": true,
+        "minItems": 1
+      }
+    }
+  ]
+}

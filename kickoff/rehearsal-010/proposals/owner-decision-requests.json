@@ -305,7 +305,7 @@
       "id": "ODR-R10-01",
       "kind": "decision",
       "title": "Approve the full Rehearsal 010 scope",
-      "question": "Approve docs/rehearsal-010-readiness/scope-manifest.json, compiled from the frozen v4.1.4 and the ratified catalog, as shown below (requirements, obligations, work items, zero exclusions, scopeSha256), slice integration and full-release acceptance remaining separate gates? Asked only once indy-init-requirements-v4.1.4 is tagged and ODR-R10-02 is applied, because both change the scope digest.",
+      "question": "Approve docs/rehearsal-010-readiness/scope-manifest.json, compiled from the frozen v4.1.5 and the ratified catalog, as shown below (requirements, obligations, work items, zero exclusions, scopeSha256), slice integration and full-release acceptance remaining separate gates? Asked only once indy-init-requirements-v4.1.5 is tagged and ODR-R10-02 is applied, because both change the scope digest. Re-asked for v4.1.5: APR-R10-OWNER-2 approved 59bfef5a, compiled from v4.1.4; the v4.1.5 recompile has the same 205 requirements, 890 obligations and 37 work items, and only the package identity and source commit change (scopeSha256 26e6ff3c...).",
       "options": [
         "A: approve the scope as shown",
         "B: do not approve (the scope is recompiled after changes)"
@@ -313,7 +313,7 @@
       "recommendation": "A, after checking the counts and digest shown against OWNER-APPROVAL-EXECUTION.md.",
       "rationale": "The scope is approved once, by digest; any later change needs a new approval.",
       "impact": "The lock pins this scopeSha256; check-sequencing refuses any other.",
-      "requiresTag": "indy-init-requirements-v4.1.4",
+      "requiresTag": "indy-init-requirements-v4.1.5",
       "requiresCurrentScope": "true",
       "pins": [
         {
@@ -418,11 +418,11 @@
       "id": "ODR-R10-19",
       "kind": "decision",
       "title": "Adopt a successor scope with split work items",
-      "question": "Adopt one successor scope (same 205 requirements and 890 obligations; split work items) instead of the approved 37-item scope 59bfef5a? Only before T0.",
+      "question": "Adopt one successor scope (same 205 requirements and 890 obligations; split work items) instead of the approved 37-item scope? Only before T0. Re-asked for v4.1.5: APR-R10-OWNER-3 chose A on the v4.1.4 compiles (a847f98c / 723c9eb3); the v4.1.5 recompiles keep the same requirements, obligations and work items, and only the package identity and source commit change.",
       "options": [
-        "A: adopt docs/rehearsal-010-optimization/proposals/scope-manifest.successor.json (53 items, a847f98c...)",
-        "B: adopt docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json (57 items, 723c9eb3...)",
-        "C: keep the approved scope 59bfef5a"
+        "A: adopt docs/rehearsal-010-optimization/proposals/scope-manifest.successor.json (53 items, 8baf049b...)",
+        "B: adopt docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json (57 items, abf544d6...)",
+        "C: keep the 37-item scope (ODR-R10-01)"
       ],
       "recommendation": "A or B only together with ODR-R10-22 (they need the speculative queue at realistic CI); otherwise C.",
       "rationale": "Changes what ODR-R10-01 approves; the lock, readiness docs and STARTUP must then name the new digest.",
@@ -598,6 +598,42 @@
       "recommendation": "A.",
       "rationale": "Both proposals extend the same frozen types.",
       "impact": "Enables the combined plan (E8).",
+      "launchable": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ODR-R10-34",
+      "kind": "decision",
+      "title": "Competition gate: bound or remove the second browser install (L1)",
+      "question": "tools/r9/verification-gate.yml (governed: tools/r9/governance.json names it, r9.fsx govern copies it and check-governance requires it byte-equal) installs browsers twice on ubuntu-latest. Its browser step (line 170) is bounded to 10 minutes, but the step \"Governed journeys J1-J3 and the design contract\" runs a second `npx playwright install --with-deps chromium webkit` (line 274) with no step limit, bounded only by the verify job's 40 minutes (line 49). On a stalled apt mirror, as Indy-init's own CI jobs saw three times on 2026-11-05, that install can consume the whole gate budget before the gate fails. What should the gate do?",
+      "options": [
+        "A: accept the exposure; record it in docs/ci-playwright-mitigation/FINAL-REPORT.md; no workflow change",
+        "B: move the journeys' npm install and browser install into their own step with timeout-minutes: 10 (dropping it instead only if verification/journeys and the candidate's root lock resolve the same Playwright version); a governed workflow edit through r9.fsx govern, proven on a rehearsal repository before T0",
+        "C: run the verify job in the digest-pinned Playwright image used by Indy-init's adversarial jobs (#150), removing both apt-based browser installs (a small apt step for tools such as git, jq and curl remains, and the gate's other tools must be provided); a governed workflow edit through r9.fsx govern, validated on a rehearsal repository before T0"
+      ],
+      "recommendation": "B: it bounds the stall the same way #150 bounded Indy-init's runner installs, with the smallest change to a governed file. C removes the browser installs' apt dependency but changes the gate's whole runtime this close to Nov 7.",
+      "rationale": "The gate decides every competition merge; an unbounded install turns a mirror stall into a 40-minute red gate instead of a 10-minute named failure.",
+      "impact": "A: none. B and C: the governed gate changes under tools/, so launch-preflight LP-09 needs a fresh Preflight tooling run of the new tree before launch; an agent applies the chosen option in a reviewed PR.",
+      "launchable": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "id": "ODR-R10-35",
+      "kind": "decision",
+      "title": "Launch scope for Rehearsal 010: apply ODR-R10-19 before T0, or defer it",
+      "question": "ODR-R10-19 is recorded as A (APR-R10-OWNER-4: adopt the 53-item successor scope, 8baf049b...), but the lock (scope.scopeSha256 26e6ff3c...) and ODR-R10-01 launch the 37-item scope, and no agent has applied -19. The analysis recommended -19 A only together with ODR-R10-22 (speculative verification), which is recorded as A in APR-R10-OWNER-3 (authorizing the speculative gate to be built) but is not built yet; without it the split helps at fast CI and hurts at slow CI (docs/rehearsal-010-optimization/OWNER-DECISIONS-REQUIRED.md). Which scope should Rehearsal 010 launch on?",
+      "options": [
+        "A: launch Rehearsal 010 on the 37-item scope ODR-R10-01 approves (26e6ff3c...); ODR-R10-19 A is not applied to Rehearsal 010 and is carried to Rehearsal 011, to be applied once the speculative gate ODR-R10-22 authorizes is built (ODR-R10-22 itself is unchanged); no lock, scope or slice file changes",
+        "B: apply ODR-R10-19 A before T0: an agent switches the lock's scope, slice manifest, work inventory and the launch docs to the successor (8baf049b...), with an independent review, and the owner then re-approves the lock's scope"
+      ],
+      "recommendation": "A: it is the launch the lock already describes, and it keeps -19's split with the queue it was designed for.",
+      "rationale": "A recorded decision that is not applied must say so, so the record and the launched scope agree.",
+      "impact": "A: none to the launch; -19 stays recorded for Rehearsal 011. B: the scope pin moves and launch preflight LP-04 must pass on the new scope before T0.",
       "launchable": [
         "A",
         "B"
