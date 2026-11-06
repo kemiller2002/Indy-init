@@ -252,9 +252,9 @@ jobs:
       - name: Playwright and browsers for the governed journeys and design contract (bounded; ODR-R10-34 B)
         id: journeys-browsers
         if: always()
-        # Its own step, so a stalled apt mirror fails here, by name, after 10 minutes instead of consuming the verify job's
+        # Its own step, so a stalled apt mirror fails here, by name, after 15 minutes instead of consuming the verify job's
         # 40 (ODR-R10-34 B). Not dropped: the governed journeys pin their own Playwright, which need not equal the candidate's.
-        timeout-minutes: 10
+        timeout-minutes: 15
         run: (cd "$RUNNER_TEMP/indy-init/verification/journeys" && npm install --no-audit --no-fund && npx playwright install --with-deps chromium webkit)
       - name: Governed journeys J1-J3 and the design contract (Chromium and WebKit; adversarial audit R3, R5)
         id: journeys
