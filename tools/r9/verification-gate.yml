@@ -92,7 +92,10 @@ jobs:
         run: |
           # A pull request that changes implementation names its slice by its branch; the gate then judges that work item
           # at the merged result (this checkout is the merge of the head into the current base).
-          src="$RUNNER_TEMP/indy-init"; slices="$src/docs/rehearsal-010-readiness/slice-execution-manifest.json"
+          # The run's derived files sit beside the scope manifest the lock pins (Rehearsal 010: docs/rehearsal-010-readiness;
+          # the competition: docs/competition-readiness).
+          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          manifest="$src/$(jq -r '.scope.manifest // "docs/rehearsal-010-readiness/scope-manifest.json"' "$lock")"; slices="$(dirname "$manifest")/slice-execution-manifest.json"
           # Records, not implementation (r9.fsx isImplementationPath agrees): they reach main through a setup/* pull request.
           impl=$(git diff --name-only HEAD^1 HEAD | grep -vE '^(docs|evidence|\.ros)/|\.md$|^\.echelon/(verification-scope|scope-checkpoint|r9-work-plan|obligations|r9-initialization-checkpoint)\.json$|^requirements/verification/verification-manifest\.json$' || true)
           slice=""; case "$HEAD_REF" in slice/SL-*) slice="${HEAD_REF#slice/}";; esac
@@ -307,6 +310,8 @@ jobs:
           CAUSA_GITHUB_TOKEN: ${{ steps.testtoken.outputs.token }}
         run: |
           src="$RUNNER_TEMP/indy-init"; rc="${{ steps.catalog.outputs.rc }}"; ev="$RUNNER_TEMP/slice-evidence"; mkdir -p "$ev"
+          lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          manifest="$src/$(jq -r '.scope.manifest // "docs/rehearsal-010-readiness/scope-manifest.json"' "$lock")"; slices="$(dirname "$manifest")/slice-execution-manifest.json"
           base="${{ steps.slice.outputs.target_base }}"
           # Governed coverage of the whole plan at the merged result and at the target base: regression and dependencies
           # are judged from this evidence, never from progress events the builder writes.
@@ -342,8 +347,8 @@ jobs:
           jq -n --arg c "$CANDIDATE" --arg s "$livestatus" '{candidate: $c, baseUrl: "https://api.github.com", status: $s}' > "$ev/live.json"
           dotnet "$rc" test-integrity --repo . --base "$base" --head "$CANDIDATE" \
             --base-results "$RUNNER_TEMP/base-results" --head-results "$RUNNER_TEMP/results" --out "$ev/test-integrity.json" || true
-          dotnet "$rc" slice-gate --manifest "$src/docs/rehearsal-010-readiness/scope-manifest.json" --events evidence/progress/events.json \
-            --slices "$src/docs/rehearsal-010-readiness/slice-execution-manifest.json" --slice "${{ steps.slice.outputs.id }}" --candidate "$CANDIDATE" \
+          dotnet "$rc" slice-gate --manifest "$manifest" --events evidence/progress/events.json \
+            --slices "$slices" --slice "${{ steps.slice.outputs.id }}" --candidate "$CANDIDATE" \
             --target-base "$base" --target-head "${{ steps.slice.outputs.target_head }}" \
             --gate "$RUNNER_TEMP/gate/gate.json" --journeys "$RUNNER_TEMP/journeys/journey-results.json" --design "$RUNNER_TEMP/journeys/design-contract.json" \
             --regression "$ev/regression.json" --build "$RUNNER_TEMP/journeys/build.json" --live "$ev/live.json" --test-integrity "$ev/test-integrity.json" \
@@ -356,12 +361,14 @@ jobs:
           src="$RUNNER_TEMP/indy-init"
           lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           bindings="$src/$(jq -r '.journeys.bindings // "verification/journeys/bindings.json"' "$lock")"
-          dotnet "${{ steps.catalog.outputs.rc }}" completion-gate --manifest "$src/docs/rehearsal-010-readiness/scope-manifest.json" \
+          manifest="$src/$(jq -r '.scope.manifest // "docs/rehearsal-010-readiness/scope-manifest.json"' "$lock")"
+          facts="$src/$(jq -r '.catalogVerification.contract // "kickoff/rehearsal-010/catalog-verification-contract.json"' "$lock")"
+          dotnet "${{ steps.catalog.outputs.rc }}" completion-gate --manifest "$manifest" \
             --coverage "$RUNNER_TEMP/gate/coverage.json" --catalog-verification "$RUNNER_TEMP/catalog/requirement-verification.json" \
             --events evidence/progress/events.json --candidate "${{ steps.candidate.outputs.sha }}" --release-gate "$RUNNER_TEMP/gate/gate.json" \
             --catalog "$RUNNER_TEMP/catalog/catalog-acceptance.json" --journeys "$RUNNER_TEMP/journeys/journey-results.json" \
             --design "$RUNNER_TEMP/journeys/design-contract.json" --journey-bindings "$bindings" \
-            --facts "$src/kickoff/rehearsal-010/catalog-verification-contract.json" \
+            --facts "$facts" \
             --approvals "$src/kickoff/acceptance/approvals.causa.json" --trusted-operator kemiller2002 --out "$RUNNER_TEMP/gate/completion.json"
       - name: Publish the coverage report, results and verdict
         if: always()
