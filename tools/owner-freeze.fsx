@@ -42,7 +42,11 @@
 //        v4.1.6 successor catalog becomes the ratified catalog, only if it is the file you approved, drops nothing and
 //        changes no ratified requirement other than those the request names
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide competition --repo Indy-init  # ODR-COMP-P01..P14, sections B and D of the
-//        decisions sheet (docs/v416-competition-decisions/proposals/owner-decision-requests.json); decisions only
+//        decisions sheet (docs/v416-competition-decisions/proposals/owner-decision-requests.json); decisions only. Section E:
+//        ODR-COMP-SCOPE (the competition scope docs/competition-readiness/scope-manifest.json, by its scopeSha256; asked only
+//        once v4.1.6 is tagged and the manifest is compiled from the package, supplement and catalog on main),
+//        ODR-COMP-CATALOG-CONTRACT and ODR-COMP-LOCK (kickoff/competition/), each recording its pinned file's sha256 at
+//        origin/main. Then commit kickoff/competition/toolchain.lock.json yourself (as ODR-RG-04).
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide rehearsal-010 --repo Indy-init  # ODR-RG-03, -05 and ODR-R10-01..36
 //        (kickoff/rehearsal-010/proposals/owner-decision-requests.json). A request that pins a file records the sha256
 //        of that file at origin/main, shown before you answer; ODR-R10-01 is asked only once v4.1.5 is tagged. A recorded
@@ -370,28 +374,36 @@ let pinsOf repo (request: JsonNode) =
 
 /// A Rehearsal 010 decision: shows exactly what it pins, then records the option with those digests. A request that
 /// names requiresTag waits until that tag exists (the digest it pins changes until then).
-/// Why the scope manifest at origin/main is not yet the one to approve: it must be compiled from the frozen package
-/// and the ratified catalog now on main, and, once ODR-R10-02 chose the successor, that catalog must be the ratified
-/// successor. None when it is current.
-let scopeNotCurrent repo =
-    let scope = atMain repo "docs/rehearsal-010-readiness/scope-manifest.json" |> parse
+/// Why a scope manifest at origin/main is not yet the one to approve: it must be compiled from the frozen package, its
+/// plan supplement (v4.1.6 onward; a package without one has none recorded) and the ratified catalog now on main, and,
+/// for Rehearsal 010's scope once ODR-R10-02 chose the successor, that catalog must be the ratified successor. None
+/// when it is current. The manifest is the one the request pins (Rehearsal 010's or the competition's).
+let r10ScopePath = "docs/rehearsal-010-readiness/scope-manifest.json"
+let scopeNotCurrent repo (manifestPath: string) =
+    let scope = atMain repo manifestPath |> parse
     let frozen = scope["frozen"]
     let catalogNow = sha256Hex (atMain repo (str frozen "catalog"))
     let packageDir = str frozen "package"
     let packageNow = sha256Hex (atMain repo $"{packageDir}/package-manifest.json")
+    let supplementNow = try Some(sha256Hex (atMain repo $"{packageDir}/verification-plan-supplement.json")) with Stop _ -> None
+    let supplementRecorded = match str frozen "verificationPlanSupplementSha256" with "" -> None | d -> Some d
     let successorChosen =
-        recordedChanges (approvalsAtMain repo) |> List.filter (fun c -> str c "decision_id" = "ODR-R10-02") |> List.tryLast |> Option.exists (fun c -> str c "option" = "A")
+        manifestPath = r10ScopePath
+        && recordedChanges (approvalsAtMain repo) |> List.filter (fun c -> str c "decision_id" = "ODR-R10-02") |> List.tryLast |> Option.exists (fun c -> str c "option" = "A")
     let ids (n: JsonNode) = items n "requirements" |> List.map (fun r -> str r "id") |> Set.ofList
     let successorIn () =
         let succ = atMain repo "docs/rehearsal-010-readiness/proposals/causa-investigation.requirement-catalog.successor.proposed.json" |> parse
         Set.isSubset (ids succ) (ids (atMain repo (str frozen "catalog") |> parse))
     if str frozen "catalogSha256" <> catalogNow then Some "the scope manifest was compiled from another catalog than the ratified one on main (the agent recompiles it)"
     elif str frozen "packageManifestSha256" <> packageNow then Some "the scope manifest was compiled from another package manifest than the one on main (the agent recompiles it)"
+    elif supplementRecorded <> supplementNow then Some "the scope manifest was compiled from another plan supplement than the package's on main (the agent recompiles it)"
     elif successorChosen && not (successorIn ()) then Some "ODR-R10-02 chose the successor, which is not ratified yet (ratify rehearsal-010)"
     else None
 
 let decideR10 repo (earlier: (JsonNode * Answer) list) (request: JsonNode) =
     let tag = str request "requiresTag"
+    // The scope a requiresCurrentScope request approves: the manifest it pins (Rehearsal 010's when it names none).
+    let scopePath = items request "pins" |> List.tryHead |> Option.map (fun p -> str p "path") |> Option.filter ((<>) "") |> Option.defaultValue r10ScopePath
     // An answer given earlier in this run changes what a later request pins: ODR-R10-02 = A means the scope is
     // recompiled after ratification, so ODR-R10-01 waits for the next run.
     let successorChosenNow =
@@ -402,8 +414,8 @@ let decideR10 repo (earlier: (JsonNode * Answer) list) (request: JsonNode) =
     elif str request "requiresCurrentScope" = "true" && successorChosenNow then
         say "  Not asked yet: ODR-R10-02 was just answered A, so the scope is recompiled after ratification. It stays pending."
         Skip
-    elif str request "requiresCurrentScope" = "true" && (scopeNotCurrent repo).IsSome then
-        say $"  Not asked yet: {(scopeNotCurrent repo).Value}. It stays pending."
+    elif str request "requiresCurrentScope" = "true" && (scopeNotCurrent repo scopePath).IsSome then
+        say $"  Not asked yet: {(scopeNotCurrent repo scopePath).Value}. It stays pending."
         Skip
     else
         let pins = pinsOf repo request

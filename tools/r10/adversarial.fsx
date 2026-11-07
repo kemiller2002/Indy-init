@@ -287,7 +287,11 @@ let earlierIntegrated = fullyIntegrated inv001
 let earlierObligations = obligationsOf inv001
 
 // Catalog acceptance fixtures: a synthetic verification of the real ratified catalog.
-let contract = Path.Combine(src, "kickoff", "rehearsal-010", "catalog-verification-contract.json")
+// The catalog verification contract that pins the ratified catalog in this tree: the competition contract (ODR-COMP-CATALOG-CONTRACT)
+// once v4.1.6's catalog is ratified; Rehearsal 010's contract pins the v4.1.5 catalog, which no longer matches requirements/catalogs.
+let contract =
+    [ Path.Combine(src, "kickoff", "competition", "catalog-verification-contract.json"); Path.Combine(src, "kickoff", "rehearsal-010", "catalog-verification-contract.json") ]
+    |> List.find File.Exists
 let contractSha = Security.Cryptography.SHA256.HashData(File.ReadAllBytes contract) |> Convert.ToHexString |> fun s -> s.ToLowerInvariant()
 let catalog = Path.Combine(src, "requirements", "catalogs", "causa-investigation.requirement-catalog.json")
 let catalogSha = Security.Cryptography.SHA256.HashData(File.ReadAllBytes catalog) |> Convert.ToHexString |> fun s -> s.ToLowerInvariant()

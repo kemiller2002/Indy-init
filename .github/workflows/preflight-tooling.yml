@@ -53,7 +53,7 @@ jobs:
             exit 1
           fi
           git worktree add --quiet --detach "$RUNNER_TEMP/v4-frozen" indy-init-requirements-v4.0.0
-      - name: Compiled packages v4.1, v4.1.1, v4.1.2, v4.1.4 and v4.1.5 on this commit are the frozen ones (tags indy-init-requirements-v4.1.0 at 183bbb4, indy-init-requirements-v4.1.1 at f85081f indy-init-requirements-v4.1.2 at 485b8a9 and indy-init-requirements-v4.1.4 at 208ec9f and indy-init-requirements-v4.1.5 at b2b3022)
+      - name: Compiled packages v4.1, v4.1.1, v4.1.2, v4.1.4, v4.1.5 and v4.1.6 on this commit are the frozen ones (tags indy-init-requirements-v4.1.0 at 183bbb4, indy-init-requirements-v4.1.1 at f85081f indy-init-requirements-v4.1.2 at 485b8a9 and indy-init-requirements-v4.1.4 at 208ec9f and indy-init-requirements-v4.1.5 at b2b3022 and indy-init-requirements-v4.1.6 at 2380b3d)
         run: |
           frozen() {
             tag=$1 commit=$2 dir=$3
@@ -70,6 +70,7 @@ jobs:
           frozen indy-init-requirements-v4.1.2 485b8a90972f5a996ed3dba3d9db17952fd677f9 requirements-compiled/v4.1.2
           frozen indy-init-requirements-v4.1.4 208ec9f187578c0e9c8b871361e302e58ffb84ba requirements-compiled/v4.1.4
           frozen indy-init-requirements-v4.1.5 b2b30223f05fd665a8af6c3a87dd134ba6851bec requirements-compiled/v4.1.5
+          frozen indy-init-requirements-v4.1.6 2380b3daf58af0d5126b37949cfe882def597688 requirements-compiled/v4.1.6
       - name: Install the SDK the tagged compiler pins (the tag's global.json)
         uses: actions/setup-dotnet@v4
         with:
