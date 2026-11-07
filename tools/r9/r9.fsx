@@ -3,7 +3,8 @@
 //   dotnet fsi tools/r9/r9.fsx -- install-conditor --lock LOCK --dir DIR [--platform RID]
 //   dotnet fsi tools/r9/r9.fsx -- workstation --lock LOCK --conditor EXE --home DIR [--platform RID] [--target-id ID] [--require-registration true]
 //   dotnet fsi tools/r9/r9.fsx -- govern --indy-init SRC --target REPO [--lock kickoff/rehearsal-0NN/toolchain.lock.json]
-//   dotnet fsi tools/r9/r9.fsx -- check-governance --indy-init SRC --target REPO [--base-scope FILE]
+//   dotnet fsi tools/r9/r9.fsx -- check-governance --indy-init SRC --target REPO [--base-scope FILE] [--trusted-operator ID --trusted-indy-init MAIN-CLONE [--approvals F]]
+//        A later change of the governance record is accepted only with the owner's re-govern approval (reGovernCauses).
 //   dotnet fsi tools/r9/r9.fsx -- gate --obligations F --root REPO --results F --dokimos EXE --out DIR
 //        (--mode release | --mode development --scope-file F) [--expect-candidate SHA]
 //        [--work-item ID --scope REQ,...] [--matrix F]
@@ -16,10 +17,11 @@
 //   dotnet fsi tools/r9/r9.fsx -- run-suites (--obligations F | --plan EXECUTION-PLAN) --root REPO --out DIR [--suites ID,...] [--require-tests true]
 //   dotnet fsi tools/r9/r9.fsx -- suite-preflight (--obligations F | --plan EXECUTION-PLAN) --root REPO [--out F] [--require-tests true]
 //        Executes every executable suite command in list mode; refuses readiness if any cannot execute, and with
-//        --require-tests if one executes but selects no test (run-suites: if one runs but executes no test).
-//   dotnet fsi tools/r9/r9.fsx -- suite-fixture --out NEW-DIR [--without-webkit true] [--empty-project NAME]
+//        --require-tests if one executes but selects no test (run-suites: if one runs but executes no test). A .NET test
+//        assembly xunit skips (could not find dependent assembly, e.g. FSharp.Core) is refused in every mode.
+//   dotnet fsi tools/r9/r9.fsx -- suite-fixture --out NEW-DIR [--without-webkit true] [--empty-project NAME] [--without-fsharp-core NAME]
 //        A deterministic tree with the plan's test layout (one trivial test per suite, no application code).
-//   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F --scope-sha256 HEX [--scope-checkpoint F]
+//   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F --scope-sha256 HEX [--scope-checkpoint F] [--scope-manifest F]
 //        --spec-preflight F --acceptance-preflight F [--work-plan F] [--manifest F] [--scope F] [--praxis EXE]
 //        Pre-implementation gate (Praxis ordering); writes the immutable .echelon/r9-initialization-checkpoint.json.
 //   dotnet fsi tools/r9/r9.fsx -- check-sequencing --target REPO [--scope-manifest F] [--out F]
@@ -220,7 +222,12 @@ let govern () =
     let target = Path.GetFullPath(req "--target")
     let g = governanceOf src
     let rosPath = Path.Combine(target, "ros.json")
+    // A re-govern (a record already exists) keeps the T0 record's lock and its items completed before governance:
+    // it adopts a corrected template, nothing else (check-governance accepts it only with the owner's approval).
+    let existingRecord = Path.Combine(target, ".echelon", "r9-governance.json") |> fun f -> if File.Exists f then Some(readJson f) else None
     if not (File.Exists rosPath) then Unusable $"{rosPath} does not exist; run conditor init first"
+    elif existingRecord |> Option.exists (fun r -> str r "toolchainLock" <> "" && str r "toolchainLock" <> lockPath) then
+        Unusable $"""the repository is governed with {str existingRecord.Value "toolchainLock"}; a re-govern keeps the rehearsal's lock (--lock {str existingRecord.Value "toolchainLock"})"""
     else
         let ros = readJson rosPath
         ros["workProtocol"]["qualityEvidence"] <- g["qualityEvidence"].DeepClone()
@@ -233,9 +240,11 @@ let govern () =
         if not (File.Exists scope) then File.WriteAllText(scope, "{\n  \"schema\": \"indy-init.r9-verification-scope/1\",\n  \"requirements\": []\n}\n")
         let current = Path.Combine(target, ".ros", "context", "current.json")
         let preexisting =
-            if File.Exists current then
+            match existingRecord with
+            | Some r -> arr r "completedBeforeGovernance" |> List.map (fun n -> n.DeepClone())
+            | None when File.Exists current ->
                 arr (readJson current) "workItems" |> List.filter (fun w -> str w "state" = "complete") |> List.map (fun w -> JsonValue.Create(str w "id") :> JsonNode)
-            else []
+            | None -> []
         let _, srcCommit = git src [ "rev-parse"; "HEAD" ]
         let record =
             JsonObject(
@@ -263,6 +272,61 @@ let passedMatrices (target: string) (vdir: string) =
         |> Seq.map (fun v -> "sha256:" + str v "matrixSha256", v)
         |> Map.ofSeq
 
+/// Rehearsal 010 (Fix 5, review F5): a running rehearsal could never adopt a corrected governance template, because any
+/// second commit touching .echelon/r9-governance.json was refused. A later version of the record (indyInitCommit Y) is
+/// accepted only when the owner approved it, judged entirely from a TRUSTED Indy-init checkout (--trusted-indy-init: a
+/// separate clone of Indy-init's owner-merged main with its history), never from the governing checkout, which is at Y
+/// and so is whatever Y's author wrote:
+///   - Y is reachable from the trusted main (owner-merged);
+///   - the trusted main's approvals (--approvals, default kickoff/rehearsal-007/approvals.causa.json) hold a record by
+///     the trusted operator (--trusted-operator) with a change {action: "re-govern", indyInitCommit: X}, where Y is X,
+///     or X is an ancestor of Y and X..Y changes nothing but that approvals file (so verification/, the lock, the scope
+///     and slice manifests and every other governed input are exactly X's);
+///   - the version keeps the T0 record's lock and completedBeforeGovernance.
+/// Without --trusted-operator and --trusted-indy-init no later version is accepted (the T0 rule).
+let reGovernCauses (target: string) : string list =
+    let recordRel = ".echelon/r9-governance.json"
+    let _, log = git target [ "log"; "--format=%H"; "--"; recordRel ]
+    let commits = log.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray |> List.rev
+    match commits with
+    | [] | [ _ ] -> []
+    | first :: later ->
+        match opt "--trusted-operator", opt "--trusted-indy-init" with
+        | None, _ | _, None -> [ $".echelon/r9-governance.json was changed after T0 ({commits.Length} commits touch it): the governance record is written once, by r9.fsx govern, and changed only by an owner-approved re-govern (--trusted-operator, --trusted-indy-init)" ]
+        | Some operator, Some trustedDir ->
+            let trusted = Path.GetFullPath trustedDir
+            let at (c: string) =
+                let code, text = git target [ "show"; $"{c}:{recordRel}" ]
+                if code = 0 then (try Some(JsonNode.Parse text) with _ -> None) else None
+            let approvalsRel = opt "--approvals" |> Option.defaultValue "kickoff/rehearsal-007/approvals.causa.json"
+            let approvalsFile = Path.Combine(trusted, approvalsRel)
+            let approved =
+                if not (File.Exists approvalsFile) then []
+                else
+                    arr (readJson approvalsFile) "approvals"
+                    |> List.filter (fun a -> let au = a["authority"] in not (isNull au) && str au "kind" = "operator" && str au "id" = operator)
+                    |> List.collect (fun a -> arr a "changes" |> List.filter (fun c -> str c "action" = "re-govern") |> List.map (fun c -> str a "id", str c "indyInitCommit"))
+            let onMain (c: string) = isSha c && fst (git trusted [ "merge-base"; "--is-ancestor"; c; "HEAD" ]) = 0
+            let onlyApprovals (x: string) (y: string) =
+                isSha x && fst (git trusted [ "merge-base"; "--is-ancestor"; x; y ]) = 0
+                && (let code, out = git trusted [ "diff"; "--name-only"; x; y ]
+                    code = 0 && out.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> Array.forall (fun f -> f.Trim() = approvalsRel))
+            let t0 = at first
+            let same (key: string) (r: JsonNode) = (match t0 with Some t -> canonical t[key] | None -> "") = canonical r[key]
+            later
+            |> List.collect (fun c ->
+                let short = c.Substring(0, min 12 c.Length)
+                match at c with
+                | None -> [ $"re-govern {short}: .echelon/r9-governance.json is missing or unreadable there" ]
+                | Some r ->
+                    let y = str r "indyInitCommit"
+                    let named = String.Join(", ", approved |> List.map (fun (id, x) -> $"{id} -> {x}"))
+                    check (onMain y) $"re-govern {short}: Indy-init {y} is not on the trusted Indy-init main: only an owner-merged commit can govern"
+                    @ check (approved |> List.exists (fun (_, x) -> x = y || onlyApprovals x y))
+                        $"""re-govern {short}: Indy-init {y} is not approved: no re-govern record by {operator} in the trusted {approvalsRel} names it, or a commit it differs from only by that file ({(if named = "" then "none recorded" else named)})"""
+                    @ check (same "toolchainLock" r) $"re-govern {short}: the record changes the rehearsal's lock; a re-govern adopts a corrected template only"
+                    @ check (same "completedBeforeGovernance" r) $"re-govern {short}: the record changes the items completed before governance; they stay as written at T0")
+
 let checkGovernance () =
     let src = Path.GetFullPath(req "--indy-init")
     let target = Path.GetFullPath(req "--target")
@@ -276,10 +340,9 @@ let checkGovernance () =
         @ check (File.Exists workflow && sha256File workflow = sha256File (Path.Combine(src, str g "workflow")))
             ".github/workflows/verification-gate.yml is missing or differs from Indy-init tools/r9/verification-gate.yml"
         @ check (File.Exists recordPath) ".echelon/r9-governance.json is missing: the repository was not governed at T0"
-        // The record pins the governing Indy-init commit and the rehearsal's lock; it is written once at T0.
-        @ (let _, log = git target [ "log"; "--format=%H"; "--"; ".echelon/r9-governance.json" ]
-           let commits = log.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length
-           check (commits <= 1) $".echelon/r9-governance.json was changed after T0 ({commits} commits touch it): the governance record is written once, by r9.fsx govern")
+        // The record pins the governing Indy-init commit and the rehearsal's lock; it is written once at T0, and
+        // changed later only by an owner-approved re-govern (reGovernCauses).
+        @ reGovernCauses target
     let record = if File.Exists recordPath then readJson recordPath else null
     let before = arr record "completedBeforeGovernance" |> List.map (fun n -> n.GetValue<string>()) |> Set.ofList
     let current = Path.Combine(target, ".ros", "context", "current.json")
@@ -639,6 +702,16 @@ let executedTests (format: string) (path: string) : int =
             [ "expected"; "unexpected"; "flaky" ] |> List.sumBy (fun k -> match stats with | null -> 0 | s when isNull s[k] -> 0 | s -> s[k].GetValue<int>())
         with _ -> 0
 
+/// The test assemblies xunit skipped because they cannot load ("Skipping: X (could not find dependent assembly ...)").
+/// Such an assembly lists and runs no test and the command still exits 0: Rehearsal 010's bootstrap enabled central
+/// package management, which drops the F# SDK's implicit FSharp.Core reference, so no F# test assembly shipped
+/// FSharp.Core.dll and every .NET suite was vacuously green. Never legitimate, so refused with or without --require-tests.
+let skippedAssemblies (output: string) : string list =
+    Regex.Matches(output, @"Skipping: (\S+) \((could not find dependent assembly [^)]*)\)")
+    |> Seq.map (fun m -> $"{m.Groups[1].Value} ({m.Groups[2].Value})")
+    |> Seq.distinct
+    |> List.ofSeq
+
 // ---- run-suites: execute the plan's own suite commands and record machine-readable results at HEAD -----------------
 
 /// Runs each selected executable suite exactly as the frozen plan states it, adding only a machine-readable logger,
@@ -662,8 +735,12 @@ let runSuites () =
         let code, output = run "sh" [ "-c"; command ] root
         File.WriteAllText(Path.Combine(dir, "run.log"), $"$ {command}\nexit {code}\n{output}")
         let files = Directory.EnumerateFiles(dir, (if format = "trx" then "*.trx" else "results.json"), SearchOption.AllDirectories) |> List.ofSeq
-        id, code, files |> List.map (fun f -> Path.GetRelativePath(out, f), format)
-    let ran = suites |> List.map runOne
+        (id, code, files |> List.map (fun f -> Path.GetRelativePath(out, f), format)), (id, (if format = "trx" then skippedAssemblies output else []))
+    let ranWithSkips = suites |> List.map runOne
+    let ran = ranWithSkips |> List.map fst
+    let skipped =
+        ranWithSkips |> List.map snd |> List.filter (snd >> List.isEmpty >> not)
+        |> List.map (fun (id, asms) -> $"""suite {id}: test assemblies were skipped and ran no test: {String.Join("; ", asms)}; see {id}/run.log""")
     let runs =
         ran |> List.collect (fun (id, _, files) ->
             files |> List.map (fun (path, format) ->
@@ -689,7 +766,7 @@ let runSuites () =
             ran
             |> List.filter (fun (_, _, files) -> not files.IsEmpty && files |> List.sumBy (fun (p, f) -> executedTests f (Path.Combine(out, p))) = 0)
             |> List.map (fun (id, code, _) -> $"suite {id} executed no test (exit {code}); a command that selects zero tests is not verification; see {id}/run.log")
-    let missing = missing @ empty
+    let missing = missing @ skipped @ empty
     if suites.IsEmpty then Unusable "no executable suite selected"
     elif missing.IsEmpty then Pass (ran |> List.map (fun (id, code, files) -> $"{id}: exit {code}, {files.Length} result file(s)") |> fun l -> l @ [ $"results {out}/results.json at {head}" ])
     else Refused missing
@@ -731,12 +808,16 @@ let suitePreflight () =
         let listed = if runner = "dotnet-test" then $"{command} --list-tests -m:1" else $"{command} --list --pass-with-no-tests"
         let code, output = run "sh" [ "-c"; listed ] root
         let count = listedTests runner output
+        let skipped = if runner = "dotnet-test" then skippedAssemblies output else []
         let cause =
             if code <> 0 then
                 output.Split('\n')
                 |> Array.tryFind (fun l -> Regex.IsMatch(l, @"error|Error:|not found", RegexOptions.IgnoreCase))
                 |> Option.map (fun l -> l.Trim())
                 |> Option.defaultValue $"exit {code}"
+            // Always refused (Rehearsal 010): an assembly xunit skips lists no test however many it declares.
+            elif not skipped.IsEmpty then
+                $"""test discovery skipped {String.Join("; ", skipped)}; the suite cannot list its tests (an F# test assembly without FSharp.Core.dll: central package management drops the SDK's implicit reference)"""
             elif requireTests && count = 0 then "the command executes but selects no test"
             else ""
         id, listed, code, count, cause
@@ -774,7 +855,9 @@ let suitePreflight () =
 /// A deterministic test tree with the plan's project, namespace and folder layout and one trivial test per suite,
 /// so every suite command of a package can be executed before T0 (#102). withWebkit = false reproduces Rehearsal
 /// 009's missing project.
-let fixtureFiles (withWebkit: bool) (emptyProject: string option) : (string * string) list =
+let fixtureFiles (withWebkit: bool) (emptyProject: string option) (withoutFSharpCore: string option) : (string * string) list =
+    let centralWithoutFSharpCore =
+        "<Project>\n  <PropertyGroup>\n    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>\n  </PropertyGroup>\n  <ItemGroup>\n    <PackageVersion Include=\"Microsoft.NET.Test.Sdk\" Version=\"17.11.1\" />\n    <PackageVersion Include=\"xunit\" Version=\"2.9.2\" />\n    <PackageVersion Include=\"xunit.runner.visualstudio\" Version=\"2.8.2\" />\n  </ItemGroup>\n</Project>\n"
     let dotnetProjects =
         [ "Causa.Contract.Tests", [ "Causa.Contract.Tests.Fixture" ]
           "Causa.Domain.Tests", [ "Causa.Domain.Tests.Fixture" ]
@@ -795,14 +878,21 @@ let fixtureFiles (withWebkit: bool) (emptyProject: string option) : (string * st
       "package.json", "{\n  \"name\": \"r9-suite-fixture\",\n  \"private\": true,\n  \"devDependencies\": {\n    \"@playwright/test\": \"1.63.0\"\n  }\n}\n"
       "playwright.config.ts", $"import {{ defineConfig }} from '@playwright/test';\n\nexport default defineConfig({{\n  testDir: 'tests/browser',\n  projects: [\n{projects}  ],\n}});\n"
       ".gitignore", "bin/\nobj/\nnode_modules/\ntest-results/\n" ]
-    @ (dotnetProjects |> List.collect (fun (p, ms) -> [ $"tests/{p}/{p}.fsproj", fsproj; $"tests/{p}/Tests.fs", testsFs p ms ]))
+    @ (dotnetProjects |> List.collect (fun (p, ms) ->
+        // --without-fsharp-core P: P is centrally managed (its own Directory.Packages.props) with no FSharp.Core version,
+        // as Rehearsal 010's bootstrap wrote it; it builds, but xunit skips the assembly and lists no test.
+        if Some p = withoutFSharpCore then
+            [ $"tests/{p}/{p}.fsproj", Regex.Replace(fsproj, " Version=\"[^\"]+\"", "")
+              $"tests/{p}/Directory.Packages.props", centralWithoutFSharpCore
+              $"tests/{p}/Tests.fs", testsFs p ms ]
+        else [ $"tests/{p}/{p}.fsproj", fsproj; $"tests/{p}/Tests.fs", testsFs p ms ]))
     @ ([ "contract"; "acceptance"; "invariants"; "live" ] |> List.map spec)
 
 let suiteFixture () =
     let out = Path.GetFullPath(req "--out")
     if Directory.Exists out && not (Seq.isEmpty (Directory.EnumerateFileSystemEntries out)) then Unusable $"{out} is not empty"
     else
-        let files = fixtureFiles (opt "--without-webkit" <> Some "true") (opt "--empty-project")
+        let files = fixtureFiles (opt "--without-webkit" <> Some "true") (opt "--empty-project") (opt "--without-fsharp-core")
         files |> List.iter (fun (path, text) ->
             let full = Path.Combine(out, path)
             Directory.CreateDirectory(Path.GetDirectoryName full) |> ignore
@@ -877,12 +967,16 @@ let authorizeImplementation () =
         let code, out = run praxis [ "work"; "--root"; target ] target
         if code <> 0 then []
         else
-            try (JsonNode.Parse out :?> JsonArray) |> Seq.map (fun n -> str n "id") |> List.ofSeq with _ -> []
+            try (JsonNode.Parse out :?> JsonArray) |> Seq.map (fun n -> str n "id", str n "title") |> List.ofSeq with _ -> []
     let lifecycle (id: string) = id.StartsWith "COND-MISSION" || id.StartsWith "ROS-INSTALL"
+    // A work-plan item is in Praxis when a Praxis item carries its id, or a title that starts with "[ID]": the
+    // STARTUP-INSTRUCTIONS form `praxis add "[ID] title"`, needed because Praxis refuses ids such as T10 as its own.
+    let inPraxis (id: string) =
+        praxisItems |> List.exists (fun (pid, title) -> pid = id || (not (isNull title) && title.StartsWith($"[{id}]", StringComparison.Ordinal)))
     let step3 =
         check (not (isNull workPlan)) $"3 work items: {workPlanPath} (indy-init.r9-work-plan/1) is missing"
-        @ check (praxisItems |> List.exists (lifecycle >> not)) "3 work items: Praxis holds no work item beyond its own lifecycle records; create them before implementing"
-        @ (items |> List.choose (fun w -> let id = str w "id" in if List.contains id praxisItems then None else Some $"3 work items: {id} is in the work plan but not in Praxis"))
+        @ check (praxisItems |> List.exists (fst >> lifecycle >> not)) "3 work items: Praxis holds no work item beyond its own lifecycle records; create them before implementing"
+        @ (items |> List.choose (fun w -> let id = str w "id" in if inPraxis id then None else Some $"3 work items: {id} is in the work plan but not in Praxis"))
     let manifest = if exists manifestPath then readJson manifestPath else null
     let catalogObligations = arr manifest "requirements" |> List.collect (fun r -> arr r "obligations" |> List.map (fun o -> str o "id", str r "id")) |> Map.ofList
     let plan = if exists (req "--obligations") then readJson (req "--obligations") else null
@@ -904,12 +998,32 @@ let authorizeImplementation () =
             let reqs = scopeRequirements |> Set.ofList
             (catalogObligations |> Map.toList) @ (planObligations |> Map.toList) |> List.filter (fun (_, r) -> reqs.Contains r) |> List.map fst
     let linked = items |> List.collect (fun w -> strList w "obligations") |> Set.ofList
+    // The approved scope manifest's coordination items: its work items without requirements. Without the manifest, or
+    // with one whose scopeSha256 is not the approved one, no item is exempt.
+    let scopeManifest = opt "--scope-manifest" |> Option.filter exists |> Option.map readJson
+    let coordinationItems =
+        match scopeManifest with
+        | Some m when opt "--scope-sha256" = Some(str m "scopeSha256") ->
+            arr m "workItems" |> List.filter (fun w -> (strList w "requirements").IsEmpty) |> List.map (fun w -> str w "id") |> Set.ofList
+        | _ -> Set.empty
+    let manifestCauses =
+        match opt "--scope-manifest", scopeManifest with
+        | Some f, None -> [ $"4 links: the scope manifest {f} does not exist" ]
+        | Some _, Some m when opt "--scope-sha256" <> Some(str m "scopeSha256") ->
+            [ $"""4 links: the scope manifest has scopeSha256 {str m "scopeSha256"}, not the approved {defaultArg (opt "--scope-sha256") "(none)"}: no coordination item is exempt""" ]
+        | _ -> []
     let step4 =
         scopeCauses
+        @ manifestCauses
         @ (items |> List.collect (fun w ->
             let id = str w "id"
-            check (not (strList w "requirements").IsEmpty) $"4 links: {id} names no requirement"
-            @ check (not (strList w "obligations").IsEmpty) $"4 links: {id} names no verification obligation"
+            let reqs, obls = strList w "requirements", strList w "obligations"
+            // A coordination item links nothing and is not refused: only an item the approved scope manifest
+            // (--scope-manifest, bound to --scope-sha256) itself gives no requirements (T14, T17, ...), and only while the
+            // work plan also gives it neither requirements nor obligations. Any other item must name both.
+            let coordination = reqs.IsEmpty && obls.IsEmpty && coordinationItems.Contains id
+            check (coordination || not reqs.IsEmpty) $"4 links: {id} names no requirement"
+            @ check (coordination || not obls.IsEmpty) $"4 links: {id} names no verification obligation"
             @ (strList w "obligations" |> List.filter (known >> not) |> List.map (fun o -> $"4 links: {id} names obligation {o}, which neither the catalog manifest nor the plan defines"))))
         @ (match inScope |> List.filter (linked.Contains >> not) with
            | [] -> []

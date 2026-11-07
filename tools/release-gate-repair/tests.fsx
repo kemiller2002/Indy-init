@@ -164,6 +164,12 @@ r9case "suite-preflight-zero-selected-tests-refused" [ 4 ] [ "SU-DOTNET-DETERMIN
 r9case "suite-preflight-zero-tests-allowed-before-implementation" [ 0 ] [ "SU-DOTNET-DETERMINISTIC: executable, 0 test(s)" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fxEmpty ] fxEmpty |> ignore
 r9case "run-suites-release-zero-executed-refused" [ 4 ] [ "suite SU-DOTNET-DETERMINISTIC executed no test (exit 0)" ] [ "run-suites"; "--obligations"; obl414; "--root"; fxEmpty; "--out"; Path.Combine(work, "runs-empty"); "--suites"; "SU-DOTNET-DETERMINISTIC"; "--require-tests"; "true" ] fxEmpty |> ignore
 r9case "run-suites-release-fixture-executes" [ 0 ] [ "SU-OWN-DOTNET: exit 0"; "SU-DOTNET-DETERMINISTIC: exit 0" ] [ "run-suites"; "--obligations"; obl414; "--root"; fx; "--out"; Path.Combine(work, "runs-fx"); "--suites"; "SU-OWN-DOTNET,SU-DOTNET-DETERMINISTIC"; "--require-tests"; "true" ] fx |> ignore
+// Rehearsal 010 (Fix 2): a centrally managed F# test project without FSharp.Core builds, but xunit skips the assembly
+// ("could not find dependent assembly 'FSharp.Core'") and the command exits 0. Refused in every mode, before and after
+// implementation, by suite-preflight and by run-suites.
+let fxNoCore = fixtureAt "fx-nofsharpcore" [ "--without-fsharp-core"; "Causa.Acceptance" ]
+r9case "suite-preflight-skipped-assembly-refused-without-require-tests" [ 4 ] [ "SU-DOTNET-DETERMINISTIC: test discovery skipped Causa.Acceptance (could not find dependent assembly 'FSharp.Core" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fxNoCore ] fxNoCore |> ignore
+r9case "run-suites-development-skipped-assembly-refused" [ 4 ] [ "suite SU-DOTNET-DETERMINISTIC: test assemblies were skipped and ran no test: Causa.Acceptance" ] [ "run-suites"; "--obligations"; obl414; "--root"; fxNoCore; "--out"; Path.Combine(work, "runs-nofsharpcore"); "--suites"; "SU-DOTNET-DETERMINISTIC,SU-OWN-DOTNET" ] fxNoCore |> ignore
 
 // ---- 3. Praxis ordering: authorize-implementation and check-sequencing -------------------------------------------
 
@@ -238,6 +244,31 @@ r9case "authorize-refuses-without-a-scope-checkpoint" [ 4 ] [ "7 scope: .echelon
 write (Path.Combine(app, ".echelon", "scope-checkpoint.json")) """{"schema":"indy-init.scope-checkpoint/1","scopeSha256":"scope-approved"}"""
 commitAll app "scope checkpoint (every work item in Praxis)" |> ignore
 r9case "authorize-refuses-a-scope-checkpoint-of-another-scope" [ 4 ] [ "7 scope: the scope checkpoint pins scope-approved, not the approved scope scope-other" ] (authorize [] @ [ "--scope-sha256"; "scope-other" ]) app |> ignore
+// Review F1 (669fe04): Praxis "[ID] title" items count for exactly that id, and only the approved scope manifest's
+// coordination items (its work items without requirements) may link nothing.
+let planWith (extra: string) =
+    write (Path.Combine(app, ".echelon", "r9-work-plan.json")) ($"""{{"schema":"indy-init.r9-work-plan/1","workItems":[{{"id":"WI-CONTENT-1","requirements":["INV-001","SMK-001"],"obligations":[{String.Join(",", catalogObligations)},"SMK-001-O1"]}}{extra}]}}""")
+let scopeManifestFile = Path.Combine(work, "scope-manifest.json")
+write scopeManifestFile """{"schema":"indy-init.scope-manifest/1","scopeSha256":"scope-approved","workItems":[{"id":"WI-CONTENT-1","requirements":["INV-001","SMK-001"]},{"id":"T10","requirements":[]},{"id":"T12","requirements":["SMK-001"]},{"id":"T13","requirements":["SMK-001"]},{"id":"WI-CONTENT-2","requirements":["SMK-001"]}]}"""
+let withApprovedManifest = authorize [] @ [ "--scope-sha256"; "scope-approved"; "--scope-manifest"; scopeManifestFile ]
+// WI-CONTENT-2 (emptied, but the manifest gives it requirements) keeps every case refused, so none writes a checkpoint.
+run praxis [ "add"; "[WI-CONTENT-2] emptied" ] app |> ignore
+planWith """,{"id":"T10","requirements":[],"obligations":[]},{"id":"WI-CONTENT-2","requirements":[],"obligations":[]}"""
+run praxis [ "add"; "[T1] another item" ] app |> ignore
+case "authorize-a-[T1]-title-does-not-count-for-T10" [ 4 ] [ "3 work items: T10 is in the work plan but not in Praxis" ] [] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
+run praxis [ "add"; "[T10] coordination item" ] app |> ignore
+case "authorize-a-[T10]-title-counts-and-the-coordination-item-is-accepted" [ 4 ] [ "4 links: WI-CONTENT-2 names no requirement" ] [ "T10 is in the work plan"; "4 links: T10" ] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
+case "authorize-a-coordination-item-needs-the-approved-manifest" [ 4 ] [ "4 links: T10 names no requirement" ] [] "dotnet" ([ "fsi"; r9; "--" ] @ authorize [] @ [ "--scope-sha256"; "scope-approved" ]) app |> ignore
+case "authorize-a-manifest-of-another-scope-exempts-nothing" [ 4 ] [ "4 links: T10 names no requirement"; "the scope manifest has scopeSha256 scope-approved, not the approved scope-other" ] [] "dotnet" ([ "fsi"; r9; "--" ] @ authorize [] @ [ "--scope-sha256"; "scope-other"; "--scope-manifest"; scopeManifestFile ]) app |> ignore
+run praxis [ "add"; "[T12] requirements, no obligations" ] app |> ignore
+run praxis [ "add"; "[T13] obligations, no requirements" ] app |> ignore
+planWith """,{"id":"T10","requirements":[],"obligations":[]},{"id":"T12","requirements":["SMK-001"],"obligations":[]},{"id":"T13","requirements":[],"obligations":["SMK-001-O1"]},{"id":"WI-CONTENT-2","requirements":[],"obligations":[]}"""
+case "authorize-refuses-requirements-without-obligations" [ 4 ] [ "4 links: T12 names no verification obligation" ] [] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
+case "authorize-refuses-obligations-without-requirements" [ 4 ] [ "4 links: T13 names no requirement" ] [] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
+case "authorize-refuses-an-emptied-non-coordination-item" [ 4 ] [ "4 links: WI-CONTENT-2 names no requirement"; "4 links: WI-CONTENT-2 names no verification obligation" ] [ "4 links: T10" ] "dotnet" ([ "fsi"; r9; "--" ] @ withApprovedManifest) app |> ignore
+planWith ""
+// authorize-implementation authorizes only a committed state: commit the Praxis items the F1 cases added.
+commitAll app "praxis: the F1 cases' work items; the work plan as before" |> ignore
 r9case "authorize-passes-and-writes-the-checkpoint" [ 0 ] [ "checkpoint"; "1 work item(s)" ] (authorize [] @ [ "--scope-sha256"; "scope-approved" ]) app |> ignore
 let checkpointSha = commitAll app "initialization checkpoint"
 r9case "authorize-refuses-a-second-checkpoint" [ 4 ] [ "is immutable" ] (authorize []) app |> ignore
@@ -465,6 +496,87 @@ write (Path.Combine(evil, "src", "Evil.fs")) "module Evil\n"
 git evil [ "add"; "-A" ] |> ignore
 git evil [ "commit"; "-qm"; "merge side (with implementation)" ] |> ignore
 r9case "check-sequencing-inspects-what-a-merge-adds" [ 4 ] [ "merge side (with implementation)" ] [ "check-sequencing"; "--target"; evil ] evil |> ignore
+
+
+// ---- re-govern (Rehearsal 010, Fix 5; review F5): a later governance record only with the owner's approval -------
+
+// A synthetic Indy-init (tools/r9, verification/, the lock and the approvals file) whose main holds: the T0 template
+// W, a corrected template X and Y, which only adds the owner's re-govern approval of X. The trusted checkout is a
+// separate clone of that main; the governing checkout (govSrc) is moved to the commit each record names.
+let govSrc = Path.Combine(work, "gov-src")
+let approvalsRel = "kickoff/rehearsal-007/approvals.causa.json"
+let govApprovals = Path.Combine(govSrc, approvalsRel)
+let gateYml = Path.Combine(govSrc, "tools", "r9", "verification-gate.yml")
+Directory.CreateDirectory(Path.Combine(govSrc, "tools", "r9")) |> ignore
+git govSrc [ "init"; "-q"; "-b"; "main" ] |> ignore
+for f in Directory.GetFiles(Path.Combine(src, "tools", "r9")) do File.Copy(f, Path.Combine(govSrc, "tools", "r9", Path.GetFileName f), true)
+write (Path.Combine(govSrc, "verification", "journeys", "j1.spec.mjs")) "// journey\n"
+write (Path.Combine(govSrc, "kickoff", "rehearsal-010", "toolchain.lock.json")) "{}\n"
+let approvalsWith (records: string) = write govApprovals ("{\"schema\":\"causa.requirements-approvals/1\",\"approvals\":[" + records + "]}\n")
+approvalsWith ""
+let govW = commitAll govSrc "T0 template"
+File.AppendAllText(gateYml, "# corrected template\n")
+let govX = commitAll govSrc "corrected template"
+let regovern (id: string) (operator: string) (commit: string) = $"{{\"id\":\"{id}\",\"authority\":{{\"kind\":\"operator\",\"id\":\"{operator}\"}},\"changes\":[{{\"action\":\"re-govern\",\"indyInitCommit\":\"{commit}\"}}]}}"
+approvalsWith (regovern "APR-TEST-REGOVERN" "kemiller2002" govX)
+let govY = commitAll govSrc "owner approves the re-govern of the corrected template"
+let trustedMain = Path.Combine(work, "gov-trusted-main")
+let refreshTrusted () =
+    if Directory.Exists trustedMain then git trustedMain [ "pull"; "-q"; "--ff-only"; govSrc; "main" ] |> ignore
+    else run "git" [ "clone"; "-q"; "--branch"; "main"; govSrc; trustedMain ] work |> ignore
+refreshTrusted ()
+let gov = Path.Combine(work, "gov-target")
+Directory.CreateDirectory gov |> ignore
+git gov [ "init"; "-q"; "-b"; "main" ] |> ignore
+write (Path.Combine(gov, "ros.json")) "{\"workProtocol\":{\"qualityEvidence\":{}}}\n"
+let lock10 = [ "--lock"; "kickoff/rehearsal-010/toolchain.lock.json" ]
+let checkGov (operator: string) = [ "check-governance"; "--indy-init"; govSrc; "--target"; gov; "--trusted-operator"; operator; "--trusted-indy-init"; trustedMain ]
+let governAt (commit: string) =
+    git govSrc [ "checkout"; "-q"; commit ] |> ignore
+    run "dotnet" ([ "fsi"; r9; "--"; "govern"; "--indy-init"; govSrc; "--target"; gov ] @ lock10) gov |> snd
+git govSrc [ "checkout"; "-q"; govW ] |> ignore
+r9case "govern-at-t0" [ 0 ] [ "govern: PASS" ] ([ "govern"; "--indy-init"; govSrc; "--target"; gov ] @ lock10) gov |> ignore
+let t0Commit = commitAll gov "T0: governance"
+r9case "check-governance-t0-record" [ 0 ] [ "check-governance: PASS" ] (checkGov "kemiller2002") gov |> ignore
+git govSrc [ "checkout"; "-q"; govY ] |> ignore
+r9case "re-govern-keeps-the-lock" [ 2 ] [ "a re-govern keeps the rehearsal's lock" ] [ "govern"; "--indy-init"; govSrc; "--target"; gov; "--lock"; "kickoff/rehearsal-009/toolchain.lock.json" ] gov |> ignore
+r9case "re-govern-writes-the-corrected-template" [ 0 ] [ "govern: PASS" ] ([ "govern"; "--indy-init"; govSrc; "--target"; gov ] @ lock10) gov |> ignore
+let regoverned = commitAll gov "re-govern: the corrected template"
+r9case "re-govern-refused-without-the-trusted-main" [ 4 ] [ "was changed after T0 (2 commits touch it)" ] [ "check-governance"; "--indy-init"; govSrc; "--target"; gov; "--trusted-operator"; "kemiller2002" ] gov |> ignore
+r9case "re-govern-accepted-with-the-owner-approval-on-main" [ 0 ] [ "check-governance: PASS" ] (checkGov "kemiller2002") gov |> ignore
+r9case "re-govern-refused-for-another-operator" [ 4 ] [ $"Indy-init {govY} is not approved" ] (checkGov "someone-else") gov |> ignore
+// A forged record: the approved commit, but it whitelists an item as completed before governance.
+let recordFile = Path.Combine(gov, ".echelon", "r9-governance.json")
+write recordFile ((File.ReadAllText recordFile).Replace("\"completedBeforeGovernance\": []", "\"completedBeforeGovernance\": [ \"WI-FORGED\" ]"))
+commitAll gov "forged: an item completed before governance" |> ignore
+r9case "re-govern-refused-when-it-changes-completed-items" [ 4 ] [ "changes the items completed before governance" ] (checkGov "kemiller2002") gov |> ignore
+let resetGov () = git gov [ "reset"; "-q"; "--hard"; regoverned ] |> ignore
+resetGov ()
+// A forged approval inside the governing commit: an agent's branch adds an operator re-govern record naming its own
+// parent. The governing checkout holds it, the trusted main does not, and the commit is not on main.
+git govSrc [ "checkout"; "-q"; "-b"; "agent"; govY ] |> ignore
+File.AppendAllText(gateYml, "# agent template\n")
+let agentT = commitAll govSrc "agent: another template"
+approvalsWith (regovern "APR-TEST-REGOVERN" "kemiller2002" govX + "," + regovern "APR-FORGED" "kemiller2002" agentT)
+let agentY = commitAll govSrc "agent: forged owner approval"
+governAt agentY |> ignore
+commitAll gov "re-govern: a forged approval" |> ignore
+r9case "re-govern-refused-for-a-forged-approval-in-the-governing-commit" [ 4 ] [ $"Indy-init {agentY} is not on the trusted Indy-init main"; $"Indy-init {agentY} is not approved" ] (checkGov "kemiller2002") gov |> ignore
+resetGov ()
+// The approved template plus a changed journey, or a changed lock, merged to main: approval of X does not cover it.
+let mainChange (name: string) (path: string) =
+    git govSrc [ "checkout"; "-q"; "main" ] |> ignore
+    git govSrc [ "reset"; "-q"; "--hard"; govY ] |> ignore
+    File.AppendAllText(Path.Combine(govSrc, path), "// changed\n")
+    let y2 = commitAll govSrc $"main: {name} changed after the approval"
+    git trustedMain [ "fetch"; "-q"; govSrc; "main" ] |> ignore
+    git trustedMain [ "reset"; "-q"; "--hard"; "FETCH_HEAD" ] |> ignore
+    governAt y2 |> ignore
+    commitAll gov $"re-govern: {name} changed" |> ignore
+    r9case $"re-govern-refused-when-{name}-changed" [ 4 ] [ $"Indy-init {y2} is not approved" ] (checkGov "kemiller2002") gov |> ignore
+    resetGov ()
+mainChange "verification" "verification/journeys/j1.spec.mjs"
+mainChange "lock" "kickoff/rehearsal-010/toolchain.lock.json"
 
 // ---- verdict ------------------------------------------------------------------------------------------------------
 
