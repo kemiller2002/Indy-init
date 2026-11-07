@@ -595,8 +595,19 @@ let lp11 =
     let released =
         if offline || isNull lock then None else
         let dir = tempDir "conditor"
-        let code, out = run src gh [ "release"; "download"; str conditor "tag"; "--repo"; "kemiller2002/conditor"; "--pattern"; "checksums.txt"; "--dir"; dir ]
         let file = Path.Combine(dir, "checksums.txt")
+        let viaGh = run src gh [ "release"; "download"; str conditor "tag"; "--repo"; "kemiller2002/conditor"; "--pattern"; "checksums.txt"; "--dir"; dir ]
+        // Cloud sessions block the GraphQL call `gh release download` makes. With the default gh (no --gh test double),
+        // the same public release file is fetched over HTTPS instead: the same bytes, judged by the same comparison below.
+        let code, out =
+            match viaGh with
+            | 0, o when File.Exists file -> 0, o
+            | ghCode, ghOut when opt "--gh" |> Option.isNone ->
+                let url = $"""https://github.com/kemiller2002/conditor/releases/download/{str conditor "tag"}/checksums.txt"""
+                match run src "curl" [ "-fsSL"; "--retry"; "2"; "-o"; file; url ] with
+                | 0, o -> 0, o
+                | c, o -> c, $"gh: {ghOut.Trim()}; https {url}: {o.Trim()}"
+            | other -> other
         let sums =
             if code = 0 && File.Exists file then
                 File.ReadAllLines file |> Array.choose (fun l ->
