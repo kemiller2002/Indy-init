@@ -1293,6 +1293,23 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-V416-OWNER-2",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-07",
+      "changes": [
+        {
+          "decision_id": "ODR-V416-02",
+          "action": "approve-package",
+          "package": "requirements-compiled/v4.1.6",
+          "manifest_sha256": "8d3706d9b5f91cc942b9feb031e4d9b1300da007e9fd97e1d10ba76ca16c1695",
+          "review_sha256": "4d5ecbfb9f9f6a2193ab3168836789ad8a893c8aa821e3152ca314f06dff93b0"
+        }
+      ]
     }
   ]
 }

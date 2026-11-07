@@ -60,6 +60,16 @@ Build to what they check. The names they look for are listed in `SRC/verificatio
    If the suite preflight refuses, fix the bootstrap in this same commit. `r9.fsx check-sequencing` exempts only the bootstrap commit: a later commit before both checkpoints that touches an implementation path (`isImplementationPath`, r9.fsx: `src/`, `tests/`, `web/`, any project or solution file, `Directory.*.props`/`.targets`, `package.json`, `package-lock.json`, `playwright.config.*`, `global.json`, `build.fsx`) is refused as application code. If the bootstrap was already published and the preflight refuses, do not repair it in a later commit: record the defect and ask the owner through `stop-decision` (reason `owner-authorized`), §6.
 4. Commit, then publish as duty 1 says (`conditor repo create`). Publishing protects main: from here on every commit reaches main through a pull request.
 
+   **Pre-created competition repository (owner decision ODR-COMP-P07 A).** For the 7 November competition the owner creates the repository before T0 (`kemiller2002/causa`) with its secrets, so `conditor repo create` refuses it as existing. Publish to it instead. It may already hold the owner's initial commit (a one-line `README.md`); the bootstrap commit goes on top of it, never replacing it and never force-pushed:
+   ```
+   git remote add origin https://github.com/OWNER/REPO.git
+   git fetch origin main                      # the owner's initial commit, if any
+   git reset --soft origin/main               # only if that fetch found a commit: the bootstrap becomes its child
+   git commit                                 # the bootstrap commit, with the T0 record and stack-drift evidence
+   git push origin HEAD:main                  # a fast-forward; never --force
+   ```
+   `git reset --soft` keeps the bootstrap tree exactly as staged; where the bootstrap writes its own `README.md` it replaces the owner's one-line file in that same commit. The README commit is not an implementation path, and `r9.fsx check-sequencing` identifies the bootstrap as the commit that adds `.echelon/r9-governance.json`, so the extra parent changes no check. After the push, the owner turns on branch protection for `main` (require a pull request), as `conditor repo create` would have; from then on every commit reaches main through a pull request.
+
 ## 3. Before any application code
 
 Implementation is prohibited until steps 1–5 pass. They need no implementation and no verification evidence.
