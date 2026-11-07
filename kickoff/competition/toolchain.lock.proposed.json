@@ -176,7 +176,7 @@
  },
  "ownerDecisionRequests": {
   "path": "docs/v416-competition-decisions/proposals/owner-decision-requests.json",
-  "sha256": "9c053995a87e4d640ab5cfc563ff834a7ac6b244bb8c5dbaaafc5552cf82ae27",
+  "sha256": "519aa30b33cbf093ec9c2eab8b7abfe4b7a3e01d27a53b8841e72544845934e0",
   "rule": "the questions the owner answers for the competition are these (ODR-COMP-P01..P19, -SCOPE, -CATALOG-CONTRACT, -LOCK), pinned by the owner's lock (as launch-preflight LP-03 does for Rehearsal 010)"
  }
 }

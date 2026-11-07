@@ -303,7 +303,7 @@
     "A: adopt the competition process-evidence rules as shown; the competition lock names them as processEvidence.rules with their sha256 (kickoff/competition/toolchain.lock.proposed.json, which ODR-COMP-LOCK approves again)",
     "B: keep Rehearsal 010's rules (every praxis:* obligation stays unverifiable: INCORRECT-REPOSITORY on every record)"
    ],
-   "recommendation": "A: the owner chose this in chat on 2026-11-07, around 17:22-17:25Z (that answer is not a record; this request is how it is recorded). it changes only the repository name to the one the records were actually written under. The alternative, rewriting the competition repository's committed T0 identity (ros.json, .ros), would change T0 records, which are never reset.",
+   "recommendation": "A: the owner chose this in chat on 2026-11-07, around 17:22-17:25Z (that answer is not a record; this request is how it is recorded). It changes only the repository name to the one the records were actually written under. The alternative, rewriting the competition repository's committed T0 identity (ros.json, .ros), would change T0 records, which are never reset.",
    "rationale": "The process-evidence rules are a governed input (ODR-R10-14); only the owner approves their successor, and an agent never pins them.",
    "impact": "The competition lock pins this file's sha256 as processEvidence.rulesSha256 (and proposedSha256), and ownerDecisionRequests.sha256 moves to this requests file's new digest; because the proposed lock changes, ODR-COMP-LOCK is asked again in the same session. The governed gate reads the new rules only after the owner commits the lock and approves a re-govern of kemiller2002/causa to that commit (PROCESS-RULES-REPAIR.md, owner steps).",
    "pins": [
@@ -324,7 +324,7 @@
     "A: extend ODR-COMP-P10 with rule A for the competition: merge on the governed executable obligations when the only refused obligations are praxis:* process records with the listed codes, labelled \"governed on executable obligations; process records unverifiable (ODR-COMP-P18)\", never counted as governed acceptance; completion stays completion-gate COMPLETE only",
     "B: no extension: the competition then merges nothing, or only under ODR-COMP-P10 A if the gate cannot run at all"
    ],
-   "recommendation": "A: the owner chose this in chat on 2026-11-07, around 17:22-17:25Z (that answer is not a record; this request is how it is recorded). every obligation the gate can actually judge on a causa pull request must still pass in the governed run; only the review and process records that GitHub's own rules make unattestable are set aside, labelled, and never counted as governed acceptance.",
+   "recommendation": "A: the owner chose this in chat on 2026-11-07, around 17:22-17:25Z (that answer is not a record; this request is how it is recorded). Every obligation the gate can actually judge on a causa pull request must still pass in the governed run; only the review and process records that GitHub's own rules make unattestable are set aside, labelled, and never counted as governed acceptance.",
    "rationale": "Changes what may merge; only the owner decides (as ODR-COMP-P10).",
    "impact": "With B no competition slice can merge through the governed gate, since every slice depends on SL-T10, whose praxis:independent-review cannot be attested. P18 pins no file: the lock binds this request's text through ownerDecisionRequests.sha256 (launch-preflight LP-03).",
    "approvalRecord": {
