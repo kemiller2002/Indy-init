@@ -1,0 +1,8 @@
+slices 31; implementation minutes 978 serial (27 DAG-estimated, 4 derived at 0.81 min/obligation, 0 default)
+ci    0 min: all 31 slices integrated at T+508 (OVER the 420-minute window); 27 integrated by the deadline; serialized integration alone needs 93 min; critical path 379 min
+ci    5 min: all 31 slices integrated at T+548 (OVER the 420-minute window); 27 integrated by the deadline; serialized integration alone needs 248 min; critical path 429 min
+ci   10 min: all 31 slices integrated at T+609 (OVER the 420-minute window); 23 integrated by the deadline; serialized integration alone needs 403 min; critical path 479 min
+ci   15 min: all 31 slices integrated at T+754 (OVER the 420-minute window); 17 integrated by the deadline; serialized integration alone needs 558 min; critical path 529 min
+ci   20 min: all 31 slices integrated at T+884 (OVER the 420-minute window); 14 integrated by the deadline; serialized integration alone needs 713 min; critical path 579 min
+ci   25 min: all 31 slices integrated at T+1034 (OVER the 420-minute window); 11 integrated by the deadline; serialized integration alone needs 868 min; critical path 629 min
+largest CI latency that fits the window: none

@@ -1151,6 +1151,43 @@ let committedPackage (source: string) : string list =
         Program.v41Command [ "--source"; source; "--package"; Path.Combine(source, "requirements-compiled", "v4.1.4"); "--base"; Path.Combine(source, "requirements-compiled", "v4"); "--check" ]
     if code = 0 then [] else [ sprintf "v4.1.4: v41 --check exited %d (the committed package differs from its compilation)" code ]
 
+/// AGENT-RULES duty 1's bootstrap (`v41 ... --bootstrap DIR`, run without --check in the governed checkout) never
+/// writes the package: every file of the frozen v4.1.6 is byte for byte what it was, and the skeleton is written. A
+/// package the compiler does not reproduce (a copy with one generated file changed: what a build of another commit
+/// sees in the frozen package) is refused with exit 4, and nothing is written to the package or to the target.
+let bootstrapLeavesPackage (source: string) : string list =
+    let package = Path.Combine(source, "requirements-compiled", "v4.1.6")
+    let basePackage = Path.Combine(source, "requirements-compiled", "v4")
+    let snapshot (dir: string) =
+        Directory.GetFiles(dir, "*", SearchOption.AllDirectories) |> Array.sort
+        |> Array.map (fun f -> Path.GetRelativePath(dir, f), Security.Cryptography.SHA256.HashData(File.ReadAllBytes f) |> Convert.ToHexString)
+        |> List.ofArray
+    let temp (name: string) = Path.Combine(Path.GetTempPath(), name + "-" + string (Guid.NewGuid()))
+    let target, copy, refusedTarget = temp "v416-bootstrap", temp "v416-package", temp "v416-bootstrap-refused"
+    let bootstrap (pkg: string) (dir: string) = Program.v41Command [ "--source"; source; "--package"; pkg; "--base"; basePackage; "--bootstrap"; dir ]
+    try
+        [ target; refusedTarget ] |> List.iter (Directory.CreateDirectory >> ignore)
+        let before = snapshot package
+        let code = bootstrap package target
+        let after = snapshot package
+        before |> List.iter (fun (rel, _) ->
+            let p = Path.Combine(copy, rel)
+            Directory.CreateDirectory(Path.GetDirectoryName p) |> ignore
+            File.Copy(Path.Combine(package, rel), p))
+        let altered = Path.Combine(copy, "agent-file-ownership.json")
+        File.AppendAllText(altered, " ")
+        let alteredBefore = snapshot copy
+        let refusedCode = bootstrap copy refusedTarget
+        [ if code <> 0 then yield sprintf "bootstrap: v41 --bootstrap of v4.1.6 exited %d" code
+          for (rel, _) in (Set.ofList before - Set.ofList after) |> Set.toList |> List.distinctBy fst do
+              yield sprintf "bootstrap: v41 --bootstrap changed the frozen v4.1.6 package: %s" rel
+          if not (File.Exists(Path.Combine(target, "Causa.slnx"))) then yield "bootstrap: the skeleton (Causa.slnx) was not written"
+          if refusedCode <> 4 then yield sprintf "bootstrap control: a package the compiler does not reproduce exited %d, not 4 (refused)" refusedCode
+          if Directory.EnumerateFileSystemEntries refusedTarget |> Seq.isEmpty |> not then yield "bootstrap control: the refused bootstrap wrote into its target"
+          if snapshot copy <> alteredBefore then yield "bootstrap control: the refused bootstrap rewrote the package" ]
+    finally
+        [ target; copy; refusedTarget ] |> List.iter (fun d -> if Directory.Exists d then Directory.Delete(d, true))
+
 /// docs/release-gate-repair/obligation-inventory.json reconciles the 613 plan obligations with Rehearsal 009's gate.
 /// The scope manifest is derived independently; both must agree on every obligation, its requirement and its
 /// evidence kind (record-only, or executable/mixed), and the inventory must exclude nothing.
@@ -1597,4 +1634,4 @@ let competitionScope (source: string) : string list =
 
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "selector grammar" selectorGrammar @ guard "selector semantics" (fun () -> selectorSemantics source) @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "bootstrap FSharp.Core" (fun () -> bootstrapFSharpCore source) @ guard "bootstrap CI workflow" (fun () -> bootstrapCiWorkflow source) @ guard "bootstrap FSharp.Core owner record" (fun () -> fsharpCoreOwnerRecords source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "v4.1.6 owner records" (fun () -> v416OwnerRecords source) @ guard "v4.1.6 owner-record controls" (fun () -> v416OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source) @ guard "plan supplement" planSupplement @ guard "competition scope" (fun () -> competitionScope source) @ guard "gate preconditions" (fun () -> gatePreconditions source)
+    guard "adversarial" adversarial @ guard "selector grammar" selectorGrammar @ guard "selector semantics" (fun () -> selectorSemantics source) @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "bootstrap FSharp.Core" (fun () -> bootstrapFSharpCore source) @ guard "bootstrap CI workflow" (fun () -> bootstrapCiWorkflow source) @ guard "bootstrap FSharp.Core owner record" (fun () -> fsharpCoreOwnerRecords source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "v4.1.6 owner records" (fun () -> v416OwnerRecords source) @ guard "v4.1.6 owner-record controls" (fun () -> v416OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source) @ guard "plan supplement" planSupplement @ guard "competition scope" (fun () -> competitionScope source) @ guard "gate preconditions" (fun () -> gatePreconditions source) @ guard "bootstrap leaves the package" (fun () -> bootstrapLeavesPackage source)
