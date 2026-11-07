@@ -6,8 +6,10 @@
 //
 // --run names the run judged (default rehearsal-010, whose checks are exactly those below). --run competition judges
 // kickoff/competition/toolchain.lock.json instead: v4.1.6 (APR-V416-OWNER-1, -2), the competition decisions
-// (APR-COMP-OWNER-1: ODR-COMP-P01..P14; ODR-COMP-SCOPE, -CATALOG-CONTRACT, -LOCK) and the Rehearsal 010 decisions whose
-// files the competition lock carries (ODR-R10-05, -06, -07, -09, -14); LP-07 and LP-10 judge the lock's
+// (APR-COMP-OWNER-1: ODR-COMP-P01..P14; ODR-COMP-P15 A or B, -P16 A; ODR-COMP-SCOPE, -CATALOG-CONTRACT, -LOCK) and the
+// Rehearsal 010 decisions whose files the competition lock carries (ODR-R10-05, -06, -07, -09, -14); with P15 B the
+// competition STARTUP must state the stack-drift waiver, with A its stack-drift command must check the lock's
+// dependencyLock; LP-03 also checks the lock's dependencyLock and assertionMergeNeeds pins; LP-07 and LP-10 judge the lock's
 // testRepository and competitionRepository (--competition defaults to its url, which must hold only its initialCommit);
 // LP-08 requires the live run to have used the competition lock; and LP-11 requires the lock to be the proposal
 // ODR-COMP-LOCK approved (only status and indyInit.commit filled) with Conditor v0.10.21's digests those of its
@@ -280,17 +282,26 @@ let pinned =
       "journeys", "bindings", "bindingsSha256"
       "processEvidence", "rules", "rulesSha256"
       "ownerDecisionRequests", "path", "sha256" ]
-    // The competition's package carries the WDL-013 plan supplement (ODR-V416-WDL013 A), which its scope is compiled from.
-    @ (if competition then [ "requirementsPackage", "verificationPlanSupplement", "verificationPlanSupplementSha256" ] else [])
+    // The competition's package carries the WDL-013 plan supplement (ODR-V416-WDL013 A), which its scope is compiled from;
+    // its lock pins the successor dependency lock (ODR-COMP-P15) and the assertion merge needs (ODR-COMP-P16).
+    @ (if competition then
+           [ "requirementsPackage", "verificationPlanSupplement", "verificationPlanSupplementSha256"
+             "dependencyLock", "path", "sha256"
+             "assertionMergeNeeds", "path", "sha256" ]
+       else [])
 let lp03 =
     check "LP-03" "every contract digest in the lock is its file's" (
         if isNull lock then [ "no lock" ] else
-        pinned |> List.collect (fun (section, fileKey, shaKey) ->
+        (pinned |> List.collect (fun (section, fileKey, shaKey) ->
             let s = node lock section
             let file, want = str s fileKey, str s shaKey
             if file = "" then [ $"the lock names no {section}.{fileKey}" ]
             elif want = "" then [ $"{section}.{shaKey} is not pinned" ]
             else fail (sha256 (path file) = want) $"{file}: sha256 {sha256 (path file)}, the lock pins {want}"))
+        // The dependency lock's source, which ODR-COMP-P15 pins with it, exists where the lock says.
+        @ (match str (node lock "dependencyLock") "source" with
+           | "" -> []
+           | s -> fail (File.Exists(path s)) $"the lock's dependencyLock.source {s} does not exist"))
 
 let lp04 =
     let manifest = json (path (str (node lock "scope") "manifest")) |> Option.toObj
@@ -331,18 +342,32 @@ let requiredDecisions =
       "ODR-R10-15", [ "A" ]; "ODR-R10-16", [ "A" ]; "ODR-R10-17", [ "A" ]; "ODR-R10-18", [ "A" ]; "ODR-R10-01", [ "A" ] ]
 
 /// The competition's decisions, each with the option it launches with: v4.1.6 as approved (APR-V416-OWNER-1), the
-/// competition decisions (APR-COMP-OWNER-1, then ODR-COMP-SCOPE, -CATALOG-CONTRACT and -LOCK), and the Rehearsal 010
+/// competition decisions (APR-COMP-OWNER-1; ODR-COMP-P15 A or B, -P16, -SCOPE, -CATALOG-CONTRACT and -LOCK), and the Rehearsal 010
 /// decisions whose files the competition lock carries unchanged (design contract, deadline policy, journey bindings,
 /// test repository, process-evidence rules).
 let competitionDecisions =
+    let launchableWith (o: string) = List.map (fun (id: string) -> id, [ o ])
     ([ "ODR-V416-01", "A"; "ODR-V416-RC1", "A"; "ODR-V416-S1", "B"; "ODR-V416-S8", "B"; "ODR-V416-RC3", "A"; "ODR-V416-RC4", "A"
        "ODR-V416-RC5", "A"; "ODR-V416-RC6", "A"; "ODR-V416-RC7", "A"; "ODR-V416-S2", "B"; "ODR-V416-S3", "A"; "ODR-V416-S4", "A"
        "ODR-V416-S5", "A"; "ODR-V416-S6", "A"; "ODR-V416-S7", "A"; "ODR-V416-S9", "A"; "ODR-V416-CAT", "A"; "ODR-V416-WDL013", "A"
        "ODR-V416-SCOPE-SELECTORS", "A"; "ODR-V416-FSCORE", "A" ]
-     @ [ for i in 1..14 -> $"ODR-COMP-P{i:D2}", "A" ]
-     @ [ "ODR-COMP-SCOPE", "A"; "ODR-COMP-CATALOG-CONTRACT", "A"; "ODR-COMP-LOCK", "A" ]
-     @ [ "ODR-R10-05", "A"; "ODR-R10-06", "A"; "ODR-R10-07", "A"; "ODR-R10-09", "A"; "ODR-R10-14", "A" ])
-    |> List.map (fun (id, o) -> id, [ o ])
+     |> List.map (fun (id, o) -> id, [ o ]))
+    @ launchableWith "A" [ for i in 1..14 -> $"ODR-COMP-P{i:D2}" ]
+    // The successor dependency lock: A adopts it; B keeps the 1.37.0 lock and waives the stack-drift preflight.
+    @ [ "ODR-COMP-P15", [ "A"; "B" ] ]
+    @ launchableWith "A" [ "ODR-COMP-P16"; "ODR-COMP-SCOPE"; "ODR-COMP-CATALOG-CONTRACT"; "ODR-COMP-LOCK" ]
+    @ launchableWith "A" [ "ODR-R10-05"; "ODR-R10-06"; "ODR-R10-07"; "ODR-R10-09"; "ODR-R10-14" ]
+/// The competition STARTUP, which must say what ODR-COMP-P15 decided: with A its stack-drift command checks the lock's
+/// dependencyLock; with B the preflight is waived.
+let startupRel = "docs/competition-readiness/STARTUP-INSTRUCTIONS.md"
+let p15Waiver = "with ODR-COMP-P15 B the stack-drift preflight is waived"
+let p15Startup (option: string) =
+    let text = if File.Exists(path startupRel) then File.ReadAllText(path startupRel) else ""
+    let depLock = str (node lock "dependencyLock") "path"
+    match option with
+    | "A" -> fail (depLock <> "" && text.Contains $"stack-drift.fsx -- check --lock SRC/{depLock}") $"ODR-COMP-P15 is A, but {startupRel}'s stack-drift preflight does not check the lock's dependencyLock (check --lock SRC/{depLock})"
+    | "B" -> fail (text.Contains p15Waiver) $"ODR-COMP-P15 is B, but {startupRel} does not waive the stack-drift preflight ('{p15Waiver}')"
+    | _ -> []
 /// The owner-freeze.fsx set that records a decision.
 let decideSet (id: string) =
     if not competition then "rehearsal-010"
@@ -370,7 +395,8 @@ let lp05 =
             | Some c when not (List.contains (str c "option") launchable) ->
                 [ $"""{id} is recorded as option {str c "option"} ({str c "action"}); {(if competition then "the competition" else "Rehearsal 010")} launches only with {String.Join(" or ", launchable)}""" ]
             | Some c ->
-                items c "pins" |> List.collect (fun p ->
+                (if competition && id = "ODR-COMP-P15" then p15Startup (str c "option") else [])
+                @ (items c "pins" |> List.collect (fun p ->
                     let file = str p "path"
                     let field = str p "field"
                     if field <> "" then
@@ -380,7 +406,7 @@ let lp05 =
                         fail (sha256 (path file) = str p "sha256") $"""{id} approved {file} at sha256 {str p "sha256"}; it is now {sha256 (path file)}"""
                         @ (match lockDigests.TryFind file with
                            | Some d when d <> "" && d <> str p "sha256" -> [ $"""{id} approved {file} at {str p "sha256"}; the lock pins {d}""" ]
-                           | _ -> [])))
+                           | _ -> []))))
     let provenance =
         (approvalsUnsigned |> List.map (fun c -> $"{approvalsRel} was changed in {c.Substring(0, 12)}, which GitHub does not verify as signed by {operator}: no record in it counts"))
         @ (duplicateIds |> List.map (fun i -> $"approval id {i} appears more than once"))

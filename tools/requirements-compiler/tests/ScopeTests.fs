@@ -1394,7 +1394,9 @@ let cf07Deferral (source: string) : string list =
       if unnamed <> set [ "J1-01" ] then yield sprintf "cf07: bound assertions missing from the needs file: %A (only J1-01 is judged at every merge by design)" unnamed
       // review CF07-4: the governed gate passes the file, and through the parser SL-T16's J2-08 is deferred on an empty ledger
       let gateYml = File.ReadAllText(Path.Combine(source, "tools/r9/verification-gate.yml"))
-      if not (gateYml.Contains "--assertion-needs \"$src/docs/rehearsal-010-readiness/assertion-merge-needs.json\"") then yield "cf07: the governed gate does not pass --assertion-needs"
+      // (ODR-COMP-P16: the path is the lock's assertionMergeNeeds.path, and Rehearsal 010's file when the lock names none)
+      if not (gateYml.Contains "needs=\"$src/$(jq -r '.assertionMergeNeeds.path // \"docs/rehearsal-010-readiness/assertion-merge-needs.json\"' \"$lock\")\"")
+         || not (gateYml.Contains "--assertion-needs \"$needs\"") then yield "cf07: the governed gate does not pass --assertion-needs from the lock with Rehearsal 010's file as the default"
       let t16 = { evidence [] [] [ "J2-08" ] with Slice = JObj [ "id", JStr "SL-T16"; "dependsOn", JArr []; "governedAssertions", JArr [ JStr "J2-08" ] ]; AssertionNeeds = Ledger.assertionNeedsOf governed }
       if Ledger.deferredAssertions s t16 <> [ "J2-08" ] then yield "cf07: SL-T16's J2-08 is not deferred with the governed needs file"
       // review CF07-R3-1: a needed slice that depends on this one (transitively) cannot be on main yet, so the assertion is
@@ -1429,6 +1431,54 @@ let cf07Deferral (source: string) : string list =
       // the verdict records what was deferred, so release knows what it still owes
       let verdict = Ledger.sliceVerdictJson (Ledger.deferredAssertions s deferredCase) deferredCase []
       if strs "deferredToRelease" verdict <> [ "J1-03" ] then yield "cf07: the slice verdict does not record the deferred assertion" ]
+
+/// ODR-COMP-P16: the competition's assertion merge needs (docs/competition-readiness/assertion-merge-needs.json, derived by
+/// tools/r10/assertion-merge-needs.fsx) name only slices of the competition plan, keep every assertion of Rehearsal 010's
+/// rules, name every assertion the competition binds (J1-01 is judged at every merge by design), and keep CF07-R3-1's
+/// invariant over the competition scope; the proposed competition lock names the file the gate then reads.
+let cf07Competition (source: string) : string list =
+    let manifest = parseFile (Path.Combine(source, "docs/competition-readiness/scope-manifest.json"))
+    let s = match Ledger.replay manifest [] with Ok s -> s | Error why -> failwithf "replay: %s" why
+    let slices = arr "slices" (parseFile (Path.Combine(source, "docs/competition-readiness/slice-execution-manifest.json")))
+    let ids = slices |> List.map (str "id") |> Set.ofList
+    let needsFile = parseFile (Path.Combine(source, "docs/competition-readiness/assertion-merge-needs.json"))
+    let r10 = parseFile (Path.Combine(source, "docs/rehearsal-010-readiness/assertion-merge-needs.json"))
+    let needs = Ledger.assertionNeedsOf needsFile
+    let lock = parseFile (Path.Combine(source, "kickoff/competition/toolchain.lock.proposed.json"))
+    let deps = arr "workItems" manifest |> List.map (fun w -> "SL-" + str "id" w, strs "dependsOn" w |> List.map ((+) "SL-")) |> Map.ofList
+    let rec reach (seen: Set<string>) = function
+        | [] -> seen
+        | x :: rest when seen.Contains x -> reach seen rest
+        | x :: rest -> reach (seen.Add x) ((Map.tryFind x deps |> Option.defaultValue []) @ rest)
+    let everything = arr "requirements" manifest |> List.collect (fun r -> arr "obligations" r |> List.map (str "id"))
+    let evidence (sl: Json) (verified: string list) : Ledger.SliceEvidence =
+        { Slice = sl; Candidate = "c"; TargetBase = "b"; TargetHead = "b"; Gate = None; Journeys = None; DesignContract = None
+          Regression = Some(JObj [ "candidate", JStr "c"; "passed", JArr(verified |> List.map JStr) ]); Build = None; LiveProvider = None
+          TestIntegrity = None; CatalogAcceptance = Some(JObj [ "candidate", JStr "c"; "refusals", JArr [] ]); AssertionNeeds = needs }
+    [ let unknown = needs |> Map.toList |> List.collect snd |> List.distinct |> List.filter (ids.Contains >> not)
+      if not unknown.IsEmpty then yield sprintf "cf07 competition: needed slices outside the competition plan: %A" unknown
+      let assertionsOf (j: Json) = arr "rules" j |> List.map (fun r -> strs "assertions" r, str "why" r)
+      if assertionsOf needsFile <> assertionsOf r10 then yield "cf07 competition: a rule's assertions or reason differ from Rehearsal 010's"
+      let unnamed = Set.difference (slices |> List.collect (strs "governedAssertions") |> Set.ofList) (needs |> Map.toList |> List.map fst |> Set.ofList)
+      if unnamed <> set [ "J1-01" ] then yield sprintf "cf07 competition: bound assertions missing from the needs file: %A" unnamed
+      // control: with Rehearsal 010's file the competition would ignore its 11 absent ids (the reason for P16)
+      let r10Absent = Ledger.assertionNeedsOf r10 |> Map.toList |> List.collect snd |> List.distinct |> List.filter (ids.Contains >> not)
+      if r10Absent.Length <> 11 then yield sprintf "cf07 competition control: Rehearsal 010's file names %d slices outside the competition plan, not 11" r10Absent.Length
+      // control: a remapped need bites. SL-T22 binds J1-04, which needs SL-WI-INV-WORKSPACE (the SAVE and FRAME parts'
+      // owner): deferred while its catalog obligations are unverified, judged once every obligation passed
+      let t22 = slices |> List.find (fun x -> str "id" x = "SL-T22")
+      if not (Ledger.deferredAssertions s (evidence t22 []) |> List.contains "J1-04") then yield "cf07 competition: SL-T22's J1-04 is judged before SL-WI-INV-WORKSPACE is present"
+      if Ledger.deferredAssertions s (evidence t22 everything) |> List.contains "J1-04" then yield "cf07 competition control: SL-T22's J1-04 is deferred with every obligation verified"
+      if str "path" (field "assertionMergeNeeds" lock |> Option.defaultValue JNull) <> "docs/competition-readiness/assertion-merge-needs.json" then
+          yield "cf07 competition: the proposed competition lock does not name docs/competition-readiness/assertion-merge-needs.json as assertionMergeNeeds.path"
+      for sl in slices do
+          let id = str "id" sl
+          for verified in [ []; everything ] do
+              let deferred = Ledger.deferredAssertions s (evidence sl verified) |> Set.ofList
+              for a in strs "governedAssertions" sl |> List.filter (deferred.Contains >> not) do
+                  for n in Map.tryFind a needs |> Option.defaultValue [] do
+                      if n <> id && deps.ContainsKey n && (reach Set.empty (Map.tryFind n deps |> Option.defaultValue [])).Contains id then
+                          yield sprintf "cf07 competition: %s judges %s, which needs %s, a slice that depends on %s" id a n id ]
 
 /// `covers` judges every form of the frozen selector grammar (Model.matches) the execution DAG uses: T18 `prefix:PF-`,
 /// T20 `prefix:EXT-DATA-`, T23 `doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md`, T25 `origin:external`. Each form
@@ -1634,4 +1684,4 @@ let competitionScope (source: string) : string list =
 
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "selector grammar" selectorGrammar @ guard "selector semantics" (fun () -> selectorSemantics source) @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "bootstrap FSharp.Core" (fun () -> bootstrapFSharpCore source) @ guard "bootstrap CI workflow" (fun () -> bootstrapCiWorkflow source) @ guard "bootstrap FSharp.Core owner record" (fun () -> fsharpCoreOwnerRecords source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "v4.1.6 owner records" (fun () -> v416OwnerRecords source) @ guard "v4.1.6 owner-record controls" (fun () -> v416OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source) @ guard "plan supplement" planSupplement @ guard "competition scope" (fun () -> competitionScope source) @ guard "gate preconditions" (fun () -> gatePreconditions source) @ guard "bootstrap leaves the package" (fun () -> bootstrapLeavesPackage source)
+    guard "adversarial" adversarial @ guard "selector grammar" selectorGrammar @ guard "selector semantics" (fun () -> selectorSemantics source) @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "bootstrap FSharp.Core" (fun () -> bootstrapFSharpCore source) @ guard "bootstrap CI workflow" (fun () -> bootstrapCiWorkflow source) @ guard "bootstrap FSharp.Core owner record" (fun () -> fsharpCoreOwnerRecords source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "v4.1.6 owner records" (fun () -> v416OwnerRecords source) @ guard "v4.1.6 owner-record controls" (fun () -> v416OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source) @ guard "plan supplement" planSupplement @ guard "competition scope" (fun () -> competitionScope source) @ guard "gate preconditions" (fun () -> gatePreconditions source) @ guard "bootstrap leaves the package" (fun () -> bootstrapLeavesPackage source) @ guard "CF-07 competition needs" (fun () -> cf07Competition source)

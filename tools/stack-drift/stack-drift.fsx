@@ -150,6 +150,7 @@ let buildLock (read: string -> byte[] option) (registryCommit: string) (source: 
                         match kind with
                         | "sdk" -> "pinned by global.json"
                         | "external-api" -> "external service; verified live by the provider-conformance task"
+                        | "npm-pinned" -> "pinned by exact npm version (declared and installed versions checked); tarball sha256 recorded"
                         | _ -> "pinned by tag or commit; identity checked where a checkout is supplied")) ]
                 @ extensions s),
             []
@@ -766,7 +767,7 @@ let tests (registry: string option) : (string * Result<unit, string>) list =
         expect "negative controls (lock): a prerelease, a digest the set does not record and a forbidden framework are problems"
             (problems |> List.exists (fun p -> p.Contains "not stable") && problems |> List.exists (fun p -> p.Contains "the set records") && problems |> List.exists (fun p -> p.Contains "forbidden framework"))
             (String.concat "; " problems))
-      match registry with
+      (match registry with
       | None -> ("lock: reproduces the frozen v4 lock from the v4 source (needs --registry)", Error "NOT RUN: no --registry supplied")
       | Some dir ->
           let frozen = parseText (File.ReadAllText "requirements-compiled/v4/dependency-lock.json")
@@ -774,7 +775,35 @@ let tests (registry: string option) : (string * Result<unit, string>) list =
           let source = parseText (File.ReadAllText "requirements-compiled/v4/analysis/dependency-lock.source.json")
           let built, problems = buildLock (gitShow dir commit) commit source
           expect "lock: reproduces the frozen v4 lock from the v4 source (deep JSON equality, no problems)" (sameJson built frozen && problems.IsEmpty)
-              (sprintf "differs or problems: %s" (String.concat "; " problems)) ]
+              (sprintf "differs or problems: %s" (String.concat "; " problems)))
+      // The competition's successor lock (ODR-COMP-P15) is this generator's output from its committed source, and differs
+      // from the echelon-current 1.37.0 lock it succeeds (ODR-ESU-01) only in what Conditor v0.10.21 changes.
+      (match registry with
+      | None -> ("lock: the competition successor lock is generated from its source (needs --registry)", Error "NOT RUN: no --registry supplied")
+      | Some dir ->
+          let committed = parseText (File.ReadAllText "docs/competition-readiness/dependency-lock.json")
+          let commit = str (field committed "releaseSet" |> Option.toObj) "registryCommit"
+          let built, problems = buildLock (gitShow dir commit) commit (parseText (File.ReadAllText "docs/competition-readiness/dependency-lock.source.json"))
+          expect "lock: the competition successor lock is generated from its source (deep JSON equality, no problems)" (sameJson built committed && problems.IsEmpty)
+              (sprintf "differs or problems: %s" (String.concat "; " problems)))
+      ( let predecessor = parseText (File.ReadAllText "docs/optimization/echelon-stack-upgrade/lock/dependency-lock.json")
+        let successor = parseText (File.ReadAllText "docs/competition-readiness/dependency-lock.json")
+        let without (ids: string list) (lock: JsonNode) =
+            let l = clone lock
+            l.AsObject().Remove "description" |> ignore
+            l.AsObject().Remove "excluded" |> ignore
+            l["systems"] <- jarr (arr lock "systems" |> List.filter (fun s -> not (List.contains (str s "id") ids)) |> List.map clone)
+            l
+        let reasons (lock: JsonNode) = arr lock "excluded" |> List.map (fun e -> str e "id", (str e "reason").Replace("0.10.20", "0.10.21"))
+        let conditor = arr successor "systems" |> List.tryFind (fun s -> str s "id" = "conditor")
+        let workflow = arr successor "systems" |> List.tryFind (fun s -> str s "id" = "forma-workflow")
+        expect "lock: the competition successor differs from the 1.37.0 lock only in Conditor v0.10.21 (528ef45) and the forma-workflow 1.2.0 its preset installs"
+            (sameJson (without [ "conditor"; "forma-workflow" ] predecessor) (without [ "conditor"; "forma-workflow" ] successor)
+             && reasons predecessor = reasons successor
+             && conditor |> Option.exists (fun c -> str c "version" = "0.10.21" && str c "tag" = "v0.10.21" && str c "commit" = "528ef4576fc79540953226b7dcfd3957654e3a29")
+             && workflow |> Option.exists (fun w -> str w "version" = "1.2.0" && str w "npmPackage" = "@echelon-foundry/forma-workflow")
+             && arr predecessor "systems" |> List.forall (fun s -> str s "id" <> "forma-workflow"))
+            "another system, the set or the exclusions differ" ) ]
 
 // ---------------------------------------------------------------- dispatch
 

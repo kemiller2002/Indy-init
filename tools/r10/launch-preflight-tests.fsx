@@ -355,6 +355,11 @@ let v416Decisions =
       "ODR-V416-S5", "A"; "ODR-V416-S6", "A"; "ODR-V416-S7", "A"; "ODR-V416-S9", "A"; "ODR-V416-CAT", "A"; "ODR-V416-WDL013", "A"
       "ODR-V416-SCOPE-SELECTORS", "A"; "ODR-V416-FSCORE", "A" ]
 
+/// The competition STARTUP's stack-drift step as the fixture has it: the ODR-COMP-P15 A command and the B waiver.
+let compStartupRel = "docs/competition-readiness/STARTUP-INSTRUCTIONS.md"
+let compStartup =
+    "# Competition startup\n\n     dotnet fsi SRC/tools/stack-drift/stack-drift.fsx -- check --lock SRC/docs/competition-readiness/dependency-lock.json \\\n"
+    + "     Only if the owner recorded ODR-COMP-P15 B instead: with ODR-COMP-P15 B the stack-drift preflight is waived for the competition.\n"
 /// The competition's positive fixture (the owner's pre-created competition repository, v4.1.6 tagged, every decision
 /// recorded, the approved proposal committed as the lock), then `edit`, then launch-preflight --run competition on it.
 let competitionFixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixture -> string list option) =
@@ -381,6 +386,12 @@ let competitionFixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixtur
           "requirements-compiled/v4.1.6/package-manifest.json", "{\"package\":\"4.1.6\"}\n"
           "requirements-compiled/v4.1.6/verification-plan-supplement.json", "{\"supplement\":\"WDL-013\"}\n"
           "docs/competition-readiness/scope-manifest.json", "{\"scopeSha256\":\"comp-scope\",\"counts\":{\"requirements\":209}}\n"
+          // The successor dependency lock and its source (ODR-COMP-P15), the assertion merge needs (ODR-COMP-P16), and the
+          // STARTUP whose stack-drift command checks the lock's dependencyLock and which states the P15 B waiver.
+          "docs/competition-readiness/dependency-lock.json", "{\"systems\":{\"conditor\":\"0.10.21\"}}\n"
+          "docs/competition-readiness/dependency-lock.source.json", "{\"conditor\":\"v0.10.21\"}\n"
+          "docs/competition-readiness/assertion-merge-needs.json", "{\"rules\":[{\"needs\":[\"SL-T22\"]}]}\n"
+          "docs/competition-readiness/STARTUP-INSTRUCTIONS.md", compStartup
           "kickoff/rehearsal-010/toolchain.lock.proposed.json", "{\"testRepository\":" + testRepository + "}\n"
           "tools/r10/adversarial.fsx", "// fixture\n    [ { Id = \"C01\"; Title = \"a\" }\n      { Id = \"C02\"; Title = \"b\" } ]\n" ]
     files |> List.iter (fun (rel, text) -> write (Path.Combine(f.Indy, rel)) text)
@@ -403,6 +414,8 @@ let competitionFixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixtur
   "deadlinePolicy":{{"path":"kickoff/rehearsal-010/deadline-policy.json","sha256":"{digest "kickoff/rehearsal-010/deadline-policy.json"}"}},
   "journeys":{{"bindings":"verification/journeys/bindings.json","bindingsSha256":"{digest "verification/journeys/bindings.json"}"}},
   "processEvidence":{{"rules":"kickoff/rehearsal-010/process-evidence-rules.json","rulesSha256":"{digest "kickoff/rehearsal-010/process-evidence-rules.json"}"}},
+  "dependencyLock":{{"path":"docs/competition-readiness/dependency-lock.json","sha256":"{digest "docs/competition-readiness/dependency-lock.json"}","source":"docs/competition-readiness/dependency-lock.source.json"}},
+  "assertionMergeNeeds":{{"path":"docs/competition-readiness/assertion-merge-needs.json","sha256":"{digest "docs/competition-readiness/assertion-merge-needs.json"}"}},
   "ownerDecisionRequests":{{"path":"docs/v416-competition-decisions/proposals/owner-decision-requests.json","sha256":"{digest "docs/v416-competition-decisions/proposals/owner-decision-requests.json"}"}},
   "resolvedSet":{{"expectedTools":{{"dokimos":"0.11.1"}}}},
   "testRepository":{testRepository},
@@ -430,6 +443,8 @@ let competitionFixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixtur
           approval "APR-COMP-OWNER-2"
               [ decide "ODR-COMP-SCOPE" "A" [ field "docs/competition-readiness/scope-manifest.json" "scopeSha256" "\"comp-scope\"" ]
                 decide "ODR-COMP-CATALOG-CONTRACT" "A" [ pinFile "kickoff/competition/catalog-verification-contract.json" ]
+                decide "ODR-COMP-P15" "A" [ pinFile "docs/competition-readiness/dependency-lock.json"; pinFile "docs/competition-readiness/dependency-lock.source.json" ]
+                decide "ODR-COMP-P16" "A" [ pinFile "docs/competition-readiness/assertion-merge-needs.json" ]
                 decide "ODR-COMP-LOCK" "A" [ pin compProposalRel proposal ] ] ]
     write (Path.Combine(f.Indy, "kickoff/rehearsal-007/approvals.causa.json")) ("{\"approvals\":[" + String.Join(",\n", approvals) + "]}\n")
     commitPush f "Owner decisions (fixture)"
@@ -475,6 +490,21 @@ let competitionCases =
           replaceIn (Path.Combine(f.Indy, "docs/competition-readiness/scope-manifest.json")) "comp-scope" "comp-scope-recompiled"
           replaceIn (compLock f) "\"scopeSha256\":\"comp-scope\"" "\"scopeSha256\":\"comp-scope-recompiled\""
           commitPush f "Owner lock (scope)")
+      // LP-05 / LP-03: the successor dependency lock (ODR-COMP-P15) and the assertion merge needs (ODR-COMP-P16)
+      case "competition-p15-missing" "LP-05" (fun f -> replaceIn (approvals f) "\"decision_id\":\"ODR-COMP-P15\"" "\"decision_id\":\"ODR-COMP-P15-X\""; commitPush f "Owner decisions (edit)")
+      case "competition-p16-missing" "LP-05" (fun f -> replaceIn (approvals f) "\"decision_id\":\"ODR-COMP-P16\"" "\"decision_id\":\"ODR-COMP-P16-X\""; commitPush f "Owner decisions (edit)")
+      case "competition-p16-with-option-b" "LP-05" (fun f -> replaceIn (approvals f) "\"decision_id\":\"ODR-COMP-P16\",\"action\":\"decide\",\"option\":\"A\"" "\"decision_id\":\"ODR-COMP-P16\",\"action\":\"decide\",\"option\":\"B\""; commitPush f "Owner decisions (edit)")
+      { Name = "competition-p15-b-with-the-startup-waiver"; Expect = "READY"; Check = ""; Args = fun _ -> None
+        Edit = fun f -> replaceIn (approvals f) "\"decision_id\":\"ODR-COMP-P15\",\"action\":\"decide\",\"option\":\"A\"" "\"decision_id\":\"ODR-COMP-P15\",\"action\":\"decide\",\"option\":\"B\""; commitPush f "Owner decisions (edit)" }
+      case "competition-p15-b-without-the-startup-waiver" "LP-05" (fun f ->
+          replaceIn (approvals f) "\"decision_id\":\"ODR-COMP-P15\",\"action\":\"decide\",\"option\":\"A\"" "\"decision_id\":\"ODR-COMP-P15\",\"action\":\"decide\",\"option\":\"B\""
+          replaceIn (Path.Combine(f.Indy, compStartupRel)) "with ODR-COMP-P15 B the stack-drift preflight is waived" "with ODR-COMP-P15 B ask the owner"; commitPush f "Owner decisions (edit)")
+      case "competition-p15-a-startup-checks-another-lock" "LP-05" (fun f ->
+          replaceIn (Path.Combine(f.Indy, compStartupRel)) "--lock SRC/docs/competition-readiness/dependency-lock.json" "--lock SRC/docs/optimization/echelon-stack-upgrade/lock/dependency-lock.json"; commitPush f "startup")
+      case "competition-dependency-lock-digest-wrong" "LP-03" (fun f -> write (Path.Combine(f.Indy, "docs/competition-readiness/dependency-lock.json")) "{\"systems\":{\"conditor\":\"0.10.20\"}}\n"; commitPush f "dependency lock")
+      case "competition-dependency-lock-source-missing" "LP-03" (fun f -> File.Delete(Path.Combine(f.Indy, "docs/competition-readiness/dependency-lock.source.json")); commitPush f "no source")
+      case "competition-assertion-needs-digest-wrong" "LP-03" (fun f -> write (Path.Combine(f.Indy, "docs/competition-readiness/assertion-merge-needs.json")) "{\"rules\":[{\"needs\":[\"SL-WI-GEN-UI\"]}]}\n"; commitPush f "needs")
+      case "competition-lock-pins-no-dependency-lock" "LP-03" (fun f -> replaceIn (compLock f) "\"dependencyLock\":" "\"dependencyLockX\":"; commitPush f "lock")
       // LP-01..LP-04: the lock and what it pins
       case "competition-lock-not-committed" "LP-01" (fun f -> File.Delete(compLock f); commitPush f "no lock")
       case "competition-lock-still-proposed" "LP-01" (fun f -> replaceIn (compLock f) "OWNER-PINNED" "PROPOSED: not an owner pin"; commitPush f "lock")

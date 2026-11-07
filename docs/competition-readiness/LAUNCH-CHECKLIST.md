@@ -20,12 +20,12 @@
 - [x] 1. v4.1.6 decided (APR-V416-OWNER-1), approved (APR-V416-OWNER-2, manifest `8d3706d9…`), tagged `indy-init-requirements-v4.1.6` on `2380b3d`; catalog ratified (ODR-V416-CAT).
 - [x] 2. Competition decisions ODR-COMP-P01..P14 recorded (APR-COMP-OWNER-1).
 - [x] 3. Conditor v0.10.21 released (commit `528ef45`; its preset carries forma-workflow 1.2.0 and the deploy secrets step); causa-storage-v1.1.0 tagged.
-- [ ] 4. Merge #186 (scope, proposed lock, catalog contract, requests) and this pull request.
+- [ ] 4. Merge #186 (scope, proposed lock, catalog contract, requests), #188 (launch-preflight) and #189 (the successor dependency lock, the assertion merge needs, ODR-COMP-P15 and -P16).
 - [ ] 5. `owner-freeze.fsx -- decide competition`: **ODR-COMP-SCOPE** (scopeSha256 `09e38f7d…`) and **ODR-COMP-CATALOG-CONTRACT**.
 - [ ] 6. The repository `kemiller2002/causa` (pre-created; one README commit `7afb157`, ODR-COMP-P07 A) has its secrets: `CAUSA_ACCEPTANCE_APP_CLIENT_ID`, `CAUSA_ACCEPTANCE_APP_KEY`; `CAUSA_GITHUB_TOKEN` (read-only) and `CAUSA_WRITE_TOKEN` (write) (ODR-COMP-P06 A); `CAUSA_BRANCH`, `DATA_ACCESS_KEY_CAUSA`, `DATA_SOURCE`, `REPO_OWNER` (ODR-COMP-P13 A); `DEPLOY_TARGET=github-pages`, Pages source "GitHub Actions". No other commit is pushed to it.
 - [ ] 7. Live-provider preflight run on the merged main, dispatched with `lock=kickoff/competition/toolchain.lock.json` (after step 8, so the lock exists on main): J1–J3 × Chromium and WebKit pass against `api.github.com`.
 - [ ] 8. `owner-freeze.fsx -- decide competition`: **ODR-COMP-LOCK**; then **the owner commits `kickoff/competition/toolchain.lock.json`**: the proposal with `status` set to the owner's pin and `indyInit.commit` filled, nothing else changed (launch-preflight LP-11 checks this).
-- [ ] 9. A dependency lock that names Conditor 0.10.21. Rehearsal 010's `docs/optimization/echelon-stack-upgrade/lock/dependency-lock.json` names 0.10.20, so the bootstrap's stack-drift preflight (ODR-ESU-04 A) reports `DRIFT conditor` against the competition lock and is NOT READY. The owner adopts a successor dependency lock (generated with `stack-drift.fsx lock`) or decides otherwise, before T0.
+- [ ] 9. A dependency lock that names Conditor 0.10.21: **resolved by ODR-COMP-P15 A once it is recorded** (`owner-freeze.fsx -- decide competition`, before step 8). Rehearsal 010's `docs/optimization/echelon-stack-upgrade/lock/dependency-lock.json` names 0.10.20, so against the competition lock the bootstrap's stack-drift preflight (ODR-ESU-04 A) reports `DRIFT conditor` and is never READY. PR #189 adds the successor `docs/competition-readiness/dependency-lock.json` (generated with `stack-drift.fsx lock`; READY on a v0.10.21 workstation, `docs/competition-readiness/evidence/stack-drift/`), which the proposed lock names as `dependencyLock` and STARTUP §2 step 3 checks against. With P15 B instead, the preflight is waived (STARTUP §2 step 3 says so). Record **ODR-COMP-P16** A in the same step: the competition's assertion merge needs `docs/competition-readiness/assertion-merge-needs.json` (the lock's `assertionMergeNeeds`).
 - [ ] 10. Observer scheduled (STARTUP §9).
 
 ## C. Launch preflight (owner side; no clock)
@@ -39,9 +39,9 @@
   - a clean Indy-init checkout equal to `origin/main`;
   - the lock, committed by the owner;
   - v4.1.6 and its tag;
-  - every contract digest, the v4.1.6 plan supplement included;
+  - every contract digest, the v4.1.6 plan supplement, the dependency lock (`dependencyLock`) and the assertion merge needs (`assertionMergeNeeds`) included;
   - the scope digest;
-  - every owner decision (v4.1.6, ODR-COMP-P01..P14, -SCOPE, -CATALOG-CONTRACT, -LOCK, and the carried ODR-R10-05, -06, -07, -09, -14) and the digests it approved;
+  - every owner decision (v4.1.6, ODR-COMP-P01..P14, -P15 (A, or B with STARTUP's waiver), -P16, -SCOPE, -CATALOG-CONTRACT, -LOCK, and the carried ODR-R10-05, -06, -07, -09, -14) and the digests it approved;
   - Dokimos 0.11.1;
   - the isolated test repository, not the competition repository;
   - the live evidence, run with the competition lock;

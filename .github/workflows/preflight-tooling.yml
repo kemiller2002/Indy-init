@@ -651,6 +651,8 @@ jobs:
           dotnet fsi tools/r10/delegated-authority.fsx -- --indy-init . test
       - name: Change-impact selection (proposed Level 2; never the gate) holds its adversarial cases
         run: dotnet fsi tools/r10/change-impact.fsx -- --indy-init . test
+      - name: Competition assertion merge needs (ODR-COMP-P16) are the mechanical remap of Rehearsal 010's onto the competition slices
+        run: dotnet fsi tools/r10/assertion-merge-needs.fsx -- --indy-init . test
       - name: Proposed successor manifests regenerate from their scope manifests (review RVO-3-3; the committed files must not be stale or edited)
         run: |
           dotnet build tools/requirements-compiler/src -c Release -v q

@@ -1,0 +1,474 @@
+{
+  "schema": "indy-init.r10-contract-first-ui.merge-dependencies/1",
+  "description": "PROPOSED (ODR-COMP-P16): the competition's merge-time needs of each governed journey assertion, for slice-gate --assertion-needs (Ledger.deferredAssertions, CF-07). Derived mechanically by tools/r10/assertion-merge-needs.fsx from docs/rehearsal-010-readiness/assertion-merge-needs.json (ODR-R10-33 A, PR #121's rules): every rule keeps its assertions and reason; each needed slice is moved to the competition slice (docs/competition-readiness/slice-execution-manifest.json) that owns the requirements it stands for, and the needs are de-duplicated. Rehearsal 010's file names 11 slices the competition plan does not have; the gate ignores an absent id, so with that file the competition would judge those assertions before what they need is on main.",
+  "derivedFrom": {
+    "rehearsal010Needs": {
+      "path": "docs/rehearsal-010-readiness/assertion-merge-needs.json",
+      "sha256": "6d2f5fe90a8082801e866ed2dfe6d5aaa32c774d87954e9a824a49b0fd0ebd8b"
+    },
+    "rehearsal010Slices": {
+      "path": "docs/rehearsal-010-readiness/slice-execution-manifest.json",
+      "sha256": "95f3086ae2fb156901b4ebe7569818a704ad6d4651146db96e4a656652ea7bc8"
+    },
+    "workItemSplit": {
+      "path": "docs/rehearsal-010-optimization/inputs/work-item-split.proposed.json",
+      "sha256": "1b0041557f6d8e9b8619d766e7329f56997d797dcdc8b830924a4ef6017d87a4"
+    },
+    "competitionSlices": {
+      "path": "docs/competition-readiness/slice-execution-manifest.json",
+      "sha256": "cda641bb9eca14d26c4e79aefff24cd59e1e53e68110aa0de060f71e001a019d"
+    },
+    "rule": "a need's requirements are its Rehearsal 010 slice's, or its split part's; it maps to itself when the competition slice of that id owns all of them, otherwise to every competition slice owning one of them"
+  },
+  "rules": [
+    {
+      "assertions": [
+        "J1-02",
+        "J3-01",
+        "J3-02"
+      ],
+      "why": "Connect against the real provider (support.mjs connect)",
+      "needs": [
+        "SL-T20"
+      ]
+    },
+    {
+      "assertions": [
+        "J1-03"
+      ],
+      "why": "Connect, then the start form (support.mjs startInvestigation does not save)",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START"
+      ]
+    },
+    {
+      "assertions": [
+        "J1-04",
+        "J1-05"
+      ],
+      "why": "Save reaches Saved on GitHub: start, the save indicator and the live write path",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE",
+        "SL-T22",
+        "SL-T21"
+      ]
+    },
+    {
+      "assertions": [
+        "J1-06"
+      ],
+      "why": "a fresh context lists and opens the saved investigation",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE",
+        "SL-T22",
+        "SL-T21",
+        "SL-T25",
+        "SL-WI-INV-LIST"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-01",
+        "J2-03"
+      ],
+      "why": "observation or evidence editors after Start (no save yet)",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-02"
+      ],
+      "why": "hypothesis editor after Start",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-04",
+        "J2-05",
+        "J2-06"
+      ],
+      "why": "link editor on recorded evidence and hypotheses; J2-06 reads the Timeline",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE",
+        "SL-T22"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-07"
+      ],
+      "why": "conclusion editor",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-08"
+      ],
+      "why": "every section shows this investigation's content; Causal Analysis lists the relationships",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE",
+        "SL-T22"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-09"
+      ],
+      "why": "Save, then a fresh context reloads every value",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE",
+        "SL-T22",
+        "SL-T21",
+        "SL-T25",
+        "SL-WI-INV-LIST"
+      ]
+    },
+    {
+      "assertions": [
+        "J3-03",
+        "J3-04",
+        "J3-06",
+        "J3-07"
+      ],
+      "why": "J3 runs saveAndConfirm (outside any assertion) before these; then records an observation",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE",
+        "SL-T22",
+        "SL-T21"
+      ]
+    },
+    {
+      "assertions": [
+        "J3-05",
+        "J3-09"
+      ],
+      "why": "a second context lists and opens the saved investigation",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE",
+        "SL-T22",
+        "SL-T21",
+        "SL-T25",
+        "SL-WI-INV-LIST"
+      ]
+    },
+    {
+      "assertions": [
+        "J3-08"
+      ],
+      "why": "runs after the unasserted saveAndConfirm in the same test, so it needs what that step needs",
+      "needs": [
+        "SL-T20",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE",
+        "SL-T22",
+        "SL-T21"
+      ]
+    }
+  ],
+  "remap": [
+    {
+      "rehearsal010": "SL-WI-GEN-EXT-DATA",
+      "competition": [
+        "SL-T20"
+      ],
+      "requirementsFrom": "rehearsal-010 slice",
+      "requirements": [
+        "EXT-DATA-001",
+        "EXT-DATA-002",
+        "EXT-DATA-003",
+        "EXT-DATA-004",
+        "EXT-DATA-005",
+        "EXT-DATA-006",
+        "EXT-DATA-007",
+        "EXT-DATA-008",
+        "EXT-DATA-012"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-INV-START-ACTIONS",
+      "competition": [
+        "SL-WI-INV-START"
+      ],
+      "requirementsFrom": "work-item split part",
+      "requirements": [
+        "INV-004",
+        "INV-022"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-INV-START",
+      "competition": [
+        "SL-WI-INV-START"
+      ],
+      "requirementsFrom": "rehearsal-010 slice",
+      "requirements": [
+        "INV-001",
+        "INV-002",
+        "INV-003",
+        "INV-004",
+        "INV-005",
+        "INV-006",
+        "INV-019",
+        "INV-020",
+        "INV-021",
+        "INV-022",
+        "INV-023"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-INV-WORKSPACE-FRAME",
+      "competition": [
+        "SL-WI-INV-WORKSPACE"
+      ],
+      "requirementsFrom": "work-item split part",
+      "requirements": [
+        "INV-007",
+        "INV-008",
+        "INV-018",
+        "INV-042"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-INV-WORKSPACE",
+      "competition": [
+        "SL-WI-INV-WORKSPACE"
+      ],
+      "requirementsFrom": "rehearsal-010 slice",
+      "requirements": [
+        "INV-007",
+        "INV-008",
+        "INV-009",
+        "INV-010",
+        "INV-011",
+        "INV-012",
+        "INV-013",
+        "INV-014",
+        "INV-015",
+        "INV-016",
+        "INV-017",
+        "INV-018",
+        "INV-024",
+        "INV-025",
+        "INV-026",
+        "INV-027",
+        "INV-028",
+        "INV-029",
+        "INV-030",
+        "INV-031",
+        "INV-032",
+        "INV-033",
+        "INV-034",
+        "INV-035",
+        "INV-036",
+        "INV-037",
+        "INV-038",
+        "INV-042",
+        "INV-043",
+        "INV-044"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-INV-WORKSPACE-SAVE",
+      "competition": [
+        "SL-WI-INV-WORKSPACE"
+      ],
+      "requirementsFrom": "work-item split part",
+      "requirements": [
+        "INV-015",
+        "INV-016",
+        "INV-043"
+      ]
+    },
+    {
+      "rehearsal010": "SL-T22",
+      "competition": [
+        "SL-T22"
+      ],
+      "requirementsFrom": "rehearsal-010 slice",
+      "requirements": [
+        "PERSIST-030",
+        "PERSIST-031",
+        "PERSIST-032",
+        "PERSIST-033"
+      ]
+    },
+    {
+      "rehearsal010": "SL-T21",
+      "competition": [
+        "SL-T21"
+      ],
+      "requirementsFrom": "rehearsal-010 slice",
+      "requirements": [
+        "EXT-DATA-009",
+        "EXT-DATA-010",
+        "PERSIST-041",
+        "PERSIST-042",
+        "PERSIST-043",
+        "PERSIST-045",
+        "PERSIST-047",
+        "PERSIST-049",
+        "PF-013",
+        "PF-014"
+      ]
+    },
+    {
+      "rehearsal010": "SL-T25",
+      "competition": [
+        "SL-T25"
+      ],
+      "requirementsFrom": "rehearsal-010 slice",
+      "requirements": [
+        "EXT-DATA-013"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-INV-LIST",
+      "competition": [
+        "SL-WI-INV-LIST"
+      ],
+      "requirementsFrom": "rehearsal-010 slice",
+      "requirements": [
+        "INV-039",
+        "INV-040",
+        "INV-041"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-INV-WORKSPACE-EVIDENCE",
+      "competition": [
+        "SL-WI-INV-WORKSPACE"
+      ],
+      "requirementsFrom": "work-item split part",
+      "requirements": [
+        "INV-012",
+        "INV-013",
+        "INV-014",
+        "INV-024",
+        "INV-025",
+        "INV-027",
+        "INV-028",
+        "INV-029"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-INV-WORKSPACE-HYPOTHESES",
+      "competition": [
+        "SL-WI-INV-WORKSPACE"
+      ],
+      "requirementsFrom": "work-item split part",
+      "requirements": [
+        "INV-009",
+        "INV-010",
+        "INV-011",
+        "INV-026"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-INV-WORKSPACE-LINKS",
+      "competition": [
+        "SL-WI-INV-WORKSPACE"
+      ],
+      "requirementsFrom": "work-item split part",
+      "requirements": [
+        "INV-030",
+        "INV-031",
+        "INV-038",
+        "INV-044"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-GEN-UI-STATES",
+      "competition": [
+        "SL-T22"
+      ],
+      "requirementsFrom": "work-item split part",
+      "requirements": [
+        "UI-003",
+        "UI-010"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-GEN-UI",
+      "competition": [
+        "SL-T22"
+      ],
+      "requirementsFrom": "rehearsal-010 slice",
+      "requirements": [
+        "UI-001",
+        "UI-003",
+        "UI-004",
+        "UI-005",
+        "UI-010",
+        "UI-013",
+        "UI-015",
+        "UI-017",
+        "UI-021",
+        "UI-022",
+        "UI-023",
+        "UI-024",
+        "UI-025",
+        "UI-026",
+        "UI-030",
+        "UI-031",
+        "UI-032",
+        "UI-033",
+        "UI-034",
+        "UI-038",
+        "UI-039"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-INV-WORKSPACE-CONCLUSION",
+      "competition": [
+        "SL-WI-INV-WORKSPACE"
+      ],
+      "requirementsFrom": "work-item split part",
+      "requirements": [
+        "INV-032",
+        "INV-033"
+      ]
+    },
+    {
+      "rehearsal010": "SL-WI-GEN-UI-LANDING",
+      "competition": [
+        "SL-T22"
+      ],
+      "requirementsFrom": "work-item split part",
+      "requirements": [
+        "UI-001",
+        "UI-022",
+        "UI-025",
+        "UI-026",
+        "UI-033"
+      ]
+    }
+  ],
+  "adoptedBy": "Not adopted. Proposed by owner decision request ODR-COMP-P16 (docs/v416-competition-decisions/proposals/owner-decision-requests.json), pinned by sha256; the competition lock names it as assertionMergeNeeds.path, which the governed gate reads (Rehearsal 010's file is the default). The deferral rule is ODR-R10-33 A's, unchanged."
+}
