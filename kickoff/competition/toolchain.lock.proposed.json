@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.r9-toolchain-lock/1",
- "description": "Proposed toolchain, requirements package and governed contracts for the 7 November competition (kemiller2002/causa): the frozen v4.1.6 (tag indy-init-requirements-v4.1.6) with its WDL-013 plan supplement, the competition scope compiled with the fixed (V2) selectors (SS-1 A), Conditor v0.10.21 whose indy-init preset carries forma-workflow 1.2.0 and the test-deploy-key secrets step (ODR-COMP-P14 A, ODR-COMP-P13 A), causa-storage 1.1.0, and, carried unchanged from Rehearsal 010's lock, the resolved set echelon-current 1.37.0 (Dokimos 0.11.1), the process-evidence rules, the design contract, the deadline policy, the journey bindings and the isolated test repository. Change this file only through the owner decision process.",
+ "description": "Proposed toolchain, requirements package and governed contracts for the 7 November competition (kemiller2002/causa): the frozen v4.1.6 (tag indy-init-requirements-v4.1.6) with its WDL-013 plan supplement, the competition scope compiled with the fixed (V2) selectors (SS-1 A), Conditor v0.10.21 whose indy-init preset carries forma-workflow 1.2.0 and the test-deploy-key secrets step (ODR-COMP-P14 A, ODR-COMP-P13 A), causa-storage 1.1.0, the competition process-evidence rules (Rehearsal 010's with repository causa-t0, ODR-COMP-P17 A), and, carried unchanged from Rehearsal 010's lock, the resolved set echelon-current 1.37.0 (Dokimos 0.11.1), the design contract, the deadline policy, the journey bindings and the isolated test repository. Change this file only through the owner decision process.",
  "indyInit": {
   "repository": "kemiller2002/Indy-init",
   "commit": "(the owner fills: the merge commit of the pull request that adds this lock, or a later main commit the owner names)",
@@ -96,15 +96,15 @@
  },
  "workstationTargetId": "indy-init-r9-workstation",
  "processEvidence": {
-  "description": "Record-bound obligations (plan suites with runner evidence-record, identities praxis:<kind>) are judged by requirements-compiler verify-process against this plan and these rules, with attestations the CI run observes itself. rulesSha256 pins the Rehearsal 010 rules the owner recorded (ODR-R10-14, APR-R10-OWNER-1).",
+  "description": "Record-bound obligations (plan suites with runner evidence-record, identities praxis:<kind>) are judged by requirements-compiler verify-process against this plan and these rules, with attestations the CI run observes itself. rulesSha256 pins the competition rules ODR-COMP-P17 proposes: Rehearsal 010's rules (ODR-R10-14, APR-R10-OWNER-1; 36172c57...) with repository causa-t0, the Praxis project id committed at T0 in kemiller2002/causa (with indy-init-rehearsal-010 every record is INCORRECT-REPOSITORY; docs/competition-readiness/PROCESS-RULES-REPAIR.md).",
   "plan": "requirements-compiled/v4/verification-plan.json",
   "planDigest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d",
-  "rules": "kickoff/rehearsal-010/process-evidence-rules.json",
-  "rulesSha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d",
-  "proposedSha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d",
-  "rulesStatus": "PINNED: the owner recorded ODR-R10-14 = A with this file's digest (APR-R10-OWNER-1)"
+  "rules": "kickoff/competition/process-evidence-rules.json",
+  "rulesSha256": "88cda0b04d1125cf49b8bf03aa664437d5c4f5ebb0584c2e57b155f731acedf3",
+  "proposedSha256": "88cda0b04d1125cf49b8bf03aa664437d5c4f5ebb0584c2e57b155f731acedf3",
+  "rulesStatus": "PINNED by the owner's ODR-COMP-P17 A record of this file's digest and the owner's commit of this lock as kickoff/competition/toolchain.lock.json (proposed until both exist)"
  },
- "status": "PROPOSED: not an owner pin. Recorded: v4.1.6 (APR-V416-OWNER-1, APR-V416-OWNER-2; tag indy-init-requirements-v4.1.6 at 2380b3d), the ratified v4.1.6 catalog (ODR-V416-CAT, 877f9cd), the competition decisions ODR-COMP-P01..P14 (APR-COMP-OWNER-1), causa-storage-v1.1.0 (causa-data 7e10394). Pending, the owner's: ODR-COMP-SCOPE (the scope digest below), ODR-COMP-CATALOG-CONTRACT, ODR-COMP-P15 (dependencyLock), ODR-COMP-P16 (assertionMergeNeeds), ODR-COMP-LOCK, the live-provider run on the merged main, then committing this file as kickoff/competition/toolchain.lock.json with status set to the owner's pin and indyInit.commit filled (as ODR-RG-04). Until then the competition has no approved lock.",
+ "status": "PROPOSED: not an owner pin. The successor of the competition lock the owner committed under ODR-COMP-LOCK (APR-COMP-OWNER-2; kickoff/competition/toolchain.lock.json at b652fbe), changing only processEvidence (the competition process-evidence rules, ODR-COMP-P17), ownerDecisionRequests.sha256 (the requests file with ODR-COMP-P17, -P18 and -P19) and the descriptions that name them. Pending, the owner's: ODR-COMP-P17, ODR-COMP-P18, ODR-COMP-P19 and ODR-COMP-LOCK again (owner-freeze.fsx decide competition), then committing this file as kickoff/competition/toolchain.lock.json with status set to the owner's pin and indyInit.commit filled (as ODR-RG-04), then the re-govern approval (docs/competition-readiness/PROCESS-RULES-REPAIR.md).",
  "scope": {
   "manifest": "docs/competition-readiness/scope-manifest.json",
   "scopeSha256": "09e38f7db1888b3bbb957272cddfa050908a077a1f115d0cef2d412d7ec40666",
@@ -176,7 +176,7 @@
  },
  "ownerDecisionRequests": {
   "path": "docs/v416-competition-decisions/proposals/owner-decision-requests.json",
-  "sha256": "9f3c92b6b43d34d6e9ffeb737c7d8ef9436249a23122879796b99d64f014874e",
-  "rule": "the questions the owner answers for the competition are these (ODR-COMP-P01..P16, -SCOPE, -CATALOG-CONTRACT, -LOCK), pinned by the owner's lock (as launch-preflight LP-03 does for Rehearsal 010)"
+  "sha256": "519aa30b33cbf093ec9c2eab8b7abfe4b7a3e01d27a53b8841e72544845934e0",
+  "rule": "the questions the owner answers for the competition are these (ODR-COMP-P01..P19, -SCOPE, -CATALOG-CONTRACT, -LOCK), pinned by the owner's lock (as launch-preflight LP-03 does for Rehearsal 010)"
  }
 }
