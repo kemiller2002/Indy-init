@@ -198,8 +198,14 @@ jobs:
           repositories: ${{ steps.testrepo.outputs.read_repos }}
           permission-contents: read
       - name: Playwright browsers for every project the plan names (Chromium and WebKit)
-        timeout-minutes: 10
-        run: npx playwright install --with-deps chromium webkit
+        # The OS packages `playwright install --with-deps` would install, the same set (Playwright's own dry run names it
+        # and must report nothing missing afterwards), fetched from the first Ubuntu archive mirror that delivers it within
+        # its bound (the runner's, then archive.ubuntu.com, then mirrors.edge.kernel.org; tools/r9/browser-os-deps.fsx):
+        # one stalled mirror no longer fails the gate before any test runs. Every mirror failing fails here, by name.
+        timeout-minutes: 20
+        run: |
+          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/browser-os-deps.fsx" -- --dir . --browsers chromium,webkit
+          npx playwright install chromium webkit
       - name: Run the plan's suites at the candidate
         env:
           MODE: ${{ inputs.mode || 'development' }}
@@ -285,10 +291,14 @@ jobs:
       - name: Playwright and browsers for the governed journeys and design contract (bounded; ODR-R10-34 B)
         id: journeys-browsers
         if: always()
-        # Its own step, so a stalled apt mirror fails here, by name, after 15 minutes instead of consuming the verify job's
-        # 40 (ODR-R10-34 B). Not dropped: the governed journeys pin their own Playwright, which need not equal the candidate's.
-        timeout-minutes: 15
-        run: (cd "$RUNNER_TEMP/indy-init/verification/journeys" && npm install --no-audit --no-fund && npx playwright install --with-deps chromium webkit)
+        # Its own step, so a stalled apt mirror fails here, by name, within its limit instead of consuming the verify job's
+        # (ODR-R10-34 B). Not dropped: the governed journeys pin their own Playwright, which need not equal the candidate's.
+        # OS packages as in the step above (browser-os-deps.fsx): none missing, as after that step, means no apt at all.
+        timeout-minutes: 20
+        run: |
+          cd "$RUNNER_TEMP/indy-init/verification/journeys" && npm install --no-audit --no-fund
+          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/browser-os-deps.fsx" -- --dir . --browsers chromium,webkit
+          npx playwright install chromium webkit
       - name: Governed journeys J1-J3 and the design contract (Chromium and WebKit; adversarial audit R3, R5)
         id: journeys
         if: always()
