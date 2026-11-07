@@ -60,3 +60,13 @@ them. Each line: id — question — **recommended answer** — why. Reply "acce
 | id | Question | Recommended | Why |
 |---|---|---|---|
 | P-13 | Amend EXT-DATA-004-O1 and DF-CON-2026-A002 so the deployed test build (deploy-pages) bundles exactly one key, `DATA_ACCESS_KEY_CAUSA`, for `REPO_OWNER`/`DATA_SOURCE`@`CAUSA_BRANCH` only, in `dist/deploy-connection.json` only, never committed or logged; least privilege (Contents read/write on that one repository), revocable; **the public site exposes the key to anyone (accepted risk)**; the CI scan allows exactly that value there and fails on any other credential ([TEST-DEPLOY-KEY.md](TEST-DEPLOY-KEY.md), ODR-COMP-P13; ODR-R10-36 for Rehearsal 010) | **A: approve the exception** (B: keep the prohibition, key typed per session) | Your direction: a test, no secret data, access acceptable; amend rather than avoid bundling |
+
+## E. Added after the v4.1.6 tag (FREEZE.md step 5: frozen guard, competition scope, proposed lock) — proposed, not recorded
+Recorded with `owner-freeze.fsx -- decide competition` (each records its pinned file's sha256 at origin/main). The scope
+is compiled from the tagged v4.1.6, its plan supplement (WDL-013, ODR-V416-WDL013 A) and the v4.1.6 ratified catalog
+with the fixed (V2) selectors (SS-1 A); Rehearsal 010's approved scope and lock stay as they are.
+| id | Question | Recommended | Why |
+|---|---|---|---|
+| SCOPE | Approve `docs/competition-readiness/scope-manifest.json` (209 requirements, 921 obligations, 31 work items, zero exclusions, scopeSha256 `09e38f7d…`) | **A: approve** | Successor of ODR-R10-01 for the competition: the lock pins this digest |
+| CATALOG-CONTRACT | Adopt `kickoff/competition/catalog-verification-contract.json` (Rehearsal 010's contract with the catalog digest moved to the v4.1.6 ratified catalog `0536ad29…`) | **A: adopt** | Rehearsal 010's contract pins the earlier catalog (`7e5e8a40…`); the governed catalog verdict would refuse |
+| LOCK | Adopt `kickoff/competition/toolchain.lock.proposed.json` and commit it as `kickoff/competition/toolchain.lock.json` (status and `indyInit.commit` filled), as ODR-RG-04 | **A: adopt** | ODR-COMP-P12 A: v4.1.6, the new scope digest, Conditor v0.10.21, causa-storage 1.1.0, `kemiller2002/causa` |

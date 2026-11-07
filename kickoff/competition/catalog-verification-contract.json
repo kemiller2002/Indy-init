@@ -1,0 +1,30 @@
+{
+  "schema": "indy-init.catalog-verification-contract/1",
+  "status": "PROPOSED (ODR-COMP-CATALOG-CONTRACT): becomes binding when the owner pins this file's sha256 as catalogVerification.contractSha256 in kickoff/competition/toolchain.lock.json. It is Rehearsal 010's contract (kickoff/rehearsal-010/catalog-verification-contract.json, ODR-R10-03 and ODR-R10-04, APR-R10-OWNER-2) with only catalog.sha256 and catalog.ratified moved to the catalog the owner ratified for v4.1.6 (ODR-V416-CAT).",
+  "description": "What a catalog verdict must bind to count as governed acceptance (adversarial audit R2). Judged by requirements-compiler catalog-acceptance inside the governed Verification gate; a builder-run verdict is supporting evidence only.",
+  "catalog": {
+    "path": "requirements/catalogs/causa-investigation.requirement-catalog.json",
+    "catalogId": "CAT-CAUSA-INVESTIGATION",
+    "sha256": "0536ad296f992c81c1c3c2ad918c11eba5a1d722f121da0713803ab60ba568b1",
+    "ratified": "Indy-init 0ab8ffd (INV-001..018), 7cefdc6 (INV-019..038, PR #98), ab24c4a (INV-039..044; ODR-R10-02 = A, APR-R10-OWNER-1, PR #114) and the v4.1.6 successor 877f9cd (INV-045..047 added, INV-028 required, INV-030's note; ODR-V416-CAT = A, APR-V416-OWNER-1, PR #185)"
+  },
+  "governedProducers": [
+    "governed-gate"
+  ],
+  "faultSensitivity": [
+    {
+      "category": "content-round-trip",
+      "checks": [
+        "save",
+        "reload",
+        "isolation"
+      ],
+      "rationale": "A round trip that passes whatever the content is verifies nothing (SA-07). These checks are the catalog's real persistence obligations (INV-017, INV-023..038 save/reload/isolation); the frozen plan has no such category, so the gate no longer passes the inert --require-fault-sensitive content-round-trip to the plan judgement."
+    }
+  ],
+  "requireProbeSpec": true,
+  "facts": {
+    "domain-profile-selected": false
+  },
+  "factsDecision": "ODR-R10-04, carried for the competition by ODR-COMP-CATALOG-CONTRACT: the competition offers no domain or profile selection on the start screen, so INV-003 is not applicable. A candidate may not declare a different value; an owner decision changes it."
+}
