@@ -63,7 +63,13 @@ Build to what they check. The names they look for are listed in `SRC/verificatio
    dotnet fsi SRC/tools/r9/r9.fsx -- install-conditor --lock SRC/kickoff/competition/toolchain.lock.json --dir CONDITOR_DIR
    dotnet fsi SRC/tools/r9/r9.fsx -- workstation --lock SRC/kickoff/competition/toolchain.lock.json --conditor CONDITOR_DIR/conditor --home ECHELON_HOME
    ```
-   `install-conditor` installs Conditor v0.10.21 and refuses any binary whose sha256 is not the lock's. Its `conditor init --preset indy-init` includes `@echelon-foundry/forma-workflow` 1.2.0 (ODR-COMP-P14 A; the causal graph of T23/T24 and WDL-013) and the deploy workflow's secrets step (ODR-COMP-P13 A). Never install another version. Then:
+   `install-conditor` installs Conditor v0.10.21 and refuses any binary whose sha256 is not the lock's. Its `conditor init --preset indy-init` includes `@echelon-foundry/forma-workflow` 1.2.0 (ODR-COMP-P14 A; the causal graph of T23/T24 and WDL-013) and the deploy workflow's secrets step (ODR-COMP-P13 A). Never install another version.
+
+   **`requirements-compiler` is the one built from SRC**, here and wherever this document names it: `dotnet build SRC/tools/requirements-compiler/src -c Release`, then `dotnet SRC/tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll`. Never use a `requirements-compiler` on the PATH or one built from another checkout or commit: it does not compile v4.1.6 as frozen, so its bootstrap is not v4.1.6's (no FSharp.Core, no CI workflow, no WDL-013 spec), and a compiler before PR #188's fix also wrote its own v4.1.6 into `SRC/requirements-compiled/v4.1.6` (duty 1's command has no `--check`). The compiler built from SRC refuses the bootstrap, writing nothing, when it does not reproduce the package byte for byte. After the bootstrap, SRC must be unchanged:
+   ```
+   git -C SRC status --porcelain --untracked-files=no     # must print nothing
+   ```
+   If it prints anything, SRC is no longer the governed commit (`scope preflight` and `scope checkpoint` refuse it as FROZEN_SOURCES_CHANGED): restore it (`git -C SRC checkout -- .`) and bootstrap again, from `conditor init` in a new empty directory, with the compiler built from SRC. Then:
    ```
    dotnet fsi SRC/tools/r9/r9.fsx -- govern --indy-init SRC --target . --lock kickoff/competition/toolchain.lock.json
    ```
