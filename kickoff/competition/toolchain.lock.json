@@ -1,0 +1,182 @@
+{
+  "schema": "indy-init.r9-toolchain-lock/1",
+  "description": "Proposed toolchain, requirements package and governed contracts for the 7 November competition (kemiller2002/causa): the frozen v4.1.6 (tag indy-init-requirements-v4.1.6) with its WDL-013 plan supplement, the competition scope compiled with the fixed (V2) selectors (SS-1 A), Conditor v0.10.21 whose indy-init preset carries forma-workflow 1.2.0 and the test-deploy-key secrets step (ODR-COMP-P14 A, ODR-COMP-P13 A), causa-storage 1.1.0, and, carried unchanged from Rehearsal 010's lock, the resolved set echelon-current 1.37.0 (Dokimos 0.11.1), the process-evidence rules, the design contract, the deadline policy, the journey bindings and the isolated test repository. Change this file only through the owner decision process.",
+  "indyInit": {
+    "repository": "kemiller2002/Indy-init",
+    "commit": "4b75cd5282d54d32f81c99c3f958ddb1e6e59144",
+    "rule": "The competition is governed from this Indy-init commit or a later main commit that contains it: r9.fsx govern records the commit it ran from as .echelon/r9-governance.json indyInitCommit, and launch-preflight LP-00 judges origin/main. This proposal leaves it as a placeholder because the commit does not exist until the pull request is merged; the owner writes it when committing toolchain.lock.json (ODR-COMP-LOCK)."
+  },
+  "conditor": {
+    "version": "0.10.21",
+    "tag": "v0.10.21",
+    "commit": "528ef4576fc79540953226b7dcfd3957654e3a29",
+    "downloadBase": "https://github.com/kemiller2002/conditor/releases/download/v0.10.21",
+    "artifacts": {
+      "linux-x64": {
+        "name": "conditor-linux-x64",
+        "sha256": "27fe83a2f2c8fe83893a73ab0e21e7e9142475f222f13d0edf18387ab03796c6"
+      },
+      "linux-arm64": {
+        "name": "conditor-linux-arm64",
+        "sha256": "ecaf820e1b8202830a7e3a3dd34c85eaf27624b6715c685c794a96ad1570fb9c"
+      },
+      "linux-musl-x64": {
+        "name": "conditor-linux-musl-x64",
+        "sha256": "0bb26394bd9b5116c4739df88d3fdd33493867f8d9211b9846f4d24f45c02420"
+      },
+      "linux-musl-arm64": {
+        "name": "conditor-linux-musl-arm64",
+        "sha256": "7236ee53bfed6304af58d3405fe1a73748c1e3f8d39f2b1fce8c4b751a71b5c9"
+      },
+      "osx-x64": {
+        "name": "conditor-osx-x64",
+        "sha256": "cb22376ea6a6b57362b1fa289e8a66b627239b1d004528b1b75ae33624275e78"
+      },
+      "osx-arm64": {
+        "name": "conditor-osx-arm64",
+        "sha256": "a532e89ec799cea13f212f37166a24a8de2f312f5f7ab04f2cb341bd2aecba99"
+      },
+      "win-x64": {
+        "name": "conditor-win-x64.exe",
+        "sha256": "655eab4c45b1f1089b29b751a07c4bdd5394be798b35a39ee885f82ac6a87568"
+      },
+      "win-arm64": {
+        "name": "conditor-win-arm64.exe",
+        "sha256": "8465ccbd086dcaf0d4fd6263e4389d118de8128201770453d651272b0f4369bd"
+      }
+    },
+    "approval": "ODR-COMP-P14 A (APR-COMP-OWNER-1): the indy-init preset pins forma-workflow 1.2.0 (exempted from the echelon-current selection test for exactly that component and version, Conditor PR #134) and its deploy template carries the ODR-COMP-P13 secrets step; released as v0.10.21 (commit 528ef45). The eight digests are those of the release's checksums.txt."
+  },
+  "resolvedSet": {
+    "registry": "kemiller2002/echelon-registry",
+    "commit": "575240233d1fc32b57cfa827ea1031b68609fc58",
+    "channel": "echelon-current",
+    "profileVersion": "1.37.0",
+    "platforms": {
+      "linux-x64": {
+        "path": "channels/echelon-current/linux-x64.json",
+        "sha256": "bba3594ad1db8a4cee3550620c4a86dd5cbb5ce2f4bc183ea50951476b29ca91"
+      },
+      "linux-arm64": {
+        "path": "channels/echelon-current/linux-arm64.json",
+        "sha256": "84be0c098b6bdda425e2628fb174e5e85c10f8b87081c00600158fb8caa9072b"
+      },
+      "osx-x64": {
+        "path": "channels/echelon-current/osx-x64.json",
+        "sha256": "ea7682ab0d7937644a1268d14efb87ba3f5a6043ce7d44579f9fd4d1272a5c57"
+      },
+      "osx-arm64": {
+        "path": "channels/echelon-current/osx-arm64.json",
+        "sha256": "b8db37491977d810180d07f429f671adecac0e360d7a9bc3786a87c2f250c566"
+      },
+      "win-x64": {
+        "path": "channels/echelon-current/win-x64.json",
+        "sha256": "d8409d60a4933320e6aeb5af8037cb73e940c37436db002793312d943ed3fb0f"
+      }
+    },
+    "expectedTools": {
+      "praxis": "3.25.0",
+      "dokimos": "0.11.1",
+      "percepta-semantic": "0.4.0",
+      "ordo": "1.20.0"
+    },
+    "approval": "echelon-current 1.37.0 approved by the owner (sets/echelon-current/1.37.0.json, OD-INDY-8; echelon-registry#109 merged as 5752402) after Conditor qualified it (conditor#131)"
+  },
+  "requirementsPackage": {
+    "path": "requirements-compiled/v4.1.6",
+    "base": "requirements-compiled/v4",
+    "packageVersion": "4.1.6",
+    "tag": "indy-init-requirements-v4.1.6",
+    "tagCommit": "2380b3daf58af0d5126b37949cfe882def597688",
+    "manifestSha256": "8d3706d9b5f91cc942b9feb031e4d9b1300da007e9fd97e1d10ba76ca16c1695",
+    "verificationPlanSha256": "468b6745df292f75907ec9b1b622250fde11dafbce34c624f698321edf1b968d",
+    "verificationPlanSupplement": "requirements-compiled/v4.1.6/verification-plan-supplement.json",
+    "verificationPlanSupplementSha256": "3a78e3966397a5633d1d59b79450b19d654f8b4979bdc04dd25ae08b204da751",
+    "approval": "APR-V416-OWNER-1 (ODR-V416-01, -RC1, -RC3..-RC7, -S1..-S9, -CAT, -WDL013, -SCOPE-SELECTORS, -FSCORE), APR-V416-OWNER-2 (ODR-V416-02, the package approval of manifest 8d3706d9)"
+  },
+  "workstationTargetId": "indy-init-r9-workstation",
+  "processEvidence": {
+    "description": "Record-bound obligations (plan suites with runner evidence-record, identities praxis:<kind>) are judged by requirements-compiler verify-process against this plan and these rules, with attestations the CI run observes itself. rulesSha256 pins the Rehearsal 010 rules the owner recorded (ODR-R10-14, APR-R10-OWNER-1).",
+    "plan": "requirements-compiled/v4/verification-plan.json",
+    "planDigest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d",
+    "rules": "kickoff/rehearsal-010/process-evidence-rules.json",
+    "rulesSha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d",
+    "proposedSha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d",
+    "rulesStatus": "PINNED: the owner recorded ODR-R10-14 = A with this file's digest (APR-R10-OWNER-1)"
+  },
+  "status": "OWNER PIN: competition lock committed by kemiller2002 under ODR-COMP-LOCK (APR-COMP-OWNER-2), 2026-11-07",
+  "scope": {
+    "manifest": "docs/competition-readiness/scope-manifest.json",
+    "scopeSha256": "09e38f7db1888b3bbb957272cddfa050908a077a1f115d0cef2d412d7ec40666",
+    "approval": "ODR-COMP-SCOPE (pending): compiled from the tagged v4.1.6, its plan supplement and the ratified v4.1.6 catalog with the fixed (V2) selectors (SS-1 A); Rehearsal 010's 26e6ff3c stays its own",
+    "rule": "scope preflight and the Praxis coverage check must pass and the scope checkpoint must be committed before any application code (STARTUP-INSTRUCTIONS.md)"
+  },
+  "catalogVerification": {
+    "contract": "kickoff/competition/catalog-verification-contract.json",
+    "contractSha256": "c5afc5375e14090407e7a56ad4d51f6d6d4faaa8ac96fd37add2af69b7d03739",
+    "approval": "ODR-COMP-CATALOG-CONTRACT (pending): Rehearsal 010's contract (ODR-R10-03, ODR-R10-04; 3d587618) with the catalog digest moved to the v4.1.6 ratified catalog (ODR-V416-CAT)"
+  },
+  "dependencyLock": {
+    "path": "docs/competition-readiness/dependency-lock.json",
+    "sha256": "2a5853f5decb3f74f478b9b19ac892e583da32c639ac843e2848598235578e87",
+    "source": "docs/competition-readiness/dependency-lock.source.json",
+    "approval": "ODR-COMP-P15 (pending): the successor of docs/optimization/echelon-stack-upgrade/lock/dependency-lock.json (echelon-current 1.37.0, ODR-ESU-01) naming Conditor v0.10.21 and the forma-workflow 1.2.0 its preset installs; generated by tools/stack-drift/stack-drift.fsx lock",
+    "rule": "the stack-drift preflight (ODR-ESU-04 A, STARTUP section 2 step 3) checks this lock (its DEPENDENCY_LOCK) against this toolchain lock and must report READY before the bootstrap is pushed"
+  },
+  "assertionMergeNeeds": {
+    "path": "docs/competition-readiness/assertion-merge-needs.json",
+    "sha256": "6d9b5b85777770a135bbcb76739e896e36890337f8c8151cc2db0f8aaec16a79",
+    "approval": "ODR-COMP-P16 (pending): Rehearsal 010's needs (ODR-R10-33 A) with each needed slice moved to the competition slice owning its requirements (tools/r10/assertion-merge-needs.fsx)",
+    "rule": "the governed slice gate reads this file for CF-07 deferral (slice-gate --assertion-needs); a lock without it uses docs/rehearsal-010-readiness/assertion-merge-needs.json"
+  },
+  "designContract": {
+    "contract": "kickoff/rehearsal-010/design-contract.json",
+    "contractSha256": "366ed579446636d31894e77ab63877d5dc5f4ef0e935ae14f089b4360780482a",
+    "approval": "APR-R10-OWNER-1 (ODR-R10-05)"
+  },
+  "deadlinePolicy": {
+    "path": "kickoff/rehearsal-010/deadline-policy.json",
+    "sha256": "9f6ac357b09190074efcc3bdba851ddce0ebd8cca56d3c0fe69fe7ba8499a4e0",
+    "approval": "APR-R10-OWNER-1 (ODR-R10-06)"
+  },
+  "journeys": {
+    "bindings": "verification/journeys/bindings.json",
+    "bindingsSha256": "cd68237205ff8f56503c46bdb6dc925085a3b07c9306ab6f9979f2b17b9754dd",
+    "approval": "APR-R10-OWNER-1 (ODR-R10-07)"
+  },
+  "testRepository": {
+    "owner": "kemiller2002",
+    "repo": "causa-acceptance-r10",
+    "branch": "causa-acceptance",
+    "isolated": true,
+    "visibility": "private",
+    "data": "synthetic only; resettable; evidence lives in the governed CI artifacts",
+    "credential": "a GitHub App installed on this repository alone (Contents: read and write); installation token minted per job by actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 (v3.3.0), scoped to this repository, revoked at job end; secrets CAUSA_ACCEPTANCE_APP_CLIENT_ID and CAUSA_ACCEPTANCE_APP_KEY",
+    "approval": "ODR-R10-09 (pending)"
+  },
+  "competitionRepository": {
+    "owner": "kemiller2002",
+    "repo": "causa",
+    "url": "https://github.com/kemiller2002/causa",
+    "defaultBranch": "main",
+    "initialCommit": "7afb15755756fb5fd2a930b5c281c8794834c8dd",
+    "preCreated": "by the owner before T0, holding only the owner's one-line README.md commit; the bootstrap commit goes on top of it, never replacing it and never force-pushed (STARTUP-INSTRUCTIONS §2 step 4, amended in #182)",
+    "secrets": "both GitHub App secrets, and the four deploy secrets CAUSA_BRANCH, DATA_ACCESS_KEY_CAUSA, DATA_SOURCE, REPO_OWNER (ODR-COMP-P13 A, TEST-DEPLOY-KEY.md); branch protection requiring a pull request",
+    "approval": "ODR-COMP-P07 A and ODR-COMP-P13 A (APR-COMP-OWNER-1)"
+  },
+  "causaStorage": {
+    "repository": "kemiller2002/causa-data",
+    "tag": "causa-storage-v1.1.0",
+    "tagObject": "ab16b7a8071f9d4a1e110053ceed44ede1aeb38e",
+    "commit": "7e10394cc95b47f7dfa5baf2e5b3a68b929bf9c4",
+    "contract": "contract/v1.1.0",
+    "contractTree": "f5d931ccade1f0dc731ab791b8c05f80a2a2afb8",
+    "contractSha256": "d3ffa7578cc1e8d9263db0a42817a72ba4d56155d888d7726ba6186e190e5f0d",
+    "approval": "ODR-V416-RC1 A, ODR-V416-S1 B (minimal 1.1.0), ODR-V416-S9 A (contract/v1.1.0/), APR-V416-OWNER-1; merged and tagged by the causa-data owner (FREEZE.md step 1b)"
+  },
+  "ownerDecisionRequests": {
+    "path": "docs/v416-competition-decisions/proposals/owner-decision-requests.json",
+    "sha256": "9f3c92b6b43d34d6e9ffeb737c7d8ef9436249a23122879796b99d64f014874e",
+    "rule": "the questions the owner answers for the competition are these (ODR-COMP-P01..P16, -SCOPE, -CATALOG-CONTRACT, -LOCK), pinned by the owner's lock (as launch-preflight LP-03 does for Rehearsal 010)"
+  }
+}
