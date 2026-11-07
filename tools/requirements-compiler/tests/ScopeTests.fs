@@ -38,6 +38,7 @@ let private catalog =
 let private sources: Sources =
     { Plan = plan
       PlanSha256 = "plan"
+      Supplement = None
       ExecutionPlan = executionPlan
       ExecutionPlanSha256 = "exec"
       Dag = dag
@@ -266,8 +267,17 @@ let private scopePackage (source: string) =
     |> Option.bind (strOpt "path")
     |> Option.defaultWith (fun () -> failwithf "%s names no requirementsPackage.path" lock)
 
+/// The commit the approved Rehearsal 010 scope records as its source (`source.commit`). The scope is a historical record:
+/// it is judged against the sources as committed there, so a later source that moved on (the catalog ODR-V416-CAT
+/// re-ratified for the competition) does not change what it was approved from.
+let private r10SourceCommit (source: string) =
+    parseFile (manifestPath source) |> field "source" |> Option.bind (strOpt "commit") |> Option.defaultWith (fun () -> failwith "the Rehearsal 010 scope records no source.commit")
+
+/// The Rehearsal 010 sources as its approved scope was compiled from them.
+let private r10Sources (source: string) = ScopeCommands.sourcesAt source (r10SourceCommit source) (scopePackage source)
+
 let real (source: string) : string list =
-    let s = ScopeCommands.sourcesOf source (scopePackage source)
+    let s = r10Sources source
     let committed = parseFile (manifestPath source)
     // The approved Rehearsal 010 scope is a historical record of the Legacy selector semantics (its v4.1.5 package).
     let semantics = recordedSemantics committed
@@ -1155,7 +1165,7 @@ let reconciliation (source: string) : string list =
 let splitScope (source: string) : string list =
     let planPath = "docs/rehearsal-010-optimization/inputs/work-item-split.proposed.json"
     let plan = parseFile (Path.Combine(source, planPath))
-    let sources = ScopeCommands.sourcesOf source (scopePackage source)
+    let sources = r10Sources source
     // The plan splits generated work items of the approved Rehearsal 010 scope, a Legacy-semantics record: it and its
     // controls are judged with the semantics that scope records (the committed successor records the same package).
     let semantics = recordedSemantics (parseFile (manifestPath source))
@@ -1233,7 +1243,7 @@ let splitScope (source: string) : string list =
 /// obligations, priorities and mandatory flags, and reproduces the committed proposal's digest.
 let milestoneAlignedSplit (source: string) : string list =
     let planPath = "docs/rehearsal-010-optimization/inputs/work-item-split.milestone-aligned.proposed.json"
-    let sources = ScopeCommands.sourcesOf source (scopePackage source)
+    let sources = r10Sources source
     let content (m: Json) = arr "requirements" m |> List.map (fun r -> str "id" r, serialize (JObj [ "o", (field "obligations" r |> Option.defaultValue (JArr [])); "p", JStr(strOpt "priority" r |> Option.defaultValue ""); "m", (field "mandatory" r |> Option.defaultValue JNull) ])) |> Map.ofList
     let committed = parseFile (Path.Combine(source, "docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json"))
     let planSha = Git.sha256Hex (File.ReadAllBytes(Path.Combine(source, planPath)))
@@ -1432,7 +1442,7 @@ let selectorSemantics (source: string) : string list =
     let task (selector: string) = JObj [ "id", JStr "T"; "covers", jstrs [ selector ] ]
     let legacyCases = [ "PF-001", true; "regex:^PF-0\\d+$", true; "PF", false; "prefix:PF-", false; "id:PF-001", false; "doc:docs/PF.md", false; "origin:baseline", false; "all", false ]
     let fixedDigest = "6a0e23b0db2aa15cde7d2dff235e7cd09b133d0d3260beaa61a7195f8d70604c"
-    let s = ScopeCommands.sourcesOf source (scopePackage source)
+    let s = r10Sources source
     let committed = parseFile (manifestPath source)
     let byDefault = compile s
     let itemIds (m: Json) = arr "workItems" m |> List.map (str "id") |> Set.ofList
@@ -1450,9 +1460,118 @@ let selectorSemantics (source: string) : string list =
           if (itemIds byDefault).Contains gone then yield sprintf "selector semantics: the default compile still generates %s" gone
           if not ((itemIds committed).Contains gone) then yield sprintf "selector semantics: the approved Legacy scope has no %s" gone
       // The command layer selects from the manifest's record: the approved scope passes `scope preflight`.
-      let code = ScopeCommands.scopeCommand [ "preflight"; "--source"; source; "--package"; scopePackage source; "--manifest"; manifestPath source ]
+      let code = ScopeCommands.scopeCommand [ "preflight"; "--source"; source; "--source-commit"; r10SourceCommit source; "--package"; scopePackage source; "--manifest"; manifestPath source ]
       if code <> 0 then yield sprintf "selector semantics: scope preflight of the approved Rehearsal 010 manifest exited %d" code ]
+
+// ---- the plan supplement (v4.1.6, ODR-V416-WDL013 A) and the competition scope ---------------------------------------
+
+/// A fixture supplement: U-001 (gate-level in the fixture) verified per obligation, bound in SU-W.
+let private fixtureSupplement =
+    let entry =
+        JObj
+            [ "requirement", JStr "U-001"; "priority", JStr "P1"; "title", JStr "Unprioritised"
+              "dependencies", JObj [ "requirements", JArr []; "contracts", JArr [] ]
+              "obligations", JArr [ JObj [ "sourceObligation", JStr "U-001-O1" ] ] ]
+    JObj
+        [ "schema", JStr "indy-init.v41-verification-plan-supplement/1"
+          "decisions", JArr [ JObj [ "requirement", JStr "U-001"; "decision", JStr "ODR-FIXTURE"; "approval", JStr "APR-FIXTURE-1"; "supersedes", JStr "ODR-V4-10 A, for U-001 only"; "suite", JStr "SU-W" ] ]
+          "requirements", JArr [ entry ] ]
+
+/// Pure fixture cases. Positive: a supplement entry leaves gate-level scope and is a plan requirement with its bound
+/// obligations, pinned in `frozen` and recorded in `approvals`. Negative and regression: without a supplement the
+/// manifest is byte for byte what it was before the supplement existed (no new key), and a manifest compiled with the
+/// supplement is refused against sources without it, and the other way round.
+let planSupplement () : string list =
+    let withSupplement =
+        { sources with
+            Supplement = Some { Path = "fixture/verification-plan-supplement.json"; Json = fixtureSupplement; Sha256 = "supp" }
+            ExecutionPlan =
+              match executionPlan with
+              | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = "suites" then k, (match v with JArr xs -> JArr(xs @ [ JObj [ "id", JStr "SU-W2"; "runner", JStr "npx playwright test --project=chromium"; "environment", JStr "ci-browser"; "planTests", JBool true; "tests", JArr [ JObj [ "id", JStr "playwright:acceptance/U-001.spec.js > U-001-O1 [chromium]"; "obligations", jstrs [ "U-001-O1" ] ] ] ] ]) | x -> x) else k, v))
+              | x -> x }
+    let m = compile withSupplement
+    let reqOf (j: Json) id = arr "requirements" j |> List.tryFind (fun r -> str "id" r = id)
+    let gate (j: Json) = field "gateLevelScope" j |> Option.map (strs "requirements") |> Option.defaultValue []
+    let frozenKeys (j: Json) = match field "frozen" j with Some(JObj ps) -> ps |> List.map fst | _ -> []
+    let count k (j: Json) = field "counts" j |> Option.bind (intOpt k) |> Option.defaultValue -1L
+    [ match reqOf m "U-001" with
+      | None -> yield "plan supplement: U-001 is not a requirement of the scope compiled with its supplement entry"
+      | Some r ->
+          if str "origin" r <> "v4-plan" || str "priority" r <> "P1" || not (boolOr "mandatory" false r) then yield sprintf "plan supplement: U-001 is %s" (serialize r)
+          match arr "obligations" r with
+          | [ o ] when str "id" o = "U-001-O1" && strs "producers" o = [ "SU-W2" ] && str "kind" o = "executable" -> ()
+          | os -> yield sprintf "plan supplement: U-001's obligations are %A, not U-001-O1 bound in SU-W2" (os |> List.map serialize)
+      if List.contains "U-001" (gate m) then yield "plan supplement: U-001 is still gate-level although its supplement entry verifies it per obligation"
+      if List.contains "U-001" (gate manifest) |> not then yield "plan supplement: the fixture without a supplement does not keep U-001 gate-level"
+      if count "planRequirements" m <> count "planRequirements" manifest + 1L || count "gateLevelRequirements" m <> count "gateLevelRequirements" manifest - 1L then
+          yield "plan supplement: the counts do not move U-001 from gate level to the plan"
+      if not (List.contains "verificationPlanSupplement" (frozenKeys m) && List.contains "verificationPlanSupplementSha256" (frozenKeys m)) then yield "plan supplement: frozen does not pin the supplement"
+      if not (arr "approvals" m |> List.exists (fun a -> str "decision" a = "ODR-FIXTURE option A" && (str "record" a).StartsWith "APR-FIXTURE-1")) then yield "plan supplement: approvals do not record the supplement's decision"
+      // Regression: no supplement, no new key, the same manifest as a compile that never knew of supplements.
+      if frozenKeys manifest |> List.exists (fun k -> k.StartsWith "verificationPlanSupplement") then yield "plan supplement: a scope without a supplement records one"
+      if arr "approvals" manifest |> List.length <> 3 then yield "plan supplement: a scope without a supplement has other approvals than the three of the v4 plan and catalog"
+      if serialize (compile { withSupplement with Supplement = None; ExecutionPlan = executionPlan }) <> serialize manifest then yield "plan supplement: removing the supplement does not give the plain scope back"
+      // Negative: preflight tells the two apart in both directions.
+      let codesOf (rs: Refusal list) = rs |> List.map (fun r -> r.Code)
+      let dropped = preflight m manifest |> codesOf
+      if not (List.contains "FROZEN_SOURCES_CHANGED" dropped && List.contains "MANDATORY_REQUIREMENT_MISSING" dropped) then yield sprintf "plan supplement: a manifest without the supplement entry passes against sources with it: %A" dropped
+      let added = preflight manifest m |> codesOf
+      if not (List.contains "FROZEN_SOURCES_CHANGED" added && List.contains "REQUIREMENT_UNSOURCED" added) then yield sprintf "plan supplement: a manifest with a supplement entry passes against sources without it: %A" added
+      if not (preflight m m).IsEmpty then yield sprintf "plan supplement: the supplemented scope fails its own preflight: %A" (preflight m m |> codesOf) ]
+
+/// The competition scope (ODR-COMP-P11 A, ODR-V416-WDL013 A, SS-1 A): compiled from the frozen v4.1.6 with the fixed
+/// (V2) selectors, its plan supplement and the ratified v4.1.6 catalog; approved on its own digest.
+let private competitionManifestPath (source: string) = Path.Combine(source, "docs", "competition-readiness", "scope-manifest.json")
+let private competitionPackage = "requirements-compiled/v4.1.6"
+
+let competitionScope (source: string) : string list =
+    let s = ScopeCommands.sourcesOf source competitionPackage
+    let committed = parseFile (competitionManifestPath source)
+    let m = compileWith (semanticsOfSources s) s
+    let reqOf id = arr "requirements" m |> List.tryFind (fun r -> str "id" r = id)
+    let item id = arr "workItems" m |> List.tryFind (fun w -> str "id" w = id)
+    let generated = arr "workItems" m |> List.filter (fun w -> str "origin" w = "generated") |> List.map (str "id") |> List.sort
+    let wdl013Tests = [ for o in 1 .. 3 -> sprintf "WDL-013-O%d" o, sprintf "playwright:acceptance/WDL-013.spec.js > WDL-013-O%d [chromium]" o ]
+    let withoutSupplement = compileWith V2 { s with Supplement = None }
+    let count k (j: Json) = field "counts" j |> Option.bind (intOpt k) |> Option.defaultValue -1L
+    [ if semanticsOfSources s <> V2 || recordedSemantics committed <> V2 then yield "competition scope: v4.1.6 is not compiled and judged with the fixed (V2) selectors"
+      if s.Supplement.IsNone then yield "competition scope: v4.1.6's verification-plan-supplement.json is not read"
+      if str "scopeSha256" m <> str "scopeSha256" committed then yield sprintf "competition scope: compiles to %s, the committed manifest has %s" (str "scopeSha256" m) (str "scopeSha256" committed)
+      if not (preflight m committed).IsEmpty then yield sprintf "competition scope: the committed manifest is stale or altered: %A" (preflight m committed |> List.truncate 5)
+      let code = ScopeCommands.scopeCommand [ "preflight"; "--source"; source; "--package"; competitionPackage; "--manifest"; competitionManifestPath source ]
+      if code <> 0 then yield sprintf "competition scope: scope preflight exited %d" code
+      // Positive: WDL-013's three frozen obligations are bound per obligation, built by T23, no longer gate-level.
+      match reqOf "WDL-013" with
+      | None -> yield "competition scope: WDL-013 is not a per-obligation requirement"
+      | Some r ->
+          let bound = arr "obligations" r |> List.map (fun o -> str "id" o, (strs "tests" o, strs "producers" o, boolOr "mandatory" false o))
+          if bound <> (wdl013Tests |> List.map (fun (o, t) -> o, ([ t ], [ "SU-BROWSER-CHROMIUM" ], true))) then yield sprintf "competition scope: WDL-013's obligations are %A" bound
+          if strs "workItems" r <> [ "T23" ] || str "priority" r <> "P1" then yield sprintf "competition scope: WDL-013 is built by %A with priority %s, not T23 and P1" (strs "workItems" r) (str "priority" r)
+      if field "gateLevelScope" m |> Option.map (strs "requirements") |> Option.defaultValue [] |> List.contains "WDL-013" then yield "competition scope: WDL-013 is still gate-level"
+      if not (item "T23" |> Option.exists (strs "requirements" >> List.contains "WDL-013")) then yield "competition scope: T23 does not build WDL-013"
+      if field "frozen" m |> Option.bind (strOpt "verificationPlanSupplementSha256") <> (s.Supplement |> Option.map (fun p -> p.Sha256)) then yield "competition scope: frozen does not pin the supplement's digest"
+      // The only generated items are what the fixed selectors yield: the catalog screens and VER-010's family item.
+      if generated <> [ "WI-GEN-VER"; "WI-INV-LIST"; "WI-INV-START"; "WI-INV-WORKSPACE" ] then yield sprintf "competition scope: generated work items %A" generated
+      for gone in [ "WI-GEN-PF"; "WI-GEN-UI"; "WI-GEN-EXT-DATA"; "WI-GEN-WDL"; "WI-GEN-RECORDS"; "WI-GEN-AR" ] do
+          if (item gone).IsSome then yield sprintf "competition scope: %s is generated although the fixed selectors cover its family" gone
+      if str "packageVersion" (field "frozen" m |> Option.defaultValue JNull) <> "4.1.6" then yield "competition scope: not compiled from v4.1.6"
+      if s.CatalogSha256 <> str "catalogSha256" (field "frozen" committed |> Option.defaultValue JNull) then yield "competition scope: not compiled from the ratified catalog on this tree"
+      if count "requirements" m <> 209L || count "obligations" m <> 921L || count "workItems" m <> 31L || count "planObligations" m <> 616L || count "catalogRequirements" m <> 47L then
+          yield sprintf "competition scope: counts %s" (field "counts" m |> Option.map serialize |> Option.defaultValue "")
+      // Negative: the same sources without the supplement give WDL-013 back to gate level, and the approved manifest is
+      // refused against them; a manifest with WDL-013 dropped is refused against the real sources.
+      if reqOf "WDL-013" |> Option.isSome && (arr "requirements" withoutSupplement |> List.exists (fun r -> str "id" r = "WDL-013")) then yield "competition scope: WDL-013 is per obligation without the supplement"
+      if count "obligations" withoutSupplement <> count "obligations" m - 3L then yield "competition scope: the supplement adds other than WDL-013's three obligations"
+      if (preflight withoutSupplement committed).IsEmpty then yield "competition scope: the approved manifest passes against v4.1.6 without its supplement"
+      let dropped =
+          match committed with
+          | JObj ps -> JObj(ps |> List.filter (fun (k, _) -> k <> "scopeSha256") |> List.map (fun (k, v) -> if k = "requirements" then k, JArr(arr "requirements" committed |> List.filter (fun r -> str "id" r <> "WDL-013")) else k, v)) |> withScopeHash
+          | x -> x
+      if not (preflight m dropped |> List.exists (fun r -> r.Code = "MANDATORY_REQUIREMENT_MISSING")) then yield "competition scope: a manifest without WDL-013 passes preflight"
+      // Regression: every earlier package has no supplement, so its scope compiles exactly as before.
+      for pkg in [ "requirements-compiled/v4.1"; "requirements-compiled/v4.1.1"; "requirements-compiled/v4.1.2"; "requirements-compiled/v4.1.4"; "requirements-compiled/v4.1.5" ] do
+          if File.Exists(Path.Combine(source, pkg, "verification-plan-supplement.json")) then yield sprintf "competition scope: %s has a plan supplement" pkg ]
 
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "selector grammar" selectorGrammar @ guard "selector semantics" (fun () -> selectorSemantics source) @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "bootstrap FSharp.Core" (fun () -> bootstrapFSharpCore source) @ guard "bootstrap CI workflow" (fun () -> bootstrapCiWorkflow source) @ guard "bootstrap FSharp.Core owner record" (fun () -> fsharpCoreOwnerRecords source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "v4.1.6 owner records" (fun () -> v416OwnerRecords source) @ guard "v4.1.6 owner-record controls" (fun () -> v416OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source)
+    guard "adversarial" adversarial @ guard "selector grammar" selectorGrammar @ guard "selector semantics" (fun () -> selectorSemantics source) @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "bootstrap FSharp.Core" (fun () -> bootstrapFSharpCore source) @ guard "bootstrap CI workflow" (fun () -> bootstrapCiWorkflow source) @ guard "bootstrap FSharp.Core owner record" (fun () -> fsharpCoreOwnerRecords source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "v4.1.6 owner records" (fun () -> v416OwnerRecords source) @ guard "v4.1.6 owner-record controls" (fun () -> v416OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source) @ guard "plan supplement" planSupplement @ guard "competition scope" (fun () -> competitionScope source)
