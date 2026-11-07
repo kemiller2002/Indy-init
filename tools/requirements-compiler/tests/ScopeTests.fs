@@ -1404,11 +1404,13 @@ let cf07Competition (source: string) : string list =
       // control: with Rehearsal 010's file the competition would ignore its 11 absent ids (the reason for P16)
       let r10Absent = Ledger.assertionNeedsOf r10 |> Map.toList |> List.collect snd |> List.distinct |> List.filter (ids.Contains >> not)
       if r10Absent.Length <> 11 then yield sprintf "cf07 competition control: Rehearsal 010's file names %d slices outside the competition plan, not 11" r10Absent.Length
+      // control: a remapped need bites. SL-T22 binds J1-04, which needs SL-WI-INV-WORKSPACE (the SAVE and FRAME parts'
+      // owner): deferred while its catalog obligations are unverified, judged once every obligation passed
+      let t22 = slices |> List.find (fun x -> str "id" x = "SL-T22")
+      if not (Ledger.deferredAssertions s (evidence t22 []) |> List.contains "J1-04") then yield "cf07 competition: SL-T22's J1-04 is judged before SL-WI-INV-WORKSPACE is present"
+      if Ledger.deferredAssertions s (evidence t22 everything) |> List.contains "J1-04" then yield "cf07 competition control: SL-T22's J1-04 is deferred with every obligation verified"
       if str "path" (field "assertionMergeNeeds" lock |> Option.defaultValue JNull) <> "docs/competition-readiness/assertion-merge-needs.json" then
           yield "cf07 competition: the proposed competition lock does not name docs/competition-readiness/assertion-merge-needs.json as assertionMergeNeeds.path"
-      // SL-T16 binds J3-01/J3-02, which need SL-T20 (EXT-DATA) in the competition: deferred on an empty ledger
-      let t16 = slices |> List.find (fun x -> str "id" x = "SL-T16")
-      if not (Ledger.deferredAssertions s (evidence t16 []) |> List.contains "J3-01") then yield "cf07 competition: SL-T16's J3-01 is judged before SL-T20 is present"
       for sl in slices do
           let id = str "id" sl
           for verified in [ []; everything ] do
