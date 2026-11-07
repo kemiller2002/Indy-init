@@ -34,8 +34,13 @@
 //   dotnet fsi tools/r9/r9.fsx -- spec-preflight --percepta EXE --out F (--indy-init SRC --lock LOCK |
 //        --machines F --invariants F --interfaces F --catalog F)
 //
+//   dotnet fsi tools/r9/r9.fsx -- verification-plan --indy-init SRC --package requirements-compiled/vX --out F [--lock LOCK]
+//        The verification plan Dokimos compiles the package against: the v4 plan, with the package's plan supplement
+//        (verification-plan-supplement.json) appended when it has one; refused when the supplement is not for this plan.
+//
 // Exit codes: 0 pass, 4 the gate refused (each refusal printed with its cause), 2 unusable input.
-// Every command is read-only on its inputs; only govern writes, and only into the target repository.
+// Every command is read-only on its inputs; only govern writes into the target repository, and verification-plan
+// writes only its --out file.
 
 open System
 open System.Diagnostics
@@ -1485,6 +1490,62 @@ let specPreflight () =
                 let summary = expected |> List.map (fun (k, n) -> $"{k}: {count k} analysed / {n} in the inputs") |> fun l -> l @ [ $"""types: {count "types"}"""; $"report {reportPath}" ]
                 if causes.IsEmpty then Pass summary else (summary |> List.iter (printfn "  %s"); Refused causes)
 
+// ---- verification-plan: the plan Dokimos compiles a package's obligations against ---------------------------------
+
+/// A successor package that verifies a requirement per obligation beyond the v4 plan carries it in
+/// `verification-plan-supplement.json` (v4.1.6: WDL-013, ODR-V416-WDL013 A). Dokimos reads one verification plan, so
+/// the plan is the v4 plan with the supplement's requirements appended, each entry verbatim. Without a supplement it is
+/// the v4 plan byte for byte. Refused, writing nothing: a supplement whose basePlan is not this v4 plan, one whose
+/// digest is not the lock's pin, a requirement the v4 plan already has, or a supplement with no requirements.
+let supplementCauses (basePlan: JsonNode) (baseSha: string) (supplement: JsonNode) (supplementSha: string) (pinned: string option) : string list =
+    let baseIds = arr basePlan "requirements" |> List.map (fun r -> str r "requirement") |> Set.ofList
+    let added = arr supplement "requirements" |> List.map (fun r -> str r "requirement")
+    [ if str supplement "schema" <> "indy-init.v41-verification-plan-supplement/1" then
+          yield $"""the supplement's schema is {str supplement "schema"}, not indy-init.v41-verification-plan-supplement/1"""
+      if str supplement["basePlan"] "fileSha256" <> baseSha then
+          yield $"""the supplement amends the plan with sha256 {str supplement["basePlan"] "fileSha256"}; the v4 plan's is {baseSha}"""
+      if str supplement["basePlan"] "planId" <> str basePlan["planIdentity"] "planId" then
+          yield $"""the supplement amends plan {str supplement["basePlan"] "planId"}; the v4 plan is {str basePlan["planIdentity"] "planId"}"""
+      match pinned with
+      | Some pin when pin <> supplementSha -> yield $"the supplement's sha256 is {supplementSha}; the lock pins {pin}"
+      | _ -> ()
+      if added.IsEmpty then yield "the supplement adds no requirement"
+      yield! added |> List.filter baseIds.Contains |> List.map (sprintf "%s is already in the v4 plan: a supplement only adds")
+      yield! added |> List.countBy id |> List.filter (snd >> (<) 1) |> List.map (fst >> sprintf "%s is in the supplement more than once") ]
+
+let composedPlan (basePlan: JsonNode) (supplement: JsonNode) : JsonNode =
+    let plan = basePlan.DeepClone()
+    let requirements = plan["requirements"].AsArray()
+    arr supplement "requirements" |> List.iter (fun r -> requirements.Add(r.DeepClone()))
+    plan
+
+let verificationPlan () =
+    let src = Path.GetFullPath(req "--indy-init")
+    let package = req "--package"
+    let out = req "--out"
+    let basePath = Path.Combine(src, "requirements-compiled", "v4", "verification-plan.json")
+    let supplementPath = Path.Combine(src, package, "verification-plan-supplement.json")
+    let pinned =
+        opt "--lock"
+        |> Option.map (fun l -> (readJson (Path.Combine(src, l))).["requirementsPackage"])
+        |> Option.map (fun p -> str p "verificationPlanSupplementSha256")
+        |> Option.filter (String.IsNullOrEmpty >> not)
+    match File.Exists basePath, File.Exists supplementPath, pinned with
+    | false, _, _ -> Unusable $"no v4 plan at {basePath}"
+    | true, false, Some pin -> Refused [ $"the lock pins a plan supplement (sha256 {pin}) but {package} has none" ]
+    | true, false, None ->
+        File.Copy(basePath, out, true)
+        Pass [ $"{package} has no plan supplement: the v4 plan byte for byte (sha256 {sha256File out})"; $"wrote {out}" ]
+    | true, true, _ ->
+        let baseSha, supplementSha = sha256File basePath, sha256File supplementPath
+        let basePlan, supplement = readJson basePath, readJson supplementPath
+        match supplementCauses basePlan baseSha supplement supplementSha pinned with
+        | [] ->
+            writeJson out (composedPlan basePlan supplement)
+            let added = arr supplement "requirements" |> List.map (fun r -> str r "requirement") |> String.concat ", "
+            Pass [ $"the v4 plan (sha256 {baseSha}) with {package}'s supplement (sha256 {supplementSha}): {added}"; $"wrote {out}" ]
+        | causes -> Refused causes
+
 // ---- dispatch ------------------------------------------------------------------------------------------------------
 
 match args with
@@ -1500,6 +1561,7 @@ match args with
 | "check-sequencing" :: _ -> checkSequencing () |> finish "check-sequencing"
 | "acceptance-status" :: _ -> acceptanceStatus () |> finish "acceptance-status"
 | "spec-preflight" :: _ -> specPreflight () |> finish "spec-preflight"
+| "verification-plan" :: _ -> verificationPlan () |> finish "verification-plan"
 | _ ->
-    eprintfn "usage: dotnet fsi tools/r9/r9.fsx -- install-conditor|workstation|govern|check-governance|gate|run-suites|suite-preflight|suite-fixture|spec-preflight|... (see the header)"
+    eprintfn "usage: dotnet fsi tools/r9/r9.fsx -- install-conditor|workstation|govern|check-governance|gate|run-suites|suite-preflight|suite-fixture|spec-preflight|verification-plan|... (see the header)"
     exit 2

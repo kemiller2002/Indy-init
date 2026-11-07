@@ -150,6 +150,41 @@ let compileObligations (pkg: string) =
     if code <> 0 then failwithf "dokimos verification compile %s: %s" pkg output
     out
 let obl412, obl414 = compileObligations "v4.1.2", compileObligations "v4.1.4"
+
+// ---- 2a'. v4.1.6: the plan supplement reaches Dokimos (r9.fsx verification-plan; the governed gate's compile step) ---
+// Dokimos reads one verification plan. v4.1.6 verifies WDL-013 per obligation only through its plan supplement
+// (ODR-V416-WDL013 A), so compiling against the bare v4 plan is refused ("no requirement id"); the gate and STARTUP
+// compile against the plan verification-plan composes. A package without a supplement gets the v4 plan byte for byte.
+let v4Plan = Path.Combine(src, "requirements-compiled", "v4", "verification-plan.json")
+let composedAt name = Path.Combine(work, $"verification-plan-{name}.json")
+case "dokimos-refuses-v4.1.6-against-the-bare-v4-plan" [ 1; 2; 3; 4 ] [ "WDL-013-O1"; "no requirement id" ] [] "dokimos"
+    [ "verification"; "compile"; "--indy-execution-plan"; Path.Combine(src, "requirements-compiled", "v4.1.6", "verification-execution-plan.json")
+      "--indy-verification-plan"; v4Plan; "--out"; Path.Combine(work, "obligations-v4.1.6-bare.json") ] work |> ignore
+r9case "verification-plan-v4.1.6-appends-wdl013" [ 0 ] [ "supplement (sha256 3a78e3966397a5633d1d59b79450b19d654f8b4979bdc04dd25ae08b204da751): WDL-013"; "verification-plan: PASS" ]
+    [ "verification-plan"; "--indy-init"; src; "--package"; "requirements-compiled/v4.1.6"; "--lock"; "kickoff/competition/toolchain.lock.json"; "--out"; composedAt "v4.1.6" ] work |> ignore
+case "dokimos-compiles-v4.1.6-against-the-composed-plan" [ 0 ] [ "WDL-013-O1"; "WDL-013-O2"; "WDL-013-O3" ] [ "dokimos.verification-refusals" ] "sh"
+    [ "-c"; $"""dokimos verification compile --indy-execution-plan "{Path.Combine(src, "requirements-compiled", "v4.1.6", "verification-execution-plan.json")}" --indy-verification-plan "{composedAt "v4.1.6"}" --out "{Path.Combine(work, "obligations-v4.1.6.json")}" >/dev/null && cat "{Path.Combine(work, "obligations-v4.1.6.json")}" """ ] work |> ignore
+r9case "verification-plan-v4.1.4-is-the-v4-plan" [ 0 ] [ "has no plan supplement: the v4 plan byte for byte" ]
+    [ "verification-plan"; "--indy-init"; src; "--package"; "requirements-compiled/v4.1.4"; "--out"; composedAt "v4.1.4" ] work |> ignore
+record "verification-plan-v4.1.4-bytes" (File.Exists(composedAt "v4.1.4") && sha256 (composedAt "v4.1.4") = sha256 v4Plan) "the v4 plan's sha256" (if File.Exists(composedAt "v4.1.4") then sha256 (composedAt "v4.1.4") else "missing") "compare" ""
+r9case "verification-plan-refuses-a-pinned-supplement-the-package-lacks" [ 4 ] [ "the lock pins a plan supplement" ]
+    [ "verification-plan"; "--indy-init"; src; "--package"; "requirements-compiled/v4.1.4"; "--lock"; "kickoff/competition/toolchain.lock.json"; "--out"; composedAt "missing" ] work |> ignore
+// Synthetic successors whose supplement is not for this v4 plan, repeats a v4 requirement, or adds nothing: refused,
+// writing nothing.
+let supplementText = File.ReadAllText(Path.Combine(src, "requirements-compiled", "v4.1.6", "verification-plan-supplement.json"))
+let syntheticSrc (name: string) (supplement: string) =
+    let dir = Path.Combine(work, $"plan-src-{name}")
+    write (Path.Combine(dir, "requirements-compiled", "v4", "verification-plan.json")) (File.ReadAllText v4Plan)
+    write (Path.Combine(dir, "requirements-compiled", "v9.9.9", "verification-plan-supplement.json")) supplement
+    dir
+let firstV4Requirement = (Text.Json.Nodes.JsonNode.Parse(File.ReadAllText v4Plan)).["requirements"].[0].["requirement"].GetValue<string>()
+[ "other-base", supplementText.Replace("10ce16eb8d14514ed586d6695c10dda0e741ede719af9a03d855977ebdccb9e7", String('0', 64)), "amends the plan with sha256 0000"
+  "repeats-v4", supplementText.Replace("\"requirement\":\"WDL-013\"", $"\"requirement\":\"{firstV4Requirement}\"").Replace("\"requirement\": \"WDL-013\"", $"\"requirement\": \"{firstV4Requirement}\""), $"{firstV4Requirement} is already in the v4 plan"
+  "adds-nothing", (let j = Text.Json.Nodes.JsonNode.Parse supplementText in j.["requirements"] <- Text.Json.Nodes.JsonArray(); j.ToJsonString()), "the supplement adds no requirement" ]
+|> List.iter (fun (name, supplement, cause) ->
+    let out = composedAt $"refused-{name}"
+    r9case $"verification-plan-refuses-{name}" [ 4 ] [ cause ] [ "verification-plan"; "--indy-init"; syntheticSrc name supplement; "--package"; "requirements-compiled/v9.9.9"; "--out"; out ] work |> ignore
+    record $"verification-plan-refused-{name}-writes-nothing" (not (File.Exists out)) "no output" (string (File.Exists out)) "exists" "")
 let fixtureAt name extra =
     let dir = Path.Combine(work, name)
     r9case $"suite-fixture-{name}" [ 0 ] [ "suite-fixture: PASS" ] ([ "suite-fixture"; "--out"; dir ] @ extra) work |> ignore

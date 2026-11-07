@@ -142,8 +142,12 @@ jobs:
           src="$RUNNER_TEMP/indy-init"
           lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           pkg=$(jq -r .requirementsPackage.path "$lock")
+          # The plan is the v4 plan, with the package's plan supplement appended when it has one (v4.1.6: WDL-013,
+          # ODR-V416-WDL013 A); Dokimos reads one verification plan. Without a supplement it is the v4 plan byte for byte.
+          dotnet fsi "$src/tools/r9/r9.fsx" -- verification-plan --indy-init "$src" --package "$pkg" --lock "$lock" \
+            --out "$RUNNER_TEMP/verification-plan.json"
           dokimos verification compile --indy-execution-plan "$src/$pkg/verification-execution-plan.json" \
-            --indy-verification-plan "$src/requirements-compiled/v4/verification-plan.json" --out "$RUNNER_TEMP/obligations.json"
+            --indy-verification-plan "$RUNNER_TEMP/verification-plan.json" --out "$RUNNER_TEMP/obligations.json"
       - name: Implementation was authorized before it was committed (Praxis ordering; docs/release-gate-repair)
         id: sequencing
         run: |

@@ -20,6 +20,7 @@ This is Rehearsal 010's [STARTUP-INSTRUCTIONS.md](../rehearsal-010-readiness/STA
 | The stack-drift preflight checks the successor dependency lock `docs/competition-readiness/dependency-lock.json` (Conditor v0.10.21, forma-workflow 1.2.0) (§2 step 3) | ODR-COMP-P15 A (with B, the preflight is waived) |
 | The slice gate reads the competition's assertion merge needs `docs/competition-readiness/assertion-merge-needs.json` (§4) | ODR-COMP-P16 A |
 | The generated `build-and-test.yml` browser job gets a limit that fits a real browser suite (§2 step 3) | the integration lane's bootstrap repair; same footing as ODR-ESU-03 A (generated CI that cannot pass is fixed in the bootstrap commit) |
+| The obligations are compiled against the v4 plan with v4.1.6's plan supplement appended (`r9.fsx verification-plan`), in §3 step 1 and in the governed gate; Dokimos 0.11.1 refuses WDL-013 against the bare v4 plan | ODR-V416-WDL013 A (WDL-013 is verified per obligation through the supplement); a tooling repair found at the competition bootstrap (2026-11-07); it takes effect when the owner merges it |
 
 ## 0. The launch prompt
 
@@ -122,12 +123,15 @@ Main is protected. Each record below reaches main through a pull request from a 
 
 **Praxis actor** (ODR-COMP-P08 A). Every Praxis record an agent writes (work items, checkpoints, completions) names the actor `claude`, never a lane name (`integration`, `ui-1`, …). Lanes are recorded in the work, not as actors.
 
-1. **Suite preflight.** Compile the obligations, then run the preflight:
+1. **Suite preflight.** Compose the verification plan, compile the obligations, then run the preflight:
    ```
+   dotnet fsi SRC/tools/r9/r9.fsx -- verification-plan --indy-init SRC --package requirements-compiled/v4.1.6 \
+     --lock kickoff/competition/toolchain.lock.json --out VERIFICATION-PLAN
    dokimos verification compile --indy-execution-plan SRC/requirements-compiled/v4.1.6/verification-execution-plan.json \
-     --indy-verification-plan SRC/requirements-compiled/v4/verification-plan.json --out .echelon/obligations.json
+     --indy-verification-plan VERIFICATION-PLAN --out .echelon/obligations.json
    dotnet fsi SRC/tools/r9/r9.fsx -- suite-preflight --obligations .echelon/obligations.json --root . --out evidence/t0/suite-preflight.json
    ```
+   `VERIFICATION-PLAN` is a file outside the repository. It is the v4 plan with v4.1.6's plan supplement appended (WDL-013, ODR-V416-WDL013 A), exactly as the governed gate composes it: Dokimos reads one verification plan, and against the bare v4 plan it refuses WDL-013-O1..O3 ("no requirement id") and writes nothing. `verification-plan` refuses a supplement that is not for this v4 plan or not the lock's pin.
    It must PASS: every executable suite command runs (chromium and webkit defined; one `dotnet test` target each). It runs before the bootstrap is pushed (§2 step 3); a refusal is fixed in the bootstrap commit, never after it.
 2. **Generate the work plan, and register every work item in Praxis.** Do not write the work plan by hand.
    ```
