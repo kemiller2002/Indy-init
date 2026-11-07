@@ -368,6 +368,29 @@ let suiteRunners (source: string) : string list =
       // v4.1.2 is frozen: it compiles without X21, byte for byte as approved (the committed-package check covers the bytes).
       if not (x21 (inputs "v4.1.2")).IsEmpty then yield "X21: the frozen v4.1.2 gained a check" ]
 
+/// Review F6: the governed gate step runs always() only once every precondition step succeeded (candidate, governed
+/// checkout, pinned contracts, governance, pinned toolchain, compiled plan, Praxis ordering, suite-preflight), each of
+/// which exists with that id; and when a precondition fails the gate is skipped, which the slice gate refuses.
+let gatePreconditions (source: string) : string list =
+    let yml = File.ReadAllText(Path.Combine(source, "tools/r9/verification-gate.yml")).Replace("\r\n", "\n")
+    let preconditions = [ "candidate"; "governed"; "contracts"; "governance"; "toolchain"; "compile"; "sequencing"; "suitepreflight" ]
+    let gateStep =
+        let start = yml.IndexOf "      - name: Verification gate (executable, record and mixed obligations)"
+        if start < 0 then "" else (let next = yml.IndexOf("\n      - name:", start + 10) in yml.Substring(start, (if next < 0 then yml.Length else next) - start))
+    let condition = gateStep.Split('\n') |> Array.tryFind (fun l -> l.TrimStart().StartsWith "if:") |> Option.defaultValue ""
+    [ if gateStep = "" then yield "F6: the workflow has no verification gate step"
+      for id in preconditions do
+          if not (yml.Contains(sprintf "\n        id: %s\n" id)) then yield sprintf "F6: no step has id %s" id
+          if not (condition.Contains(sprintf "steps.%s.outcome == 'success'" id)) then yield sprintf "F6: the gate step runs without requiring step %s to succeed (%s)" id condition
+      if condition.Contains "||" then yield sprintf "F6: the gate step's condition has an alternative that bypasses a precondition (%s)" condition
+      // A skipped gate leaves no verdict: the slice gate refuses it.
+      let manifest = parseFile (Path.Combine(source, "docs/rehearsal-010-readiness/scope-manifest.json"))
+      let s = match Ledger.replay manifest [] with Ok s -> s | Error why -> failwithf "replay: %s" why
+      let e : Ledger.SliceEvidence =
+          { Slice = JObj [ "id", JStr "SL-WI-INV-START"; "workItem", JStr "WI-INV-START"; "dependsOn", JArr []; "requirements", JArr [] ]; Candidate = "c"; TargetBase = "b"; TargetHead = "b"
+            Gate = None; Journeys = None; DesignContract = None; Regression = None; Build = None; LiveProvider = None; TestIntegrity = None; CatalogAcceptance = None; AssertionNeeds = Map.empty }
+      if not (Ledger.sliceGate s e |> List.exists (fun r -> r.Code = "GATE_MISSING")) then yield "F6: the slice gate does not refuse a skipped governed gate (GATE_MISSING)" ]
+
 /// Rehearsal 010 (Fix 2): central package management drops the F# SDK's implicit FSharp.Core reference, so no F#
 /// assembly ships FSharp.Core.dll and xunit discovers no test. A successor package that pins bootstrap.fsharpCore gets
 /// the central version and the conditional reference; the frozen packages bootstrap exactly as before.
@@ -1611,4 +1634,4 @@ let competitionScope (source: string) : string list =
 
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "selector grammar" selectorGrammar @ guard "selector semantics" (fun () -> selectorSemantics source) @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "bootstrap FSharp.Core" (fun () -> bootstrapFSharpCore source) @ guard "bootstrap CI workflow" (fun () -> bootstrapCiWorkflow source) @ guard "bootstrap FSharp.Core owner record" (fun () -> fsharpCoreOwnerRecords source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "bootstrap leaves the package" (fun () -> bootstrapLeavesPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "v4.1.6 owner records" (fun () -> v416OwnerRecords source) @ guard "v4.1.6 owner-record controls" (fun () -> v416OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source) @ guard "plan supplement" planSupplement @ guard "competition scope" (fun () -> competitionScope source)
+    guard "adversarial" adversarial @ guard "selector grammar" selectorGrammar @ guard "selector semantics" (fun () -> selectorSemantics source) @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "bootstrap FSharp.Core" (fun () -> bootstrapFSharpCore source) @ guard "bootstrap CI workflow" (fun () -> bootstrapCiWorkflow source) @ guard "bootstrap FSharp.Core owner record" (fun () -> fsharpCoreOwnerRecords source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "v4.1.5 owner records" (fun () -> v415OwnerRecords source) @ guard "v4.1.5 owner-record controls" (fun () -> v415OwnerRecordControls source) @ guard "v4.1.6 owner records" (fun () -> v416OwnerRecords source) @ guard "v4.1.6 owner-record controls" (fun () -> v416OwnerRecordControls source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source) @ guard "plan supplement" planSupplement @ guard "competition scope" (fun () -> competitionScope source) @ guard "gate preconditions" (fun () -> gatePreconditions source) @ guard "bootstrap leaves the package" (fun () -> bootstrapLeavesPackage source)

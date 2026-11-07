@@ -9,6 +9,9 @@ export default defineConfig({
   workers: 1,
   retries: 0,
   reporter: [['list'], ['./reporter.mjs']],
+  // Bounded actions (Rehearsal 010): a candidate without the application (no Connect form) fails each journey within
+  // half a minute instead of burning its whole test timeout, so the governed gate still has time to give its verdict.
+  use: { actionTimeout: 30000, navigationTimeout: 30000 },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'webkit', use: { ...devices['iPad (gen 7)'], viewport: { width: 820, height: 1180 } } },
