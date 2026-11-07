@@ -312,6 +312,8 @@ jobs:
           src="$RUNNER_TEMP/indy-init"; rc="${{ steps.catalog.outputs.rc }}"; ev="$RUNNER_TEMP/slice-evidence"; mkdir -p "$ev"
           lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           manifest="$src/$(jq -r '.scope.manifest // "docs/rehearsal-010-readiness/scope-manifest.json"' "$lock")"; slices="$(dirname "$manifest")/slice-execution-manifest.json"
+          # ODR-COMP-P16: the assertion merge needs the lock names (assertionMergeNeeds.path); Rehearsal 010's file is the default.
+          needs="$src/$(jq -r '.assertionMergeNeeds.path // "docs/rehearsal-010-readiness/assertion-merge-needs.json"' "$lock")"
           base="${{ steps.slice.outputs.target_base }}"
           # Governed coverage of the whole plan at the merged result and at the target base: regression and dependencies
           # are judged from this evidence, never from progress events the builder writes.
@@ -353,7 +355,7 @@ jobs:
             --gate "$RUNNER_TEMP/gate/gate.json" --journeys "$RUNNER_TEMP/journeys/journey-results.json" --design "$RUNNER_TEMP/journeys/design-contract.json" \
             --regression "$ev/regression.json" --build "$RUNNER_TEMP/journeys/build.json" --live "$ev/live.json" --test-integrity "$ev/test-integrity.json" \
             --catalog "$RUNNER_TEMP/catalog/catalog-acceptance.json" --approvals "$src/kickoff/acceptance/approvals.causa.json" --trusted-operator kemiller2002 \
-            --assertion-needs "$src/docs/rehearsal-010-readiness/assertion-merge-needs.json" \
+            --assertion-needs "$needs" \
             --out "$ev/slice-gate.json"
       - name: Full-scope completion gate (release; a slice PASS is never a release PASS)
         if: always() && inputs.mode == 'release'
