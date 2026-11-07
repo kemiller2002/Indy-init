@@ -104,10 +104,10 @@ P19 pins no file. Like P18, its text is bound by the lock's `ownerDecisionReques
 
 Run these in a GitHub Codespace from `/workspaces`, with the clone at `/workspaces/Indy-init`, signed in to git and gh as kemiller2002. Run owner-freeze from `/workspaces`, not from inside the clone: the clone's `global.json` pins an SDK. Steps 2 and 3 need `jq` (present in the default Codespaces image) and a clean working tree.
 
-**0. Merge this pull request** (it holds proposals only):
+**0. Merge this pull request (#195)** (it holds proposals only):
 
 ```
-gh pr merge <this PR> --repo kemiller2002/Indy-init --merge
+gh pr merge 195 --repo kemiller2002/Indy-init --merge
 ```
 
 **1. Decide.** This asks only the open requests: ODR-COMP-P17, ODR-COMP-P18 and ODR-COMP-P19, which are new, and ODR-COMP-LOCK, which is asked again because the proposed lock changed. Every other request is already recorded and is not asked. Answer `A`, `A`, `A`, `A`, then type `record`. The command commits as you, pushes, and opens the pull request; the second line merges it.
