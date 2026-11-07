@@ -295,6 +295,59 @@
     }
   },
   {
+   "id": "ODR-COMP-P17",
+   "kind": "decision",
+   "title": "The competition's process-evidence rules: Rehearsal 010's with repository causa-t0",
+   "question": "Adopt kickoff/competition/process-evidence-rules.json (sha256 88cda0b04d1125cf49b8bf03aa664437d5c4f5ebb0584c2e57b155f731acedf3) as the rules the competition's governed gate judges every record-bound (praxis:*) obligation with (requirements-compiler verify-process --process-rules, the lock's processEvidence.rules)? It is Rehearsal 010's rules (kickoff/rehearsal-010/process-evidence-rules.json, rulesSha256 36172c57..., ODR-R10-14 A, APR-R10-OWNER-1) with exactly one change, \"repository\": \"indy-init-rehearsal-010\" -> \"causa-t0\", and a description saying so; the owner, agents, reviewers, automation, review roles and owner decisions are unchanged. The competition repository's Praxis project id is causa-t0: conditor init took it from the bootstrap directory name, and it is committed at T0 in ros.json and .ros, where every one of the 11 Praxis events on kemiller2002/causa main (1c67842) says repository causa-t0. With Rehearsal 010's rules verify-process disqualifies every record with INCORRECT-REPOSITORY (ProcessVerification.fs recordDiagnostics): at causa 1c67842, 0 of 10 records qualify and 0 of 133 category checks verify; with these rules, 10 of 10 qualify and 5 verify (the rest wait for evidence the run has not produced yet, such as reviews). Evidence: docs/competition-readiness/PROCESS-RULES-REPAIR.md.",
+   "options": [
+    "A: adopt the competition process-evidence rules as shown; the competition lock names them as processEvidence.rules with their sha256 (kickoff/competition/toolchain.lock.proposed.json, which ODR-COMP-LOCK approves again)",
+    "B: keep Rehearsal 010's rules (every praxis:* obligation stays unverifiable: INCORRECT-REPOSITORY on every record)"
+   ],
+   "recommendation": "A: the owner chose this in chat on 2026-11-07, around 17:22-17:25Z (that answer is not a record; this request is how it is recorded). it changes only the repository name to the one the records were actually written under. The alternative, rewriting the competition repository's committed T0 identity (ros.json, .ros), would change T0 records, which are never reset.",
+   "rationale": "The process-evidence rules are a governed input (ODR-R10-14); only the owner approves their successor, and an agent never pins them.",
+   "impact": "The competition lock pins this file's sha256 as processEvidence.rulesSha256 (and proposedSha256), and ownerDecisionRequests.sha256 moves to this requests file's new digest; because the proposed lock changes, ODR-COMP-LOCK is asked again in the same session. The governed gate reads the new rules only after the owner commits the lock and approves a re-govern of kemiller2002/causa to that commit (PROCESS-RULES-REPAIR.md, owner steps).",
+   "pins": [
+    {
+     "path": "kickoff/competition/process-evidence-rules.json"
+    }
+   ],
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P17\", \"action\": \"decide\", \"option\": \"A\", \"pins\": [{\"path\": \"kickoff/competition/process-evidence-rules.json\", \"sha256\": \"<at origin/main>\"}]}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P18",
+   "kind": "decision",
+   "title": "Extension of ODR-COMP-P10: a slice may merge on its executable obligations when only praxis:* process records are unverifiable",
+   "question": "Extend ODR-COMP-P10 (the governed-gate contingency) for the competition, because governed acceptance of praxis:independent-review is unreachable on a kemiller2002/causa pull request: (1) a review record qualifies only if CI, in the same run (verification-gate.yml review-attestations), observes an approving GitHub review by the reviewer's frozen login, kemiller2002 in the process-evidence rules, that approves exactly the candidate commit, else STALE-REVIEW (ProcessVerification.fs, the independent-review case of recordDiagnostics); (2) the candidate is github.sha (verification-gate.yml, 'Candidate is the checked-out commit'), which on a pull_request is the merge commit refs/pull/N/merge, and GitHub reviews attach to the pull request head, never to the merge commit; (3) every causa pull request is authored by kemiller2002, the account the builder works through, and GitHub does not let an author approve their own pull request (cf. OD-INDY-17). 15 of the 31 slices in docs/competition-readiness/slice-execution-manifest.json have praxis:* acceptance tests, SL-T10 among them, and every slice depends on SL-T10, so no slice can reach governed PASS. Rule A: a slice may merge when the governed Verification gate ran to a verdict and the only refused obligations are praxis:* process-record obligations with verify-process codes INCORRECT-REPOSITORY, MISSING-INDEPENDENT-REVIEW, STALE-REVIEW, UNATTESTED-REVIEW, MISSING-CHECKPOINT, MISSING-PROCESS-RECORD or MISSING-ASSIGNMENT; every executable, journey, design-contract, build, test-integrity and regression obligation of the slice must PASS in that governed run; each such merge is labelled \"governed on executable obligations; process records unverifiable (ODR-COMP-P18)\", is not counted as governed acceptance in the ledger, and completion remains completion-gate COMPLETE only. As worded, a refusal with any other code still blocks the merge: at causa 1c67842 verify-process also reports MISSING-APPROVAL (AR-008-O2, AR-024-O1, AR-024-O2, whose owner decisions the rules name as DEC-R10-KICKOFF; slices SL-T30, SL-T33, SL-T34) and MISSING-RELEASE-SELECTION (UI-030-O3, slice SL-T22).",
+   "options": [
+    "A: extend ODR-COMP-P10 with rule A for the competition: merge on the governed executable obligations when the only refused obligations are praxis:* process records with the listed codes, labelled \"governed on executable obligations; process records unverifiable (ODR-COMP-P18)\", never counted as governed acceptance; completion stays completion-gate COMPLETE only",
+    "B: no extension: the competition then merges nothing, or only under ODR-COMP-P10 A if the gate cannot run at all"
+   ],
+   "recommendation": "A: the owner chose this in chat on 2026-11-07, around 17:22-17:25Z (that answer is not a record; this request is how it is recorded). every obligation the gate can actually judge on a causa pull request must still pass in the governed run; only the review and process records that GitHub's own rules make unattestable are set aside, labelled, and never counted as governed acceptance.",
+   "rationale": "Changes what may merge; only the owner decides (as ODR-COMP-P10).",
+   "impact": "With B no competition slice can merge through the governed gate, since every slice depends on SL-T10, whose praxis:independent-review cannot be attested. P18 pins no file: the lock binds this request's text through ownerDecisionRequests.sha256 (launch-preflight LP-03).",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P18\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-P19",
+   "kind": "decision",
+   "title": "Where the J1 'Primary investigative question' (INV-023) is stored in the competition",
+   "question": "How does the competition store INV-023, the 'Primary investigative question' entered when an investigation is started? Journey J1 (verification/journeys/bindings.json, all three P0) binds INV-023 in J1-03, checks the entered question in GitHub itself in J1-05 (providerHolds([problem, title, question]), j1-create-persist.spec.mjs) and on reload in J1-06. The pre-competition field map (docs/contract-readiness/causa-precompetition/UI-FIELD-MAP.json, UB-023) maps INV-023 to Payload.InvestigationDetailsRevised.question (CMD-INV-CREATE) and marks it blocked by OD-CR-01; causa-storage 1.1.0 (causa-data contract/v1.1.0/CONTRACT.md section 1; requirements-compiled/v4.1.6/proposals/STORAGE-1.1.md section 3) leaves InvestigationDetailsRevised to a later 1.2.0; and COMPETITION-CONSUMPTION.md (section 2) says a blocked binding stays unimplemented until the owner decides, and an agent must not choose the meaning of a blocked field itself. The frozen InvestigationStarted payload is exactly {title, observationId, original} (causa-data contract/v1.0.0 CONTRACT.md, unchanged in 1.1.0), so no 1.1.0 field of the start holds the question; the only wire field named question is UnknownIdentified {unknownId, question, materiality}.",
+   "options": [
+    "A: for the competition, store INV-023 as one UnknownIdentified with materiality informational, written in the same command group as the start (CMD-INV-CREATE); on reload the earliest-created unknown is the primary question. Side effects: the question also appears in the unknowns list, and it needs a migration once causa-storage 1.2.0's InvestigationDetailsRevised exists",
+    "B: do not store it: J1-05 and J1-06 then fail on the question value and stay failed for the competition; J1-03's start is unaffected"
+   ],
+   "recommendation": "A: it uses only fields the frozen 1.1.0 contract already has, keeps the entered question in GitHub where J1-05 and J1-06 look for it, and keeps the start a single command group; its cost (the question listed among the unknowns, a later migration to InvestigationDetailsRevised) is named here so it is the owner's choice, not an agent's reading of a blocked field.",
+   "rationale": "UB-023 is a blocked binding (OD-CR-01); COMPETITION-CONSUMPTION.md section 2 leaves its meaning to the owner.",
+   "impact": "With A the competition's CMD-INV-CREATE writes InvestigationStarted and one UnknownIdentified (materiality informational) together, and the workspace reads the earliest-created unknown as the primary question. With B J1-05 and J1-06 stay failed for the competition. P19 pins no file: the lock binds this request's text through ownerDecisionRequests.sha256 (launch-preflight LP-03).",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P19\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
    "id": "ODR-COMP-SCOPE",
    "kind": "decision",
    "title": "Approve the competition scope (successor of ODR-R10-01)",
@@ -345,12 +398,12 @@
    "id": "ODR-COMP-LOCK",
    "kind": "decision",
    "title": "Commit the competition toolchain lock (as ODR-RG-04)",
-   "question": "Adopt kickoff/competition/toolchain.lock.proposed.json as the competition's lock: v4.1.6 (tag indy-init-requirements-v4.1.6 at 2380b3d, manifest 8d3706d9...), the competition scope (ODR-COMP-SCOPE's scopeSha256), Conditor v0.10.21 (ODR-COMP-P14 A, all eight artifact digests as in its release checksums.txt), causa-storage-v1.1.0 (causa-data 7e10394), the competition repository kemiller2002/causa (pre-created, ODR-COMP-P07 A), the catalog verification contract (ODR-COMP-CATALOG-CONTRACT), the successor dependency lock (ODR-COMP-P15) and the competition assertion merge needs (ODR-COMP-P16), and, unchanged from Rehearsal 010's lock, echelon-current 1.37.0, the workstation target, the process-evidence plan and rules, the design contract, the deadline policy, the journey bindings and the isolated test repository? Then commit it yourself as kickoff/competition/toolchain.lock.json, changing only `status` (to your pin) and `indyInit.commit` (to the merge commit of the pull request that adds this lock, or a later main commit you name).",
+   "question": "Adopt kickoff/competition/toolchain.lock.proposed.json as the competition's lock: v4.1.6 (tag indy-init-requirements-v4.1.6 at 2380b3d, manifest 8d3706d9...), the competition scope (ODR-COMP-SCOPE's scopeSha256), Conditor v0.10.21 (ODR-COMP-P14 A, all eight artifact digests as in its release checksums.txt), causa-storage-v1.1.0 (causa-data 7e10394), the competition repository kemiller2002/causa (pre-created, ODR-COMP-P07 A), the catalog verification contract (ODR-COMP-CATALOG-CONTRACT), the successor dependency lock (ODR-COMP-P15), the competition assertion merge needs (ODR-COMP-P16) and the competition process-evidence rules (ODR-COMP-P17: Rehearsal 010's with repository causa-t0), and, unchanged from Rehearsal 010's lock, echelon-current 1.37.0, the workstation target, the process-evidence plan, the design contract, the deadline policy, the journey bindings and the isolated test repository? Then commit it yourself as kickoff/competition/toolchain.lock.json, changing only `status` (to your pin) and `indyInit.commit` (to the merge commit of the pull request that adds this lock, or a later main commit you name).",
    "options": [
     "A: adopt the proposed lock and commit it as kickoff/competition/toolchain.lock.json",
     "B: keep the Rehearsal 010 lock (v4.1.5, the 37-item Legacy scope, Conditor v0.10.20)"
    ],
-   "recommendation": "A, after ODR-COMP-SCOPE, ODR-COMP-CATALOG-CONTRACT, ODR-COMP-P15 and ODR-COMP-P16 are recorded (the lock pins their files' digests) and the live-provider preflight has run on the merged main. ODR-COMP-P12 A asks for exactly this re-pin.",
+   "recommendation": "A, after ODR-COMP-SCOPE, ODR-COMP-CATALOG-CONTRACT, ODR-COMP-P15, ODR-COMP-P16 and ODR-COMP-P17 are recorded (the lock pins their files' digests) and the live-provider preflight has run on the merged main. ODR-COMP-P12 A asks for exactly this re-pin.",
    "rationale": "The lock is the one starting point every agent uses; only the owner commits it (ODR-RG-04). Recording this decision pins the proposed file you approved; your commit of toolchain.lock.json is the pin itself.",
    "impact": "With B the competition runs on v4.1.5, the old scope and a Conditor without forma-workflow in its preset.",
    "requiresTag": "indy-init-requirements-v4.1.6",
