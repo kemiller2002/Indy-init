@@ -5,7 +5,10 @@
 //   CAUSA_APP_URL         the candidate's served application (deployed exact SHA, or a local build of it)
 //   CAUSA_CANDIDATE       the candidate commit SHA the results are bound to
 //   CAUSA_PROVIDER        github (default: real provider) | harness-double (synthetic fixtures only; never evidence)
-//   CAUSA_GITHUB_TOKEN    a scoped token for the designated test repository (github mode)
+//   CAUSA_GITHUB_TOKEN    a read-only token for the designated test repository: the journeys read GitHub back with it
+//   CAUSA_WRITE_TOKEN     a separate write token for that repository: the application is connected with it, since it
+//                         saves through the application (ODR-R10-28 A, PF-015-O2/O3; neither falls back to the other
+//                         in github mode: without it the journeys cannot connect, which is BLOCKED, never PASS)
 //   CAUSA_TEST_OWNER, CAUSA_TEST_REPO, CAUSA_TEST_BRANCH   the designated test repository
 //   CAUSA_DOUBLE_URL      the harness double's base URL (harness-double mode)
 import { test, expect } from '@playwright/test';
@@ -17,6 +20,7 @@ export const env = {
   app: process.env.CAUSA_APP_URL || 'http://127.0.0.1:4620/',
   provider: process.env.CAUSA_PROVIDER || 'github',
   token: process.env.CAUSA_GITHUB_TOKEN || 'harness-token',
+  writeToken: process.env.CAUSA_WRITE_TOKEN || ((process.env.CAUSA_PROVIDER || 'github') === 'harness-double' ? 'harness-token' : ''),
   owner: process.env.CAUSA_TEST_OWNER || 'harness',
   repo: process.env.CAUSA_TEST_REPO || 'causa-test',
   branch: process.env.CAUSA_TEST_BRANCH || 'main',
@@ -94,7 +98,8 @@ export const connect = async (page) => {
   await (await firstVisible([page.getByLabel('Repository owner', { exact: true }), page.getByLabel(/owner/i)])).fill(env.owner);
   await (await firstVisible([page.getByLabel('Repository', { exact: true }), page.getByLabel(/repository name|^repo/i)])).fill(env.repo);
   await (await firstVisible([page.getByLabel(/branch/i)])).fill(env.branch);
-  await (await firstVisible([page.getByLabel(/token|credential/i)])).fill(env.token);
+  if (!env.writeToken) throw new Error('CAUSA_WRITE_TOKEN is not set: the application cannot be connected with a write credential (PF-015: BLOCKED)');
+  await (await firstVisible([page.getByLabel(/token|credential/i)])).fill(env.writeToken);
   await page.getByRole('button', { name: /connect/i }).first().click();
 };
 

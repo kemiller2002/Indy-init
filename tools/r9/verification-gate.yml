@@ -27,11 +27,13 @@ on:
 
 permissions:
   # read only (ODR-R10-09): this job's own token never writes. Live persistence goes to the isolated test repository
-  # with a GitHub App installation token minted below for that repository alone (contents read/write, nothing else),
-  # revoked when the job ends. That token reaches only the steps that run the live suites, the journeys and the slice
-  # gate, as CAUSA_GITHUB_TOKEN; it is never persisted in the checkout, written to a file or an artifact, or put in
-  # the served application. Candidate code in those steps can read it (the application needs a credential to persist),
-  # so what it can reach is bounded to synthetic data in one repository for one job (LIVE-PROVIDER-PREFLIGHT.md).
+  # with GitHub App installation tokens minted below, revoked when the job ends (ODR-R10-28 A, PF-015-O2/O3): a
+  # read-only CAUSA_GITHUB_TOKEN (contents: read on the test repository and, when the lock names one, the catalog
+  # repository) and a separate CAUSA_WRITE_TOKEN (contents: read/write on the test repository alone); neither falls
+  # back to the other. They reach only the steps that run the live suites, the journeys and the slice gate; they are
+  # never persisted in the checkout, written to a file or an artifact, or put in the served application. Candidate code
+  # in those steps can read them (the application needs a credential to persist), so what they can reach is bounded to
+  # synthetic data in the designated repositories for one job (LIVE-PROVIDER-PREFLIGHT.md).
   contents: read
   pull-requests: read
 
@@ -46,7 +48,10 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # Rehearsal 010: setup (~13 minutes with the plan's suites) plus the governed journeys exceeded 40 minutes, so the
+    # gate step never ran (GATE_MISSING) for any slice before the application existed. The journeys are now bounded
+    # (their step and Playwright's global timeout) and the gate runs whatever they did.
+    timeout-minutes: 100
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,12 +69,17 @@ jobs:
         with:
           global-json-file: global.json
       - name: Indy-init at the governing commit
+        id: governed
         run: |
           commit=$(jq -r .indyInitCommit .echelon/r9-governance.json)
           git init -q "$RUNNER_TEMP/indy-init"
           git -C "$RUNNER_TEMP/indy-init" fetch -q --depth 1 https://github.com/kemiller2002/Indy-init "$commit"
           git -C "$RUNNER_TEMP/indy-init" checkout -q FETCH_HEAD
+          # A re-govern (check-governance) is judged from Indy-init's owner-merged main, cloned separately with its history
+          # (trees, no blobs but the checkout's): its approvals and ancestry, never the governing commit's own files.
+          git clone -q --filter=blob:none --branch main https://github.com/kemiller2002/Indy-init "$RUNNER_TEMP/indy-init-main"
       - name: Governed contracts are the ones the lock pins (catalog, design, deadline policy, journey bindings)
+        id: contracts
         run: |
           src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           r10=$(jq -r 'has("catalogVerification")' "$lock")
@@ -109,14 +119,17 @@ jobs:
             echo "target_base=$(git rev-parse HEAD^1)" >> "$GITHUB_OUTPUT"
             git fetch -q "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}" "$BASE_REF" && echo "target_head=$(git rev-parse FETCH_HEAD)" >> "$GITHUB_OUTPUT"
           fi
-      - name: Governance is unchanged (policy, this workflow, completed items, scope only grows)
+      - name: Governance is unchanged (policy, this workflow, completed items, scope only grows; a re-govern only with the owner's approval)
+        id: governance
         run: |
           base_scope=""
           if [ -n "${{ github.base_ref }}" ]; then
             git show "origin/${{ github.base_ref }}:.echelon/verification-scope.json" > "$RUNNER_TEMP/base-scope.json" 2>/dev/null && base_scope="--base-scope $RUNNER_TEMP/base-scope.json"
           fi
-          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-governance --indy-init "$RUNNER_TEMP/indy-init" --target . $base_scope
+          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-governance --indy-init "$RUNNER_TEMP/indy-init" --target . $base_scope \
+            --trusted-operator kemiller2002 --trusted-indy-init "$RUNNER_TEMP/indy-init-main" --approvals kickoff/rehearsal-007/approvals.causa.json
       - name: Pinned toolchain (Conditor 0.10.20, then the echelon-current resolved set)
+        id: toolchain
         run: |
           # The lock named at govern time (r9.fsx govern --lock); Rehearsal 009's record names none and reads its own.
           lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
@@ -124,6 +137,7 @@ jobs:
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- workstation --lock "$lock" --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "ci-${{ github.run_id }}"
           echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
       - name: Compile the frozen verification plan
+        id: compile
         run: |
           src="$RUNNER_TEMP/indy-init"
           lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
@@ -131,6 +145,7 @@ jobs:
           dokimos verification compile --indy-execution-plan "$src/$pkg/verification-execution-plan.json" \
             --indy-verification-plan "$src/requirements-compiled/v4/verification-plan.json" --out "$RUNNER_TEMP/obligations.json"
       - name: Implementation was authorized before it was committed (Praxis ordering; docs/release-gate-repair)
+        id: sequencing
         run: |
           # A lock that pins a scope manifest (Rehearsal 010 on) also requires the committed scope checkpoint with its
           # scopeSha256 and complete Praxis work-item coverage before implementation.
@@ -139,6 +154,7 @@ jobs:
           scope=""; [ -n "$manifest" ] && scope="--scope-manifest $RUNNER_TEMP/indy-init/$manifest"
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-sequencing --target . $scope --out "$RUNNER_TEMP/sequencing.json"
       - name: Every suite command of the plan can execute (suite-preflight)
+        id: suitepreflight
         run: |
           npm ci
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- suite-preflight --obligations "$RUNNER_TEMP/obligations.json" --root . \
@@ -149,6 +165,9 @@ jobs:
           src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           echo "owner=$(jq -r '.testRepository.owner // ""' "$lock")" >> "$GITHUB_OUTPUT"
           echo "repo=$(jq -r '.testRepository.repo // ""' "$lock")" >> "$GITHUB_OUTPUT"
+          # The read-only token also reaches the catalog repository when the lock names one (same owner: an App
+          # installation token covers one account).
+          echo "read_repos=$(jq -r '[.testRepository.repo] + (if .catalogRepository.repo and .catalogRepository.owner == .testRepository.owner then [.catalogRepository.repo] else [] end) | join(",")' "$lock")" >> "$GITHUB_OUTPUT"
           isolated=$(jq -r '.testRepository.isolated // false' "$lock")
           echo "isolated=$isolated" >> "$GITHUB_OUTPUT"
           # A Rehearsal 010 lock (it carries the governed catalog contract) must name an isolated test repository:
@@ -156,7 +175,7 @@ jobs:
           if jq -e '.catalogVerification' "$lock" > /dev/null && [ "$isolated" != true ]; then
             echo "::error::the lock names no isolated testRepository (ODR-R10-09)"; exit 1
           fi
-      - name: Test-repository credential, for that repository alone, revoked when this job ends (ODR-R10-09)
+      - name: Write credential (CAUSA_WRITE_TOKEN), contents read/write on the test repository alone, revoked when this job ends (ODR-R10-09, ODR-R10-28 A)
         id: testtoken
         # Fails, and so refuses the run, when the owner's App credentials are absent: live evidence is never produced
         # with a broader token.
@@ -168,13 +187,24 @@ jobs:
           owner: ${{ steps.testrepo.outputs.owner }}
           repositories: ${{ steps.testrepo.outputs.repo }}
           permission-contents: write
+      - name: Read-only credential (CAUSA_GITHUB_TOKEN), contents read only, revoked when this job ends (ODR-R10-28 A, PF-015-O2)
+        id: readtoken
+        if: steps.testrepo.outputs.isolated == 'true'
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ secrets.CAUSA_ACCEPTANCE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CAUSA_ACCEPTANCE_APP_KEY }}
+          owner: ${{ steps.testrepo.outputs.owner }}
+          repositories: ${{ steps.testrepo.outputs.read_repos }}
+          permission-contents: read
       - name: Playwright browsers for every project the plan names (Chromium and WebKit)
         timeout-minutes: 10
         run: npx playwright install --with-deps chromium webkit
       - name: Run the plan's suites at the candidate
         env:
           MODE: ${{ inputs.mode || 'development' }}
-          CAUSA_GITHUB_TOKEN: ${{ steps.testtoken.outputs.token }}
+          CAUSA_GITHUB_TOKEN: ${{ steps.readtoken.outputs.token }}
+          CAUSA_WRITE_TOKEN: ${{ steps.testtoken.outputs.token }}
         run: |
           # npm dependencies are installed by the suite-preflight step
 
@@ -262,9 +292,17 @@ jobs:
       - name: Governed journeys J1-J3 and the design contract (Chromium and WebKit; adversarial audit R3, R5)
         id: journeys
         if: always()
+        # Bounded (Rehearsal 010): a candidate without the application used to burn every journey's whole test timeout
+        # and push the job past its limit, so the gate never ran. The journeys stop at Playwright's global timeout and the
+        # step at this one; either way the gate below still runs and judges what was recorded (a journey that did not
+        # finish is not a pass).
+        timeout-minutes: 45
         env:
           CAUSA_PROVIDER: github
-          CAUSA_GITHUB_TOKEN: ${{ steps.testtoken.outputs.token }}
+          # The journeys connect the application with the write token (it saves through the application) and read GitHub
+          # back directly with the read-only one.
+          CAUSA_GITHUB_TOKEN: ${{ steps.readtoken.outputs.token }}
+          CAUSA_WRITE_TOKEN: ${{ steps.testtoken.outputs.token }}
           CAUSA_CANDIDATE: ${{ steps.candidate.outputs.sha }}
           CAUSA_APP_URL: http://127.0.0.1:4620/
         run: |
@@ -283,14 +321,20 @@ jobs:
           echo "{\"candidate\":\"$CAUSA_CANDIDATE\",\"built\":$built,\"started\":$started}" > "$RUNNER_TEMP/journeys/build.json"
           test "${{ steps.journeys-browsers.outcome }}" = success
           set +e
-          (cd "$src/verification/journeys" && CAUSA_JOURNEY_RESULTS="$RUNNER_TEMP/journeys/journey-results.json" npx playwright test)
+          (cd "$src/verification/journeys" && CAUSA_JOURNEY_RESULTS="$RUNNER_TEMP/journeys/journey-results.json" npx playwright test --global-timeout=1800000)
           ln -sfn "$src/verification/journeys/node_modules" "$src/verification/design-contract/node_modules"
           (cd "$src/verification/design-contract" && CAUSA_DESIGN_CONTRACT="$design" CAUSA_DESIGN_RENDERED="$RUNNER_TEMP/journeys/design-rendered.json" \
-            CAUSA_SCREENSHOTS="$RUNNER_TEMP/journeys/screenshots" npx playwright test)
+            CAUSA_SCREENSHOTS="$RUNNER_TEMP/journeys/screenshots" npx playwright test --global-timeout=600000)
           dotnet "${{ steps.catalog.outputs.rc }}" design-contract --contract "$design" --forma-inventory "$src/$(jq -r '.forma.inventories[-1]' "$design")" \
             --root . --candidate "$CAUSA_CANDIDATE" --rendered "$RUNNER_TEMP/journeys/design-rendered-chromium.json,$RUNNER_TEMP/journeys/design-rendered-webkit.json" --out "$RUNNER_TEMP/journeys/design-contract.json"
           exit 0
       - name: Verification gate (executable, record and mixed obligations)
+        # Always produce the verdict once every precondition holds: the candidate, the governed checkout, the pinned
+        # contracts, governance, the pinned toolchain, the compiled plan, the Praxis ordering and suite-preflight (review F6:
+        # no precondition is weakened). Only what follows them (the suites, the records, the journeys) may have failed or
+        # overrun: the gate then judges what was recorded and fails closed on missing evidence. A failed precondition skips
+        # the gate, which the slice gate refuses (GATE_MISSING); the job fails either way.
+        if: always() && steps.candidate.outcome == 'success' && steps.governed.outcome == 'success' && steps.contracts.outcome == 'success' && steps.governance.outcome == 'success' && steps.toolchain.outcome == 'success' && steps.compile.outcome == 'success' && steps.sequencing.outcome == 'success' && steps.suitepreflight.outcome == 'success'
         env:
           MODE: ${{ inputs.mode || 'development' }}
           WORK_ITEM: ${{ inputs.work_item || steps.slice.outputs.work_item }}
@@ -307,7 +351,7 @@ jobs:
         if: always() && steps.slice.outputs.id != ''
         env:
           CANDIDATE: ${{ steps.candidate.outputs.sha }}
-          CAUSA_GITHUB_TOKEN: ${{ steps.testtoken.outputs.token }}
+          CAUSA_GITHUB_TOKEN: ${{ steps.readtoken.outputs.token }}
         run: |
           src="$RUNNER_TEMP/indy-init"; rc="${{ steps.catalog.outputs.rc }}"; ev="$RUNNER_TEMP/slice-evidence"; mkdir -p "$ev"
           lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
@@ -340,13 +384,22 @@ jobs:
           catalogPass=$(jq '[.requirements[].obligations[] | select(.status == "PASS") | .id]' "$RUNNER_TEMP/catalog/requirement-verification.json" 2>/dev/null || echo '[]')
           jq -n --arg c "$CANDIDATE" --argjson head "$(verified "$ev/gate-all-head/coverage.json")" --argjson base "$(verified "$ev/gate-all-base/coverage.json")" \
             --argjson cat "$catalogPass" '{candidate: $c, passed: ($head + $cat), required: $base}' > "$ev/regression.json"
-          # Real provider: the plan's live suites ran at the merged result against GitHub (their obligations are judged by the gate).
-          # Passed only when both live suites ran tests and none failed (their files existing is not enough).
+          # Real provider, judged per slice (Rehearsal 010: one failing live test anywhere used to fail every live slice).
+          # The slice's own live obligations (mandatory obligations of its requirements produced by SU-DOTNET-LIVE or
+          # SU-BROWSER-LIVE in the approved scope manifest) must all be verified by Dokimos in the governed whole-plan
+          # coverage at the merged result. A live slice with no such obligation fails closed. The live suites ran here
+          # against api.github.com with the job's credentials, and both must have executed tests (review F7): a live suite
+          # that did not run, or ran nothing, is never a pass. An obligation is mandatory unless it says mandatory: false.
           livestatus=failed
-          trx=$(ls "$RUNNER_TEMP"/results/SU-DOTNET-LIVE/*.trx 2>/dev/null || true); pw="$RUNNER_TEMP/results/SU-BROWSER-LIVE/results.json"
-          if [ -n "$trx" ] && [ -f "$pw" ] && cat -- "$RUNNER_TEMP"/results/SU-DOTNET-LIVE/*.trx | grep -q 'outcome="Passed"' && ! cat -- "$RUNNER_TEMP"/results/SU-DOTNET-LIVE/*.trx | grep -qE 'outcome="(Failed|Error|Timeout|Aborted)"' \
-             && [ "$(jq '.stats.unexpected // 1' "$pw")" = 0 ] && [ "$(jq '.stats.expected // 0' "$pw")" -gt 0 ]; then livestatus=passed; fi
-          jq -n --arg c "$CANDIDATE" --arg s "$livestatus" '{candidate: $c, baseUrl: "https://api.github.com", status: $s}' > "$ev/live.json"
+          live=$(jq -c --slurpfile slice "$RUNNER_TEMP/slice.json" '[.requirements[] | select(.id as $r | $slice[0].requirements | index($r)) | .obligations[]
+            | select((.mandatory != false) and ((.producers // []) | any(. == "SU-DOTNET-LIVE" or . == "SU-BROWSER-LIVE"))) | .id] | unique' \
+            "$src/docs/rehearsal-010-readiness/scope-manifest.json")
+          unverified=$(jq -cn --argjson l "$live" --argjson v "$(verified "$ev/gate-all-head/coverage.json")" '$l - $v')
+          executed() { jq --arg s "$1" '[.runs[]? | select(.suite == $s) | .executedTests] | add // 0' "$RUNNER_TEMP/results/results.json" 2>/dev/null || echo 0; }
+          ran=$(jq -cn --argjson d "$(executed SU-DOTNET-LIVE)" --argjson b "$(executed SU-BROWSER-LIVE)" '{"SU-DOTNET-LIVE": $d, "SU-BROWSER-LIVE": $b}')
+          if [ "$(jq length <<< "$live")" -gt 0 ] && [ "$(jq length <<< "$unverified")" = 0 ] && jq -e 'all(.[]; . > 0)' <<< "$ran" > /dev/null; then livestatus=passed; fi
+          jq -n --arg c "$CANDIDATE" --arg s "$livestatus" --argjson l "$live" --argjson u "$unverified" --argjson r "$ran" \
+            '{candidate: $c, baseUrl: "https://api.github.com", status: $s, liveObligations: $l, unverified: $u, executedTests: $r}' > "$ev/live.json"
           dotnet "$rc" test-integrity --repo . --base "$base" --head "$CANDIDATE" \
             --base-results "$RUNNER_TEMP/base-results" --head-results "$RUNNER_TEMP/results" --out "$ev/test-integrity.json" || true
           dotnet "$rc" slice-gate --manifest "$manifest" --events evidence/progress/events.json \

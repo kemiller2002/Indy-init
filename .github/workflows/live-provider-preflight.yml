@@ -48,7 +48,7 @@ jobs:
           echo "owner=$(jq -r .testRepository.owner "$LOCK")" >> "$GITHUB_OUTPUT"
           echo "repo=$(jq -r .testRepository.repo "$LOCK")" >> "$GITHUB_OUTPUT"
           echo "branch=$(jq -r '.testRepository.branch // "causa-acceptance"' "$LOCK")" >> "$GITHUB_OUTPUT"
-      - name: Test-repository credential, for that repository alone, revoked when this job ends
+      - name: Write credential (CAUSA_WRITE_TOKEN) for the test repository alone, revoked when this job ends
         id: testtoken
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
@@ -57,9 +57,19 @@ jobs:
           owner: ${{ steps.testrepo.outputs.owner }}
           repositories: ${{ steps.testrepo.outputs.repo }}
           permission-contents: write
-      - name: The credential reaches the test repository, and nothing else
+      - name: Read-only credential (CAUSA_GITHUB_TOKEN) for the test repository alone (ODR-R10-28 A, PF-015-O2/O3)
+        id: readtoken
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ secrets.CAUSA_ACCEPTANCE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CAUSA_ACCEPTANCE_APP_KEY }}
+          owner: ${{ steps.testrepo.outputs.owner }}
+          repositories: ${{ steps.testrepo.outputs.repo }}
+          permission-contents: read
+      - name: The credentials reach the test repository, and nothing else
         env:
           GH_TOKEN: ${{ steps.testtoken.outputs.token }}
+          GH_READ_TOKEN: ${{ steps.readtoken.outputs.token }}
           OWNER: ${{ steps.testrepo.outputs.owner }}
           REPO: ${{ steps.testrepo.outputs.repo }}
           BRANCH: ${{ steps.testrepo.outputs.branch }}
@@ -71,6 +81,12 @@ jobs:
           test "$repos" = "$OWNER/$REPO" || { echo "::error::the token reaches [$repos], not only $OWNER/$REPO"; exit 1; }
           test "$(api "/repos/$OWNER/$REPO/branches/$BRANCH" | jq -r .name)" = "$BRANCH" || { echo "::error::$OWNER/$REPO has no branch $BRANCH"; exit 1; }
           echo "token scope: $repos only"
+          # The read-only token reaches the same repository and cannot write it (403 on a write attempt; nothing is created).
+          read_repos=$(curl -sS -H "Authorization: Bearer $GH_READ_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/installation/repositories | jq -r '[.repositories[].full_name] | join(",")')
+          test "$read_repos" = "$OWNER/$REPO" || { echo "::error::the read token reaches [$read_repos], not only $OWNER/$REPO"; exit 1; }
+          code=$(curl -sS -o /dev/null -w '%{http_code}' -X PUT -H "Authorization: Bearer $GH_READ_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$OWNER/$REPO/contents/.preflight/read-token-probe" -d "{\"message\":\"probe\",\"content\":\"\",\"branch\":\"$BRANCH\"}")
+          test "$code" = 403 || { echo "::error::the read token's write attempt answered $code, not 403"; exit 1; }
       - name: Browsers and the test runner (no credential in this step)
         # Bounded: a stalled browser install (apt mirror) fails this step after the limit instead of the whole job budget. No retry, so a
         # cancelled apt leaves no lock behind for a second attempt (the problem 8d58246 removed); nothing is skipped. Trade-off: on a very
@@ -83,7 +99,8 @@ jobs:
       - name: Journeys J1-J3 against the real provider (Chromium and WebKit)
         env:
           CAUSA_PROVIDER: github
-          CAUSA_GITHUB_TOKEN: ${{ steps.testtoken.outputs.token }}
+          CAUSA_GITHUB_TOKEN: ${{ steps.readtoken.outputs.token }}
+          CAUSA_WRITE_TOKEN: ${{ steps.testtoken.outputs.token }}
           CAUSA_TEST_OWNER: ${{ steps.testrepo.outputs.owner }}
           CAUSA_TEST_REPO: ${{ steps.testrepo.outputs.repo }}
           CAUSA_TEST_BRANCH: ${{ steps.testrepo.outputs.branch }}
@@ -106,6 +123,7 @@ jobs:
           jq -e '[.results[] | select(.status != "passed")] | length == 0' "$r" > /dev/null || { echo "::error::a journey did not pass"; exit 1; }
           # The token never reaches a file or an artifact.
           ! grep -rqF "${{ steps.testtoken.outputs.token }}" "$RUNNER_TEMP/live" || { echo "::error::the token appears in the evidence"; exit 1; }
+          ! grep -rqF "${{ steps.readtoken.outputs.token }}" "$RUNNER_TEMP/live" || { echo "::error::the read token appears in the evidence"; exit 1; }
       - name: Publish the live-provider evidence
         if: always()
         uses: actions/upload-artifact@v4
