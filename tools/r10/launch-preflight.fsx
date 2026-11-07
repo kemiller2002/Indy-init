@@ -535,7 +535,8 @@ let lp10 =
             let tips = refList |> List.map (fun r -> snd (git mirror [ "rev-parse"; r + "^{commit}" ])) |> List.distinct
             let result =
               fail (tips.Length <= 1) $"the competition repository's branches and tags point at {tips.Length} different commits; it must hold one initial commit"
-              @ fail (not competition || tips = [ initial ]) $"""the competition repository holds {String.Join(", ", tips)}, not only the owner's initial commit {initial} (competitionRepository.initialCommit)"""
+              @ (if competition && isNull lock then [ "no lock: the competition repository's initial commit is the lock's competitionRepository.initialCommit" ]
+                 else fail (not competition || tips = [ initial ]) $"""the competition repository holds {String.Join(", ", tips)}, not only the owner's initial commit {initial} (competitionRepository.initialCommit)""")
               @ (refList |> List.collect (fun r ->
                 let _, count = git mirror [ "rev-list"; "--count"; r ]
                 let t0 = fst (git mirror [ "cat-file"; "-e"; $"{r}:evidence/t0/t0.json" ]) = 0
