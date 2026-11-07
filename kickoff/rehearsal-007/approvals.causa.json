@@ -1310,6 +1310,77 @@
           "review_sha256": "4d5ecbfb9f9f6a2193ab3168836789ad8a893c8aa821e3152ca314f06dff93b0"
         }
       ]
+    },
+    {
+      "id": "APR-COMP-OWNER-2",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-07",
+      "changes": [
+        {
+          "decision_id": "ODR-COMP-P15",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/competition-readiness/dependency-lock.json",
+              "sha256": "2a5853f5decb3f74f478b9b19ac892e583da32c639ac843e2848598235578e87"
+            },
+            {
+              "path": "docs/competition-readiness/dependency-lock.source.json",
+              "sha256": "90a203257b36d58368a523505c3bee168a6b1381267af9d88053316a8d3c7105"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-COMP-P16",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/competition-readiness/assertion-merge-needs.json",
+              "sha256": "6d9b5b85777770a135bbcb76739e896e36890337f8c8151cc2db0f8aaec16a79"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-COMP-SCOPE",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/competition-readiness/scope-manifest.json",
+              "sha256": "2a6509cd2f4df1e6e5162a6a944f1bf7d1bb8863f445bbff0a801f8cd2fb9e94",
+              "field": "scopeSha256",
+              "value": "\"09e38f7db1888b3bbb957272cddfa050908a077a1f115d0cef2d412d7ec40666\""
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-COMP-CATALOG-CONTRACT",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "kickoff/competition/catalog-verification-contract.json",
+              "sha256": "c5afc5375e14090407e7a56ad4d51f6d6d4faaa8ac96fd37add2af69b7d03739"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-COMP-LOCK",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "kickoff/competition/toolchain.lock.proposed.json",
+              "sha256": "a443dddfbc38dc2a50b1ae2a45631450fc30917ee0508bbc2b19659c6d378127"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
