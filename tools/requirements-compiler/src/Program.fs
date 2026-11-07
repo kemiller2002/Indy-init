@@ -1228,6 +1228,27 @@ let v41Inputs (source: string) (package: string) (basePackage: string) (formaTar
         else match extract with Some x -> x | None -> failwithf "%s is missing; generate it with --forma-tarball" inventoryPath
       FormaExtract = extract
       ReadSource = fun p -> let f = Path.Combine(source, p) in if File.Exists f then Some(File.ReadAllText f) else None
+      // The v4 plan's own sources (its verification manifest, plan curation and categories table), read only when an
+      // amendment declares a supplementaryPlan entry; the entry takes the bindings the amendment gives, never v4's.
+      DerivePlanEntry =
+        fun requirement bindings ->
+            let b n = Path.Combine(basePackage, n)
+            let spec =
+                match parseFile (b "curation/verification-plan.json") with
+                | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = "testBindings" then k, (field "testBindings" bindings |> Option.defaultValue (JArr [])) else k, v))
+                | x -> x
+            let baseline = parseFile (Path.Combine(source, "requirements", "causa-requirements-baseline-v4.json"))
+            let planInputs: VerificationPlan.Inputs =
+                { Repository = ""
+                  Commit = ""
+                  BaselineId = str "id" baseline
+                  BaselineSha256 = ""
+                  Baseline = baseline
+                  Manifest = parseFile (b "verification-manifest.json")
+                  Spec = spec
+                  Approvals = { Repository = ""; Commit = ""; Path = ""; Sha256 = ""; TrustedOperators = []; Document = JObj [] }
+                  Categories = { Path = "curation/evidence-categories.json"; Sha256 = fileSha (b "curation/evidence-categories.json"); Table = parseFile (b "curation/evidence-categories.json") } }
+            VerificationPlan.entryOf planInputs requirement
       AuthoredText =
         (authored |> List.map (fun n -> "analysis/" + n, File.ReadAllText(a n)))
         @ (documents |> List.filter (fun n -> File.Exists(Path.Combine(package, n))) |> List.map (fun n -> n, File.ReadAllText(Path.Combine(package, n)))) }

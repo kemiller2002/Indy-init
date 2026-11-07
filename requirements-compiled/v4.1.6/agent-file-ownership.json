@@ -22,10 +22,10 @@
     "Integration alone writes: .gitignore, every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, web/index.html, web/causa.css, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (checks X02 and X18). A UI role changes web/index.html or web/causa.css only through a change request integration owns and applies (v4.1.1); each UI role writes only its own screen fragments web/screens/<screen>.html and web/screens/<screen>.css as proposals/r10-contract-first-ui/COMPETITION-UI-OWNERSHIP.json assigns them, and web/index.html includes them through build.fsx, which integration writes at bootstrap with every fragment listed."
   ],
   "counts": {
-    "files": 341,
+    "files": 342,
     "domain": 35,
     "persistence": 51,
-    "ui": 78,
+    "ui": 79,
     "ui-2": 29,
     "ui-3": 31,
     "integration": 114,
@@ -3996,6 +3996,19 @@
       ],
       "requirements": [
         "WDL-012"
+      ]
+    },
+    {
+      "path": "tests/browser/acceptance/WDL-013.spec.js",
+      "owner": "ui",
+      "kind": "test",
+      "tests": [
+        "playwright:acceptance/WDL-013.spec.js > WDL-013-O1 [chromium]",
+        "playwright:acceptance/WDL-013.spec.js > WDL-013-O2 [chromium]",
+        "playwright:acceptance/WDL-013.spec.js > WDL-013-O3 [chromium]"
+      ],
+      "requirements": [
+        "WDL-013"
       ]
     },
     {

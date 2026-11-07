@@ -498,6 +498,16 @@ let private entry (i: Inputs) (rules: Map<string, Json>) (manifestEntries: Map<s
     | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = "obligations" then k, JArr(obligations |> List.map withContract) else k, v))
     | j -> j
 
+/// One requirement's plan entry, derived by exactly the rules `build` applies to a P0 requirement (its obligations
+/// verbatim, the verification manifest's rules and gates, the spec's freshness policies, the categories table) with the
+/// spec's testBindings. No exclusion and no scope decision applies. A successor package uses it for a requirement the
+/// owner moved into per-obligation verification (v4.1.6, ODR-V416-WDL013); the v4 plan itself is never rebuilt.
+let entryOf (i: Inputs) (r: Json) : Json =
+    let rules = arr "rules" i.Manifest |> List.map (fun x -> str "id" x, x) |> Map.ofList
+    let manifestEntries = arr "entries" i.Manifest |> List.map (fun e -> str "requirement" e, e) |> Map.ofList
+    let bindings = bindingsOf i.Spec |> List.groupBy fst |> List.map (fun (o, xs) -> o, xs |> List.collect snd) |> Map.ofList
+    entry i rules manifestEntries bindings Map.empty Map.empty r
+
 let private identityCovers =
     "sha256 of the plan serialized by the compiler's canonical writer (ASCII JSON, two-space indent, trailing newline) with planIdentity removed"
 
