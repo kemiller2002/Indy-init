@@ -1275,38 +1275,39 @@ let v41Command (args: string list) : int =
             let i = v41Inputs m.["--source"] package m.["--base"] (m.TryFind "--forma-tarball")
             let built = V41Package.build i
             // --bootstrap: write the empty application repository into a new or empty directory (never the package).
-            match m.TryFind "--bootstrap" with
-            // An empty application repository may already hold its .git directory (git init, or a clone of an empty
-            // repository); anything else is refused, so the bootstrap never overwrites work.
-            // v4.1.1: Conditor initializes the empty repository first; the generator then layers onto it (layerFile)
-            // and refuses, writing nothing, if any file it would change is not one of the three it may merge.
-            | Some dir when Directory.Exists dir && Directory.EnumerateFileSystemEntries dir |> Seq.exists (fun e -> Path.GetFileName e <> ".git") ->
-                let layered = i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (strOpt "layersOnto") = Some "conditor"
-                if not (layered && File.Exists(Path.Combine(dir, "conditor.json"))) then
-                    failwithf "--bootstrap needs a new or empty directory (a .git directory is allowed)%s; %s holds other files" (if layered then ", or one Conditor initialized" else "") dir
-                let files = V41Package.bootstrapFiles i (V41Package.ownedFiles i) (File.ReadAllText(Path.Combine(m.["--source"], "global.json")))
-                let plan =
-                    files |> List.map (fun (n, t) ->
+            let writeBootstrap (target: string) =
+                match Some target with
+                // An empty application repository may already hold its .git directory (git init, or a clone of an empty
+                // repository); anything else is refused, so the bootstrap never overwrites work.
+                // v4.1.1: Conditor initializes the empty repository first; the generator then layers onto it (layerFile)
+                // and refuses, writing nothing, if any file it would change is not one of the three it may merge.
+                | Some dir when Directory.Exists dir && Directory.EnumerateFileSystemEntries dir |> Seq.exists (fun e -> Path.GetFileName e <> ".git") ->
+                    let layered = i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (strOpt "layersOnto") = Some "conditor"
+                    if not (layered && File.Exists(Path.Combine(dir, "conditor.json"))) then
+                        failwithf "--bootstrap needs a new or empty directory (a .git directory is allowed)%s; %s holds other files" (if layered then ", or one Conditor initialized" else "") dir
+                    let files = V41Package.bootstrapFiles i (V41Package.ownedFiles i) (File.ReadAllText(Path.Combine(m.["--source"], "global.json")))
+                    let plan =
+                        files |> List.map (fun (n, t) ->
+                            let p = Path.Combine(dir, n)
+                            n, (if File.Exists p then V41Package.layerFile n (File.ReadAllText p) t else Ok(Some t)))
+                    match plan |> List.choose (fun (_, r) -> match r with Error e -> Some e | Ok _ -> None) with
+                    | [] -> ()
+                    | errors -> failwithf "the bootstrap cannot layer onto %s:\n  %s" dir (String.concat "\n  " errors)
+                    let writes = plan |> List.choose (fun (n, r) -> match r with Ok(Some t) -> Some(n, t) | _ -> None)
+                    for (n, t) in writes do
                         let p = Path.Combine(dir, n)
-                        n, (if File.Exists p then V41Package.layerFile n (File.ReadAllText p) t else Ok(Some t)))
-                match plan |> List.choose (fun (_, r) -> match r with Error e -> Some e | Ok _ -> None) with
-                | [] -> ()
-                | errors -> failwithf "the bootstrap cannot layer onto %s:\n  %s" dir (String.concat "\n  " errors)
-                let writes = plan |> List.choose (fun (n, r) -> match r with Ok(Some t) -> Some(n, t) | _ -> None)
-                for (n, t) in writes do
-                    let p = Path.Combine(dir, n)
-                    Directory.CreateDirectory(Path.GetDirectoryName p) |> ignore
-                    File.WriteAllText(p, t)
-                let merged = writes |> List.filter (fun (n, _) -> List.contains n [ "package.json"; ".gitignore"; "Directory.Build.props" ] && File.Exists(Path.Combine(dir, n)))
-                printfn "bootstrap: %d of %d files written onto the Conditor repository %s (merged: %s)" writes.Length files.Length dir (merged |> List.map fst |> String.concat ", ")
-            | Some dir ->
-                let files = V41Package.bootstrapFiles i (V41Package.ownedFiles i) (File.ReadAllText(Path.Combine(m.["--source"], "global.json")))
-                for (n, t) in files do
-                    let p = Path.Combine(dir, n)
-                    Directory.CreateDirectory(Path.GetDirectoryName p) |> ignore
-                    File.WriteAllText(p, t)
-                printfn "bootstrap: %d files written to %s" files.Length dir
-            | None -> ()
+                        Directory.CreateDirectory(Path.GetDirectoryName p) |> ignore
+                        File.WriteAllText(p, t)
+                    let merged = writes |> List.filter (fun (n, _) -> List.contains n [ "package.json"; ".gitignore"; "Directory.Build.props" ] && File.Exists(Path.Combine(dir, n)))
+                    printfn "bootstrap: %d of %d files written onto the Conditor repository %s (merged: %s)" writes.Length files.Length dir (merged |> List.map fst |> String.concat ", ")
+                | Some dir ->
+                    let files = V41Package.bootstrapFiles i (V41Package.ownedFiles i) (File.ReadAllText(Path.Combine(m.["--source"], "global.json")))
+                    for (n, t) in files do
+                        let p = Path.Combine(dir, n)
+                        Directory.CreateDirectory(Path.GetDirectoryName p) |> ignore
+                        File.WriteAllText(p, t)
+                    printfn "bootstrap: %d files written to %s" files.Length dir
+                | None -> ()
             let report = V41Package.validationReport built.Checks
             let verdict = str "verdict" report
             let inventory =
@@ -1323,19 +1324,33 @@ let v41Command (args: string list) : int =
                 | _ -> []
             let manifest = V41Package.packageManifest i (authored @ inventoryPin @ (generated |> List.map (fun (n, t) -> n, sha t))) verdict |> serialize
             let all = generated @ [ "package-manifest.json", manifest ]
+            let differing = all |> List.filter (fun (n, t) -> let p = Path.Combine(package, n) in not (File.Exists p) || File.ReadAllText p <> t) |> List.map fst
+            // A file in the package that the compiler neither generates nor reads is stale or foreign.
+            let expected = (all |> List.map fst) @ (i.AuthoredText |> List.map fst) @ (inventoryPin |> List.map fst) |> Set.ofList
+            let present = (if Directory.Exists package then Directory.GetFiles(package, "*", SearchOption.AllDirectories) else [||]) |> Array.map (fun f -> Path.GetRelativePath(package, f).Replace('\\', '/')) |> Array.sort |> List.ofArray
+            let stray = present |> List.filter (expected.Contains >> not)
+            let reportDifferences () =
+                differing |> List.iter (eprintfn "differs from the package: %s")
+                stray |> List.iter (eprintfn "not generated or read by the compiler: %s")
+            let bootstrap = m.TryFind "--bootstrap"
+            // --bootstrap never writes the package (AGENT-RULES duty 1 runs it without --check, in the governed
+            // checkout), and it writes the skeleton only when this compiler reproduces the package byte for byte: a
+            // compiler that does not (a build of another Indy-init commit) would bootstrap a skeleton that is not the
+            // package's. Refused, nothing is written.
+            if bootstrap.IsSome && (not differing.IsEmpty || not stray.IsEmpty) then
+                reportDifferences ()
+                eprintfn "bootstrap refused: this compiler does not reproduce %s byte for byte (build requirements-compiler from the --source checkout); nothing was written" package
+                4
+            else
+            bootstrap |> Option.iter writeBootstrap
             built.Checks |> List.iter (fun c ->
                 printfn "%s %s  %s" (if c.Problems.IsEmpty then "PASS" else "FAIL") c.Id c.Title
                 c.Problems |> List.truncate 10 |> List.iter (printfn "      - %s"))
             printfn "%s validation: %s; status: CANDIDATE" (match i.Amendment with Some _ -> "v" + V41Package.packageVersion i | None -> "v4.1") verdict
             if check then
-                let differing = all |> List.filter (fun (n, t) -> let p = Path.Combine(package, n) in not (File.Exists p) || File.ReadAllText p <> t) |> List.map fst
-                differing |> List.iter (eprintfn "differs from the package: %s")
-                // A file in the package that the compiler neither generates nor reads is stale or foreign.
-                let expected = (all |> List.map fst) @ (i.AuthoredText |> List.map fst) @ (inventoryPin |> List.map fst) |> Set.ofList
-                let present = Directory.GetFiles(package, "*", SearchOption.AllDirectories) |> Array.map (fun f -> Path.GetRelativePath(package, f).Replace('\\', '/')) |> Array.sort |> List.ofArray
-                let stray = present |> List.filter (expected.Contains >> not)
-                stray |> List.iter (eprintfn "not generated or read by the compiler: %s")
+                reportDifferences ()
                 if not differing.IsEmpty || not stray.IsEmpty then 4 elif verdict = "PASS" then 0 else 3
+            elif bootstrap.IsSome then (if verdict = "PASS" then 0 else 3)
             else
                 for (n, t) in all do
                     let p = Path.Combine(package, n)
