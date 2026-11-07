@@ -248,6 +248,75 @@
     "approvalRecord": {
       "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-P14\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
     }
+  },
+  {
+   "id": "ODR-COMP-SCOPE",
+   "kind": "decision",
+   "title": "Approve the competition scope (successor of ODR-R10-01)",
+   "question": "Approve docs/competition-readiness/scope-manifest.json as the full scope of the 7 November competition, as shown below (requirements, obligations, work items, zero exclusions, scopeSha256)? It is compiled by `requirements-compiler scope compile` from the frozen v4.1.6 (tag indy-init-requirements-v4.1.6, manifest 8d3706d9...), its plan supplement (WDL-013 verified per obligation, ODR-V416-WDL013 A), the catalog ratified for v4.1.6 (ODR-V416-CAT) and the requirements baseline, with the fixed (V2) selectors (ODR-V416-SCOPE-SELECTORS A, SS-1 A): 209 requirements (162 plan incl. WDL-013, 47 catalog), 921 obligations (616 plan, 663 plan tests), 31 work items (4 generated: WI-GEN-VER and the three catalog screens), 358 gate-level requirements, scopeSha256 09e38f7d... Rehearsal 010's approved scope (26e6ff3c..., ODR-R10-01, APR-R10-OWNER-4) stays as it is, a historical record. Slice integration and full-release acceptance remain separate gates. Asked only once indy-init-requirements-v4.1.6 is tagged and the manifest is current (compiled from the package, supplement and catalog on main).",
+   "options": [
+    "A: approve the competition scope as shown",
+    "B: do not approve (the scope is recompiled after changes)"
+   ],
+   "recommendation": "A, after checking the counts and digest shown against the pull request that compiled it (`scope preflight` PASS; the offline suite reproduces it byte for byte and checks WDL-013's three obligations are bound and no WI-GEN-PF/UI/EXT-DATA/WDL item remains).",
+   "rationale": "The scope is approved once, by digest; any later change needs a new approval. SS-1 A: the competition scope is compiled with the fixed selectors and approved on its own digest.",
+   "impact": "The competition lock pins this scopeSha256 (kickoff/competition/toolchain.lock.json scope.scopeSha256); check-sequencing and authorize-implementation refuse any other. With B there is no approved competition scope and the lock cannot be committed.",
+   "requiresTag": "indy-init-requirements-v4.1.6",
+   "requiresCurrentScope": "true",
+   "pins": [
+    {
+     "path": "docs/competition-readiness/scope-manifest.json",
+     "field": "scopeSha256",
+     "show": "counts"
+    }
+   ],
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-SCOPE\", \"action\": \"decide\", \"option\": \"A\", \"pins\": [{\"path\": \"docs/competition-readiness/scope-manifest.json\", \"sha256\": \"<at origin/main>\", \"field\": \"scopeSha256\", \"value\": \"<the manifest's scopeSha256>\"}]}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-CATALOG-CONTRACT",
+   "kind": "decision",
+   "title": "The competition's catalog verification contract (successor of ODR-R10-03 and ODR-R10-04)",
+   "question": "Adopt kickoff/competition/catalog-verification-contract.json as the contract a governed catalog verdict must bind in the competition? It is Rehearsal 010's contract (ODR-R10-03, ODR-R10-04; APR-R10-OWNER-2, 3d587618...) with only the catalog digest moved to the catalog ratified for v4.1.6 (0536ad29..., ODR-V416-CAT): the same governed producer, the same fault-sensitive content-round-trip category, the probe specification required, and the fact domain-profile-selected = false (INV-003 not applicable). Rehearsal 010's contract still pins the earlier catalog (7e5e8a40...), so a competition gate judged by it would refuse every verdict.",
+   "options": [
+    "A: adopt the successor contract as shown",
+    "B: keep Rehearsal 010's contract (the governed catalog verdict refuses the v4.1.6 catalog)"
+   ],
+   "recommendation": "A: the only change is the catalog the owner already ratified (ODR-V416-CAT).",
+   "rationale": "The contract is a governed asset; only the owner approves it (as ODR-R10-03).",
+   "impact": "The competition lock pins this file's sha256 as catalogVerification.contractSha256.",
+   "requiresTag": "indy-init-requirements-v4.1.6",
+   "pins": [
+    {
+     "path": "kickoff/competition/catalog-verification-contract.json"
+    }
+   ],
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-CATALOG-CONTRACT\", \"action\": \"decide\", \"option\": \"A\", \"pins\": [{\"path\": \"kickoff/competition/catalog-verification-contract.json\", \"sha256\": \"<at origin/main>\"}]}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003)."
+   }
+  },
+  {
+   "id": "ODR-COMP-LOCK",
+   "kind": "decision",
+   "title": "Commit the competition toolchain lock (as ODR-RG-04)",
+   "question": "Adopt kickoff/competition/toolchain.lock.proposed.json as the competition's lock: v4.1.6 (tag indy-init-requirements-v4.1.6 at 2380b3d, manifest 8d3706d9...), the competition scope (ODR-COMP-SCOPE's scopeSha256), Conditor v0.10.21 (ODR-COMP-P14 A, all eight artifact digests as in its release checksums.txt), causa-storage-v1.1.0 (causa-data 7e10394), the competition repository kemiller2002/causa (pre-created, ODR-COMP-P07 A), the catalog verification contract (ODR-COMP-CATALOG-CONTRACT), and, unchanged from Rehearsal 010's lock, echelon-current 1.37.0, the workstation target, the process-evidence plan and rules, the design contract, the deadline policy, the journey bindings and the isolated test repository? Then commit it yourself as kickoff/competition/toolchain.lock.json, changing only `status` (to your pin) and `indyInit.commit` (to the merge commit of the pull request that adds this lock, or a later main commit you name).",
+   "options": [
+    "A: adopt the proposed lock and commit it as kickoff/competition/toolchain.lock.json",
+    "B: keep the Rehearsal 010 lock (v4.1.5, the 37-item Legacy scope, Conditor v0.10.20)"
+   ],
+   "recommendation": "A, after ODR-COMP-SCOPE and ODR-COMP-CATALOG-CONTRACT are recorded (the lock pins their files' digests) and the live-provider preflight has run on the merged main. ODR-COMP-P12 A asks for exactly this re-pin.",
+   "rationale": "The lock is the one starting point every agent uses; only the owner commits it (ODR-RG-04). Recording this decision pins the proposed file you approved; your commit of toolchain.lock.json is the pin itself.",
+   "impact": "With B the competition runs on v4.1.5, the old scope and a Conditor without forma-workflow in its preset.",
+   "requiresTag": "indy-init-requirements-v4.1.6",
+   "pins": [
+    {
+     "path": "kickoff/competition/toolchain.lock.proposed.json"
+    }
+   ],
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-COMP-LOCK\", \"action\": \"decide\", \"option\": \"A\", \"pins\": [{\"path\": \"kickoff/competition/toolchain.lock.proposed.json\", \"sha256\": \"<at origin/main>\"}]}, recorded by the owner with tools/owner-freeze.fsx decide competition. Agents never write an owner record (RDP-003). The lock itself is the owner's own commit of kickoff/competition/toolchain.lock.json (as ODR-RG-04); an agent never writes it."
+   }
   }
  ]
 }

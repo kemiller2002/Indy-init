@@ -1,7 +1,8 @@
 /// Command layer of the scope, progress and continuation checks: file reading and exit codes only.
 ///
-///   requirements-compiler scope compile --source DIR --package DIR --out FILE
-///   requirements-compiler scope preflight --source DIR --package DIR --manifest FILE [--praxis-queue FILE] [--out FILE]
+///   requirements-compiler scope compile --source DIR --package DIR --out FILE [--source-commit SHA]
+///   requirements-compiler scope preflight --source DIR --package DIR --manifest FILE [--source-commit SHA] [--praxis-queue FILE] [--out FILE]
+///     (--source-commit reads the sources as committed at SHA instead of the working tree: a historical scope)
 ///   requirements-compiler scope checkpoint --source DIR --package DIR --manifest FILE (--praxis-queue FILE | --praxis-context FILE)... --at ISO --commit SHA --out FILE
 ///   requirements-compiler scope work-plan --manifest FILE --out FILE   (the indy-init.r9-work-plan/1 authorize-implementation reads)
 ///   requirements-compiler progress --manifest FILE --events FILE --out FILE
@@ -23,26 +24,48 @@ let private options (args: string list) =
 
 let private sha (path: string) = File.ReadAllBytes path |> Git.sha256Hex
 
-/// The frozen sources of a package, read from an Indy-init checkout.
-let sourcesOf (source: string) (package: string) : Sources =
-    let p (rel: string) = Path.Combine(source, rel)
-    let pkg (rel: string) = Path.Combine(source, package, rel)
-    let commit = match Git.headCommit source with Ok c -> c | Error _ -> ""
-    { Plan = parseFile (p "requirements-compiled/v4/verification-plan.json")
-      PlanSha256 = sha (p "requirements-compiled/v4/verification-plan.json")
-      ExecutionPlan = parseFile (pkg "verification-execution-plan.json")
-      ExecutionPlanSha256 = sha (pkg "verification-execution-plan.json")
-      Dag = parseFile (pkg "execution-dag.json")
-      PackageManifest = parseFile (pkg "package-manifest.json")
-      PackageManifestSha256 = sha (pkg "package-manifest.json")
+/// The frozen sources of a package, read through `read` (a path relative to the Indy-init checkout -> its bytes, None
+/// when absent). `commit` is informational: preflight compares content, so a later commit with unchanged sources passes.
+let sourcesFrom (read: string -> byte[] option) (package: string) (commit: string) : Sources =
+    let need (rel: string) = read rel |> Option.defaultWith (fun () -> failwithf "%s does not exist in the sources" rel)
+    let pkg (rel: string) = package.TrimEnd('/', '\\').Replace('\\', '/') + "/" + rel
+    let plan = "requirements-compiled/v4/verification-plan.json"
+    let catalog = "requirements/catalogs/causa-investigation.requirement-catalog.json"
+    let baseline = "requirements/causa-requirements-baseline-v4.json"
+    let supplement = pkg "verification-plan-supplement.json"
+    { Plan = need plan |> parseBytes
+      PlanSha256 = need plan |> Git.sha256Hex
+      // The package's plan supplement (v4.1.6 onward), when the package has one.
+      Supplement = read supplement |> Option.map (fun b -> { Path = supplement; Json = parseBytes b; Sha256 = Git.sha256Hex b })
+      ExecutionPlan = need (pkg "verification-execution-plan.json") |> parseBytes
+      ExecutionPlanSha256 = need (pkg "verification-execution-plan.json") |> Git.sha256Hex
+      Dag = need (pkg "execution-dag.json") |> parseBytes
+      PackageManifest = need (pkg "package-manifest.json") |> parseBytes
+      PackageManifestSha256 = need (pkg "package-manifest.json") |> Git.sha256Hex
       PackagePath = package
-      Catalog = parseFile (p "requirements/catalogs/causa-investigation.requirement-catalog.json")
-      CatalogSha256 = sha (p "requirements/catalogs/causa-investigation.requirement-catalog.json")
-      Baseline = parseFile (p "requirements/causa-requirements-baseline-v4.json")
-      BaselineSha256 = sha (p "requirements/causa-requirements-baseline-v4.json")
+      Catalog = need catalog |> parseBytes
+      CatalogSha256 = need catalog |> Git.sha256Hex
+      Baseline = need baseline |> parseBytes
+      BaselineSha256 = need baseline |> Git.sha256Hex
       Repository = "kemiller2002/Indy-init"
-      // The source commit is informational: preflight compares content, so a later commit with unchanged sources passes.
       Commit = commit }
+
+/// The frozen sources of a package, read from an Indy-init checkout's working tree.
+let sourcesOf (source: string) (package: string) : Sources =
+    let read (rel: string) = let f = Path.Combine(source, rel) in if File.Exists f then Some(File.ReadAllBytes f) else None
+    sourcesFrom read package (match Git.headCommit source with Ok c -> c | Error _ -> "")
+
+/// The frozen sources of a package as committed at `commit` of the checkout (never the working tree): how a historical
+/// scope is judged against the sources it was compiled from after a later source (a re-ratified catalog) moved on.
+let sourcesAt (source: string) (commit: string) (package: string) : Sources =
+    let read (rel: string) = match Git.showFile source commit rel with Ok b -> Some b | Error _ -> None
+    sourcesFrom read package commit
+
+/// The sources a command reads: the working tree, or, with --source-commit SHA, that commit of the checkout.
+let private sourcesFor (o: Map<string, string>) =
+    match o.TryFind "--source-commit" with
+    | Some c -> sourcesAt o["--source"] c o["--package"]
+    | None -> sourcesOf o["--source"] o["--package"]
 
 let private verdictJson (name: string) (refusals: Refusal list) =
     JObj [ "schema", JStr "indy-init.scope-verdict/1"; "check", JStr name; "verdict", JStr(if refusals.IsEmpty then "PASS" else "REFUSED"); "refusals", JArr(refusals |> List.map refusalJson) ]
@@ -54,7 +77,7 @@ let private finish (name: string) (refusals: Refusal list) =
 
 let private preflightAll (o: Map<string, string>) =
     let manifest = parseFile o["--manifest"]
-    let sources = sourcesOf o["--source"] o["--package"]
+    let sources = sourcesFor o
     // The selector semantics the manifest was compiled with, from what it records (Scope.recordedSemantics): Legacy
     // only for a scope of a package up to v4.1.5, so the historical Rehearsal 010 records are judged as compiled.
     let semantics = recordedSemantics manifest
@@ -83,10 +106,10 @@ let scopeCommand (args: string list) : int =
     | "compile" :: rest ->
         let o = options rest
         match o.TryFind "--source", o.TryFind "--package", o.TryFind "--out" with
-        | Some s, Some p, Some out ->
+        | Some _, Some _, Some out ->
             // --split PLAN: a successor scope (a split plan applied); the approved scope is compiled without it.
             // The selector semantics follow the package version, as preflight reads them back from the manifest.
-            let sources = sourcesOf s p
+            let sources = sourcesFor o
             let semantics = semanticsOfSources sources
             let compiled =
                 match o.TryFind "--split" with
