@@ -5,6 +5,6 @@
   "type": "module",
   "dependencies": {
     "@echelon-foundry/limen": "0.9.1",
-    "@echelon-foundry/design-system": "https://github.com/kemiller2002/echelon-design-system/releases/download/v0.10.0/echelon-foundry-design-system-0.10.0.tgz"
+    "@echelon-foundry/design-system": "https://github.com/kemiller2002/forma/releases/download/v0.10.0/echelon-foundry-design-system-0.10.0.tgz"
   }
 }
